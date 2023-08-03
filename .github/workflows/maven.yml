@@ -14,14 +14,14 @@ on:
   pull_request:
     branches: [ "main", "develop" ]
 
- 
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
-      
+
     - uses: actions/checkout@v3
     - name: Set up JDK 17
       uses: actions/setup-java@v3
@@ -47,9 +47,8 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         script: | 
           docker pull starthelm/start-helm:latest && 
-          docker stop start-helm || true && 
-          docker rm start-helm || true && 
-          docker run starthelm/start-helm:latest -e SPRING_PROFILES_ACTIVE=prod
+          docker rm -f start-helm || true &&  
+          docker run -e "SPRING_PROFILES_ACTIVE=prod" --name start-helm --restart always starthelm/start-helm:latest
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
