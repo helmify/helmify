@@ -45,7 +45,11 @@ jobs:
         username: ${{ secrets.DEPLOY_USERNAME }}
         key: ${{ secrets.DEPLOY_KEY }}
         port: ${{ secrets.DEPLOY_PORT }}
-        script: whoami
+        script: | 
+          docker pull starthelm/start-helm:latest && 
+          docker stop start-helm > /dev/null && 
+          docker rm start-helm > /dev/null && 
+          docker run starthelm/start-helm:latest -e SPRING_PROFILES_ACTIVE=prod
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
