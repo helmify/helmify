@@ -47,7 +47,7 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         script: | 
           docker pull starthelm/start-helm:latest && 
-          curl https://raw.githubusercontent.com/psalg-dev/start-helm/develop/docker-compose.yml || true &&
+          wget https://raw.githubusercontent.com/psalg-dev/start-helm/develop/docker-compose.yml &&
           docker compose up -d --force-recreate
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
