@@ -48,9 +48,9 @@ jobs:
         script: | 
           docker pull starthelm/start-helm:latest && 
           docker rm -f start-helm || true &&  
-          docker run -e "SPRING_PROFILES_ACTIVE=prod" /
-          -e "TZ=Europe/Berlin"
-          -p 80:80 --network host --name start-helm /
+          docker run -e "SPRING_PROFILES_ACTIVE=prod" \
+          -e "TZ=Europe/Berlin" \
+          -p 80:80 --network host --name start-helm \
           --restart always starthelm/start-helm:latest
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
