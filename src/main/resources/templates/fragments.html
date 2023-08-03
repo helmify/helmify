@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<div th:fragment="pom-upload-form">
+    <div id="pom-form-container">
+        <form id="pom-form"
+              hx-encoding="multipart/form-data"
+              hx-post="/upload-pom"
+              method="post">
+            <div >
+                <input type="file" name="pom" accept="application/xml" class="form-control-file">
+                <button
+                        class="button outline primary"
+                        hx-trigger="click"
+                        hx-target="#pom-upload-message"
+                        style="margin: 20px 0 30px 0"
+                >Upload Maven POM
+                </button>
+            </div>
+        </form>
+        <div id="pom-upload-message" hx-swap-oob="true">
+            <p th:if="${message != null}" th:text="'Server says: ' + ${message} " />
+        </div>
+
+    </div>
+</div>
+</html>
