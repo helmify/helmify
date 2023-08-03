@@ -1,0 +1,9 @@
+services:
+  start-helm:
+    image: starthelm/start-helm:latest
+    container_name: start-helm
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      TZ: "Europe/Berlin"
+    ports:
+      - "80:80"
