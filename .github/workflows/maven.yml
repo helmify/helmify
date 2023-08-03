@@ -47,8 +47,8 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         script: | 
           docker pull starthelm/start-helm:latest && 
-          docker stop start-helm > /dev/null && 
-          docker rm start-helm > /dev/null && 
+          docker stop start-helm || true && 
+          docker rm start-helm || true && 
           docker run starthelm/start-helm:latest -e SPRING_PROFILES_ACTIVE=prod
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
