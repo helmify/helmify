@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StartHelmAppTests {
+public class StartHelmAppTests {
 
 	WebClient webClient;
 
