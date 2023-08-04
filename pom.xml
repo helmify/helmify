@@ -16,6 +16,7 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<htmx.org.version>1.6.0</htmx.org.version>
 		<htmlunit.version>2.70.0</htmlunit.version>
+		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -75,7 +76,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.1.2</version>
+				<version>${maven-surefire-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
