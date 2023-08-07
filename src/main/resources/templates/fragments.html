@@ -7,21 +7,36 @@
               hx-encoding="multipart/form-data"
               hx-post="/upload-pom"
               method="post">
-            <div >
-                <input type="file" name="pom" accept="application/xml" class="form-control-file">
-                <button
-                        class="button outline primary"
-                        hx-trigger="click"
-                        hx-target="#pom-upload-message"
-                        style="margin: 20px 0 30px 0"
-                >Upload Maven POM
-                </button>
+            <div class="row">
+
+                <label class="button primary outline col card-label" for="upload-input">
+                    1. Upload Maven POM
+                </label>
+                <label class="button secondary outline col card-label">
+                    2. Provide Metadata
+                </label>
+                <label class="button default outline col card-label">
+                    3. Profit
+                </label>
+
+                <input id="upload-input"
+                       type="file"
+                       name="pom"
+                       accept="application/xml"
+                       class="form-control-file"
+                       style="display: none;"
+                       onchange="this.form.requestSubmit()"
+                >
+
             </div>
         </form>
         <div id="pom-upload-message" hx-swap-oob="true">
             <p th:if="${message != null}" th:text="'Server says: ' + ${message} " />
-        </div>
 
+            <p th:if="${dependencies != null}" th:text="'Dependencies: ' + ${dependencies} " />
+
+            <p th:if="${error != null}" th:text="'Server says Error: ' + ${error} " />
+        </div>
     </div>
 </div>
 </html>
