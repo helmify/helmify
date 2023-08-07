@@ -1,4 +1,4 @@
-package com.start.helm;
+package com.start.helm.domain;
 
 
 import org.springframework.stereotype.Controller;

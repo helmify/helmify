@@ -1,3 +1,10 @@
 spring:
   application:
     name: start-helm
+  devtools:
+    restart:
+      additional-paths: src/main/resources/static
+
+logging:
+  level:
+    web: DEBUG
