@@ -14,6 +14,13 @@ public class HelmContext {
   private boolean createIngress = false;
 
   @Getter
+  @Setter
+  private String appName;
+  @Getter
+  @Setter
+  private String appVersion;
+
+  @Getter
   private final Set<HelmDependency> helmDependencies = new HashSet<>();
 
   public void addHelmDependency(HelmDependency helmDependency) {
