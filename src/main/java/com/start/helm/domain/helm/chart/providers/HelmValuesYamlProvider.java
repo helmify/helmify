@@ -16,7 +16,7 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
   @Override
   public String getFileContent(HelmContext context) {
     return yaml.dumpAsMap(
-        HelmValues.getDefaultHelmValues()
+        HelmValues.getDefaultHelmValues(context)
     );
   }
 }

@@ -1,4 +1,4 @@
-package com.start.helm.domain.artifacthub;
+package com.start.helm.domain.dependency.artifacthub;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

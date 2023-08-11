@@ -1,9 +1,10 @@
 package com.start.helm.domain.helm;
 
 
+import java.util.List;
 import java.util.Objects;
 
-public record HelmDependency(String name, String version, String repository, String... tags){
+public record HelmDependency(String name, String version, String repository, List<String> tags){
   @Override
   public boolean equals(Object o) {
     if (this == o) {
