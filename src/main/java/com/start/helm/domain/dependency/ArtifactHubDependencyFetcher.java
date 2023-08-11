@@ -1,6 +1,6 @@
 package com.start.helm.domain.dependency;
 
-import com.start.helm.domain.artifacthub.ArtifactHubResponse;
+import com.start.helm.domain.dependency.artifacthub.ArtifactHubResponse;
 import com.start.helm.domain.helm.HelmDependency;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class ArtifactHubDependencyFetcher implements DependencyFetcher {
         .orElse(List.of())
         .stream()
         .filter(p -> p.repository().verifiedPublisher()).findFirst()
-        .map(p -> new HelmDependency(p.name(), p.version(), p.repository().url()));
+        .map(p -> new HelmDependency(p.name(), p.version(), p.repository().url(), List.of()));
   }
 
 }

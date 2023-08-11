@@ -1,5 +1,6 @@
 package com.start.helm.domain.helm.chart.model;
 
+import com.start.helm.domain.helm.HelmContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,13 +43,13 @@ public class HelmValues {
   private List<?> tolerations;
   private Map<String, Object> affinity;
 
-  public static HelmValues getDefaultHelmValues() {
+  public static HelmValues getDefaultHelmValues(HelmContext context) {
     return HelmValues.builder()
         .replicaCount(1)
         .image(new HelmValuesImage())
         .imagePullSecrets(new ArrayList<>())
         .nameOverride("")
-        .fullnameOverride("")
+        .fullnameOverride(context.getAppName())
         .serviceAccount(new HelmValuesServiceAccount())
         .podAnnotations(new HashMap<>())
         .podSecurityContext(new HashMap<>())

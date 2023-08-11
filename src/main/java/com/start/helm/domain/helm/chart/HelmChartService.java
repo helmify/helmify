@@ -1,6 +1,8 @@
 package com.start.helm.domain.helm.chart;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.helm.chart.customizers.ChartYamlCustomizer;
+import com.start.helm.domain.helm.chart.customizers.DeploymentYamlCustomizer;
 import com.start.helm.domain.helm.chart.providers.HelmChartYamlProvider;
 import com.start.helm.domain.helm.chart.providers.HelmDeploymentYamlProvider;
 import com.start.helm.domain.helm.chart.providers.HelmHelperProvider;
@@ -107,13 +109,14 @@ public class HelmChartService {
     HelmChartModel model = new HelmChartModel();
 
     model.context = context;
-    model.chartYaml = helmChartYamlProvider.getFileContent(context);
+
+    model.chartYaml = new ChartYamlCustomizer(context).apply(helmChartYamlProvider.getFileContent(context));
     model.valuesYaml = valuesYamlProvider.getFileContent(context);
     model.serviceYaml = serviceYamlProvider.getFileContent(context);
     model.serviceAccountYaml = serviceAccountYamlProvider.getFileContent(context);
     model.ingressYaml = ingressYamlProvider.getFileContent(context);
     model.hpaYaml = hpaProvider.getFileContent(context);
-    model.deploymentYaml = deploymentProvider.getFileContent(context);
+    model.deploymentYaml = new DeploymentYamlCustomizer().customize(deploymentProvider.getFileContent(context), context);
     model.helperTpl = helperProvider.getFileContent(context);
     model.notes = notesProvider.getFileContent(context);
     model.ignore = ignoreProvider.getFileContent(context);

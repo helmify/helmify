@@ -19,12 +19,22 @@ public class HelmContext {
   @Getter
   @Setter
   private String appVersion;
+  @Getter
+  @Setter
+  private FrameworkVendor frameworkVendor = FrameworkVendor.Spring;
 
   @Getter
   private final Set<HelmDependency> helmDependencies = new HashSet<>();
 
   public void addHelmDependency(HelmDependency helmDependency) {
     this.helmDependencies.add(helmDependency);
+  }
+
+  public enum FrameworkVendor {
+    Spring
+    //Quarkus
+    //Micronaut
+    //...
   }
 
 }
