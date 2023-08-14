@@ -8,6 +8,8 @@ import lombok.ToString;
 
 /**
  * Processing Context for new Helm Chart.
+ * <p>
+ * Here we prepare "things to do".
  * */
 @ToString
 public class HelmContext {

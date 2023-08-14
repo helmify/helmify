@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 public class SpringBootStarterWebResolver implements DependencyResoler {
 
   @Override
+  public String dependencyName() {
+    return "web";
+  }
+
+  @Override
   public List<String> matchOn() {
     return List.of("spring-boot-starter-web", "spring-boot-starter-webflux", "spring-boot-starter-graphql");
   }

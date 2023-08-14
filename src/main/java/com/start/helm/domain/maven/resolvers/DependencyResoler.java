@@ -15,5 +15,6 @@ public interface DependencyResoler {
 
     Optional<HelmChartFragment> resolveDependency(HelmContext context);
 
+    String dependencyName();
 
   }

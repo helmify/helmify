@@ -15,6 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringBootStarterAmqpResolver implements DependencyResoler {
 
+  @Override
+  public String dependencyName() {
+    return "rabbitmq";
+  }
 
   @Override
   public List<String> matchOn() {
@@ -35,8 +39,7 @@ public class SpringBootStarterAmqpResolver implements DependencyResoler {
     fragment.setValuesEntries(getValuesEntries());
     fragment.setSecretEntries(getSecretEntries());
 
-    String dependencyName = "rabbitmq";
-    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName(), dependencyName);
+    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName(), dependencyName());
 
     fragment.setInitContainer(Map.of(
         "name", name,
@@ -57,7 +60,7 @@ public class SpringBootStarterAmqpResolver implements DependencyResoler {
                     sleep 2;
                 done;
                 echo '%s OK ✓'
-                """.formatted(dependencyName, dependencyName, dependencyName, dependencyName)
+                """.formatted(dependencyName(), dependencyName(), dependencyName(), dependencyName())
         ),
         "resources", Map.of(
             "requests", Map.of(
@@ -82,12 +85,14 @@ public class SpringBootStarterAmqpResolver implements DependencyResoler {
   }
 
   private Map<String, Object> getValuesEntries() {
-    return Map.of("rabbitmq",
+    return Map.of(
+        "rabbitmq",
         Map.of("enabled", true,
             "port", 5672,
-            "virtual-host", "/",
+            "vhost", "/",
             "auth", Map.of("username", "guest", "password", "guest")
-        )
+        ),
+        "global", Map.of("hosts", Map.of("rabbitmq", "rabbitmq"), "ports", Map.of("rabbitmq", 5672))
     );
   }
 
@@ -103,7 +108,7 @@ public class SpringBootStarterAmqpResolver implements DependencyResoler {
     return Map.of(
         "spring.rabbitmq.host", "{{ .Values.global.hosts.rabbitmq }}",
         "spring.rabbitmq.port", "{{ .Values.rabbitmq.port }}",
-        "spring.rabbitmq.virtual-host", "{{ .Values.rabbitmq.virtual-host }}"
+        "spring.rabbitmq.virtual-host", "{{ .Values.rabbitmq.vhost }}"
     );
   }
 
