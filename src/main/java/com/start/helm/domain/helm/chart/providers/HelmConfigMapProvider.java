@@ -37,11 +37,7 @@ public class HelmConfigMapProvider implements HelmFileProvider {
     StringBuffer patch = new StringBuffer();
 
 
-    fragments.forEach(f -> {
-      f.getDefaultConfig().forEach((k, v) -> {
-        patch.append(k).append("=").append(v).append("\n");
-      });
-    });
+    fragments.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
 
     return TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4);
   }
