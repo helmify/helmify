@@ -77,4 +77,9 @@ public class HelmIngressYamlProvider implements HelmFileProvider {
     return String.format(template, context.getAppName(), context.getAppName());
   }
 
+  @Override
+  public String getFileName() {
+    return "templates/ingress.yaml";
+  }
+
 }

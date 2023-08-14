@@ -37,5 +37,8 @@ public class HelmNotesProvider implements HelmFileProvider{
   public String getFileContent(HelmContext context) {
     return template.replace("REPLACEME", context.getAppName());
   }
-
+  @Override
+  public String getFileName() {
+    return "templates/NOTES.txt";
+  }
 }

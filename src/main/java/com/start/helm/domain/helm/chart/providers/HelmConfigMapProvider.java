@@ -46,4 +46,9 @@ public class HelmConfigMapProvider implements HelmFileProvider {
     return TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4);
   }
 
+  @Override
+  public String getFileName() {
+    return "templates/configmap.yaml";
+  }
+
 }

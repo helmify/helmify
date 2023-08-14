@@ -1,14 +1,11 @@
 package com.start.helm.domain.maven;
 
-import com.start.helm.domain.dependency.DependencyFetcher;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.resolvers.DependencyResoler;
-import com.start.helm.domain.maven.resolvers.SpringBootStarterAmqpResolver;
-import com.start.helm.domain.maven.resolvers.SpringBootStarterWebResolver;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
@@ -16,19 +13,10 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MavenModelProcessor {
 
-  private final DependencyFetcher dependencyFetcher;
-
-  private final List<DependencyResoler> dependencyMatchers = new ArrayList<>();
-
-  public MavenModelProcessor(DependencyFetcher dependencyFetcher) {
-    this.dependencyFetcher = dependencyFetcher;
-    this.dependencyMatchers.addAll(List.of(
-        new SpringBootStarterWebResolver(),
-        new SpringBootStarterAmqpResolver()
-    ));
-  }
+  private final List<DependencyResoler> dependencyMatchers;
 
   public HelmContext process(Model m) {
     List<Dependency> dependencies = m.getDependencies();

@@ -78,4 +78,9 @@ public class HelmHelperProvider implements HelmFileProvider{
     return template.replace("REPLACEME", context.getAppName());
   }
 
+  @Override
+  public String getFileName() {
+    return "templates/_helpers.tpl";
+  }
+
 }

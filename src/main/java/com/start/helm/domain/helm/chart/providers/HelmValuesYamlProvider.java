@@ -1,6 +1,5 @@
 package com.start.helm.domain.helm.chart.providers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.model.HelmValues;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +17,10 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
     return yaml.dumpAsMap(
         HelmValues.getDefaultHelmValues(context)
     );
+  }
+
+  @Override
+  public String getFileName() {
+    return "values.yaml";
   }
 }

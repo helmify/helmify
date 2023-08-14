@@ -4,7 +4,9 @@ import com.start.helm.domain.helm.HelmChartFragment;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SpringBootStarterWebResolver implements DependencyResoler {
 
   @Override

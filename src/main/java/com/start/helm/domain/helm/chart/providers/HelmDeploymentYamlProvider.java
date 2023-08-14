@@ -63,6 +63,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
                   httpGet:
                     path: /
                     port: http
+                # allow for graceful shutdown
                 lifecycle:
                   preStop:
                     exec:
@@ -97,6 +98,11 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   public String getFileContent(HelmContext context) {
     String filledTemplate = template.replace("REPLACEME", context.getAppName());
     return customize(filledTemplate, context);
+  }
+
+  @Override
+  public String getFileName() {
+    return "templates/deployment.yaml";
   }
 
   private String customize(String content, HelmContext context) {
