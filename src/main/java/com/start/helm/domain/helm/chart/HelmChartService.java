@@ -1,9 +1,8 @@
 package com.start.helm.domain.helm.chart;
 
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.helm.chart.customizers.ChartYamlCustomizer;
-import com.start.helm.domain.helm.chart.customizers.DeploymentYamlCustomizer;
 import com.start.helm.domain.helm.chart.providers.HelmChartYamlProvider;
+import com.start.helm.domain.helm.chart.providers.HelmConfigMapProvider;
 import com.start.helm.domain.helm.chart.providers.HelmDeploymentYamlProvider;
 import com.start.helm.domain.helm.chart.providers.HelmHelperProvider;
 import com.start.helm.domain.helm.chart.providers.HelmHpaYamlProvider;
@@ -15,7 +14,6 @@ import com.start.helm.domain.helm.chart.providers.HelmServiceYamlProvider;
 import com.start.helm.domain.helm.chart.providers.HelmValuesYamlProvider;
 import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Service for generating helm charts based on input
- * */
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -40,9 +38,10 @@ public class HelmChartService {
   private final HelmHelperProvider helperProvider;
   private final HelmNotesProvider notesProvider;
   private final HelmIgnoreProvider ignoreProvider;
+  private final HelmConfigMapProvider configMapProvider;
 
   @SneakyThrows
-  private void writeZip(HelmChartModel model){
+  private void writeZip(HelmChartModel model) {
     FileOutputStream fileOutputStream = new FileOutputStream("helm.zip");
     ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 
@@ -100,6 +99,12 @@ public class HelmChartService {
     zipOutputStream.write(model.notes.getBytes());
     zipOutputStream.closeEntry();
 
+    zipEntry = new ZipEntry("templates/configmap.yaml");
+    zipOutputStream.putNextEntry(zipEntry);
+    zipOutputStream.write(model.configMap.getBytes());
+    zipOutputStream.closeEntry();
+
+
     zipOutputStream.close();
     fileOutputStream.close();
 
@@ -110,17 +115,17 @@ public class HelmChartService {
 
     model.context = context;
 
-    model.chartYaml = new ChartYamlCustomizer(context).apply(helmChartYamlProvider.getFileContent(context));
+    model.chartYaml = helmChartYamlProvider.getFileContent(context);
     model.valuesYaml = valuesYamlProvider.getFileContent(context);
     model.serviceYaml = serviceYamlProvider.getFileContent(context);
     model.serviceAccountYaml = serviceAccountYamlProvider.getFileContent(context);
     model.ingressYaml = ingressYamlProvider.getFileContent(context);
     model.hpaYaml = hpaProvider.getFileContent(context);
-    model.deploymentYaml = new DeploymentYamlCustomizer().customize(deploymentProvider.getFileContent(context), context);
+    model.deploymentYaml = deploymentProvider.getFileContent(context);
     model.helperTpl = helperProvider.getFileContent(context);
     model.notes = notesProvider.getFileContent(context);
     model.ignore = ignoreProvider.getFileContent(context);
-
+    model.configMap = configMapProvider.getFileContent(context);
 
     log.info("Chart.yaml: {}", model.chartYaml);
     log.info("values.yaml: {}", model.valuesYaml);
@@ -132,6 +137,7 @@ public class HelmChartService {
     log.info("helper.tpl: {}", model.helperTpl);
     log.info("notes.txt: {}", model.notes);
     log.info(".helmignore: {}", model.ignore);
+    log.info("configmap.yaml: {}", model.configMap);
 
     writeZip(model);
 
@@ -150,6 +156,7 @@ public class HelmChartService {
     String helperTpl;
     String notes;
     String ignore;
+    String configMap;
   }
 
 

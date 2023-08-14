@@ -1,7 +1,9 @@
 package com.start.helm.domain.maven.resolvers;
 
+import com.start.helm.domain.helm.HelmChartFragment;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
+import java.util.Optional;
 
 public class SpringBootStarterWebResolver implements DependencyResoler {
 
@@ -11,7 +13,8 @@ public class SpringBootStarterWebResolver implements DependencyResoler {
   }
 
   @Override
-  public void updateHelmContext(HelmContext context) {
+  public Optional<HelmChartFragment> resolveDependency(HelmContext context) {
     context.setCreateIngress(true);
+    return Optional.empty();
   }
 }

@@ -2,9 +2,12 @@ package com.start.helm.domain.helm.chart.providers;
 
 import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
 
+import com.start.helm.app.config.YamlConfig;
 import com.start.helm.domain.helm.HelmContext;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 @Component
 @RequiredArgsConstructor
@@ -14,16 +17,16 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
       apiVersion: apps/v1
       kind: Deployment
       metadata:
-        name: {{ include "%s.fullname" . }}
+        name: {{ include "REPLACEME.fullname" . }}
         labels:
-          {{- include "%s.labels" . | nindent 4 }}
+          {{- include "REPLACEME.labels" . | nindent 4 }}
       spec:
         {{- if not .Values.autoscaling.enabled }}
         replicas: {{ .Values.replicaCount }}
         {{- end }}
         selector:
           matchLabels:
-            {{- include "%s.selectorLabels" . | nindent 6 }}
+            {{- include "REPLACEME.selectorLabels" . | nindent 6 }}
         template:
           metadata:
             {{- with .Values.podAnnotations }}
@@ -31,13 +34,13 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
               {{- toYaml . | nindent 8 }}
             {{- end }}
             labels:
-              {{- include "%s.selectorLabels" . | nindent 8 }}
+              {{- include "REPLACEME.selectorLabels" . | nindent 8 }}
           spec:
             {{- with .Values.imagePullSecrets }}
             imagePullSecrets:
               {{- toYaml . | nindent 8 }}
             {{- end }}
-            serviceAccountName: {{ include "%s.serviceAccountName" . }}
+            serviceAccountName: {{ include "REPLACEME.serviceAccountName" . }}
             securityContext:
               {{- toYaml .Values.podSecurityContext | nindent 8 }}
       ###@helm-start:initcontainers
@@ -60,8 +63,22 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
                   httpGet:
                     path: /
                     port: http
+                lifecycle:
+                  preStop:
+                    exec:
+                      command: ["sh", "-c", "sleep 10"]
+                volumeMounts:
+                  - name: {{ include "REPLACEME.fullname" . }}-config-vol
+                    mountPath: /config/application.properties
+                    subPath: application.properties
                 resources:
                   {{- toYaml .Values.resources | nindent 12 }}
+            volumes:
+              - name: {{ include "REPLACEME.fullname" . }}-config-vol
+                projected:
+                  sources:
+                    - configMap:
+                        name: {{ include "REPLACEME.fullname" . }}-config
             {{- with .Values.nodeSelector }}
             nodeSelector:
               {{- toYaml . | nindent 8 }}
@@ -78,8 +95,33 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
   @Override
   public String getFileContent(HelmContext context) {
-    return String.format(template, context.getAppName(), context.getAppName(), context.getAppName(),
-        context.getAppName(), context.getAppName());
+    String filledTemplate = template.replace("REPLACEME", context.getAppName());
+    return customize(filledTemplate, context);
+  }
+
+  private String customize(String content, HelmContext context) {
+    final String withInitContainers = injectInitContainers(content, context);
+    return injectEnvVars(withInitContainers, context);
+  }
+
+  private static String injectInitContainers(String content, HelmContext context) {
+    StringBuffer buffer = new StringBuffer();
+    Yaml yaml = YamlConfig.getInstance();
+    context.getHelmChartFragments().forEach(f -> buffer.append(yaml.dump(List.of(f.getInitContainer()))).append("\n"));
+    String withInitContainer = insertAfter(content, "###@helm-start:initcontainers", buffer.toString(), 6);
+    return insertAfter(withInitContainer, "###@helm-start:initcontainers", "initContainers:\n", 6)
+        .replace("'\"", "\"")
+        .replace("\"'", "\"");
+  }
+
+  private static String injectEnvVars(String content, HelmContext context) {
+    StringBuffer buffer = new StringBuffer();
+    Yaml yaml = YamlConfig.getInstance();
+    context.getHelmChartFragments().forEach(f -> buffer.append(yaml.dump(f.getEnvironmentEntries())).append("\n"));
+    String withEnvVars = insertAfter(content, "###@helm-start:envblock", buffer.toString(), 10);
+    return insertAfter(withEnvVars, "###@helm-start:envblock", "env:\n", 10)
+        .replace("'{{", "{{")
+        .replace("}}'", "}}");
   }
 
 }
