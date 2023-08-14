@@ -2,20 +2,18 @@ package com.start.helm.domain.maven.resolvers;
 
 import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
-import com.start.helm.domain.dependency.DependencyFetcher;
 import com.start.helm.domain.helm.HelmChartFragment;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.HelmDependency;
-import com.start.helm.domain.helm.chart.model.InitContainer;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-public
-class SpringBootStarterAmqpResolver implements DependencyResoler {
+@Component
+public class SpringBootStarterAmqpResolver implements DependencyResoler {
 
 
   @Override
@@ -35,10 +33,10 @@ class SpringBootStarterAmqpResolver implements DependencyResoler {
     fragment.setDefaultConfig(getDefaultConfig());
     fragment.setPreferredChart(getPreferredChart());
     fragment.setValuesEntries(getValuesEntries());
-
+    fragment.setSecretEntries(getSecretEntries());
 
     String dependencyName = "rabbitmq";
-    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName() , dependencyName);
+    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName(), dependencyName);
 
     fragment.setInitContainer(Map.of(
         "name", name,
@@ -50,16 +48,16 @@ class SpringBootStarterAmqpResolver implements DependencyResoler {
             "runAsGroup", 1000,
             "runAsNonRoot", true
         ),
-        "command",  List.of(
+        "command", List.of(
             "sh",
             "-c",
             """
-            echo 'Waiting for %s to become ready...'
-            until printf "." && nc -z -w 2 {{ .Values.global.hosts.%s }} {{ .Values.global.ports.%s }}; do
-                sleep 2;
-            done;
-            echo '%s OK ✓'
-            """.formatted(dependencyName, dependencyName, dependencyName, dependencyName)
+                echo 'Waiting for %s to become ready...'
+                until printf "." && nc -z -w 2 {{ .Values.global.hosts.%s }} {{ .Values.global.ports.%s }}; do
+                    sleep 2;
+                done;
+                echo '%s OK ✓'
+                """.formatted(dependencyName, dependencyName, dependencyName, dependencyName)
         ),
         "resources", Map.of(
             "requests", Map.of(
@@ -76,11 +74,20 @@ class SpringBootStarterAmqpResolver implements DependencyResoler {
     return Optional.of(fragment);
   }
 
+  private static Map<String, Object> getSecretEntries() {
+    return Map.of(
+        "rabbitmq-username", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
+        , "rabbitmq-password", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
+    );
+  }
+
   private Map<String, Object> getValuesEntries() {
     return Map.of("rabbitmq",
-        Map.of( "enabled", true,
-                "port", 5672,
-                "virtual-host", "/")
+        Map.of("enabled", true,
+            "port", 5672,
+            "virtual-host", "/",
+            "auth", Map.of("username", "guest", "password", "guest")
+        )
     );
   }
 

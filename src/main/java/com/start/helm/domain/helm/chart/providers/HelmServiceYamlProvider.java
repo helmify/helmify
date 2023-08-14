@@ -37,4 +37,9 @@ public class HelmServiceYamlProvider implements HelmFileProvider{
     return String.format(template, context.getAppName(), context.getAppName(), context.getAppName());
   }
 
+  @Override
+  public String getFileName() {
+    return "templates/service.yaml";
+  }
+
 }

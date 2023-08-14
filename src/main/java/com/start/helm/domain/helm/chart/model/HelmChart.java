@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Model for Helm Chart.yaml
+ * */
 @Getter
 @Setter
 @Builder

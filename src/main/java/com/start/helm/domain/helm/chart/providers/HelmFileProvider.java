@@ -6,4 +6,6 @@ public interface HelmFileProvider {
 
   String getFileContent(HelmContext context);
 
+  String getFileName();
+
 }

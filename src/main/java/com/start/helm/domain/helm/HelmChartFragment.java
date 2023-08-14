@@ -1,12 +1,14 @@
 package com.start.helm.domain.helm;
 
-import com.start.helm.domain.helm.chart.model.InitContainer;
 import java.util.List;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Aggregation of sections touched by introducing a new dependency
+ * */
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -17,7 +19,7 @@ public class HelmChartFragment {
   private Map<String, String> preferredChart;
   private Map<String, Object> valuesEntries;
   private Map<String, Object> initContainer;
-
+  private Map<String, Object> secretEntries;
 
 
 }

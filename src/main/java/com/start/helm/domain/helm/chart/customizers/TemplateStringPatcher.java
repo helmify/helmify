@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Util class for patching in sections of text into a helm template file.
+ * */
 public class TemplateStringPatcher {
 
   public static int indexOfString(List<String> list, String string) {

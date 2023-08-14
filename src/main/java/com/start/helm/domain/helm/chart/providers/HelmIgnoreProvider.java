@@ -34,4 +34,9 @@ public class HelmIgnoreProvider implements HelmFileProvider {
   public String getFileContent(HelmContext context) {
     return template;
   }
+
+  @Override
+  public String getFileName() {
+    return ".helmignore";
+  }
 }

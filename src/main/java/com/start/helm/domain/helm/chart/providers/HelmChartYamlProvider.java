@@ -32,6 +32,11 @@ public class HelmChartYamlProvider implements HelmFileProvider {
     return customize(chart, context);
   }
 
+  @Override
+  public String getFileName() {
+    return "Chart.yaml";
+  }
+
   private String customize (HelmChart helmChart, HelmContext context) {
 
     if (helmChart.getDependencies() == null) {
