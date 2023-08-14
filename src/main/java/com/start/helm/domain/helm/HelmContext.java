@@ -1,6 +1,8 @@
 package com.start.helm.domain.helm;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +27,13 @@ public class HelmContext {
 
   @Getter
   private final Set<HelmDependency> helmDependencies = new HashSet<>();
+
+  @Getter
+  private Set<HelmChartFragment> helmChartFragments = new HashSet<>();
+
+  public void addHelmChartFragment(HelmChartFragment helmChartFragment) {
+    this.helmChartFragments.add(helmChartFragment);
+  }
 
   public void addHelmDependency(HelmDependency helmDependency) {
     this.helmDependencies.add(helmDependency);

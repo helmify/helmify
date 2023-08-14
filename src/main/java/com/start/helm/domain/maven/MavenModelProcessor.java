@@ -8,6 +8,7 @@ import com.start.helm.domain.maven.resolvers.SpringBootStarterWebResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
@@ -25,7 +26,7 @@ public class MavenModelProcessor {
     this.dependencyFetcher = dependencyFetcher;
     this.dependencyMatchers.addAll(List.of(
         new SpringBootStarterWebResolver(),
-        new SpringBootStarterAmqpResolver(this.dependencyFetcher)
+        new SpringBootStarterAmqpResolver()
     ));
   }
 
@@ -33,6 +34,9 @@ public class MavenModelProcessor {
     List<Dependency> dependencies = m.getDependencies();
 
     HelmContext context = new HelmContext();
+
+    context.setAppName(m.getArtifactId());
+    context.setAppVersion(m.getVersion());
 
     dependencies.stream()
         .filter(d -> !"test".equals(d.getScope()))
@@ -43,17 +47,15 @@ public class MavenModelProcessor {
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
-        .forEach(d -> d.updateHelmContext(context));
+        .map(d -> d.resolveDependency(context))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toSet())
+        .forEach(context::addHelmChartFragment);
 
     log.info("Helm context: {}", context);
     return context;
-
   }
-
-
-
-
-
 
 
 }
