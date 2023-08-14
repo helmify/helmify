@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class SpringBootStarterAmqpResolver implements DependencyResoler {
+public class SpringBootStarterAmqpResolver implements DependencyResolver {
 
   @Override
   public String dependencyName() {

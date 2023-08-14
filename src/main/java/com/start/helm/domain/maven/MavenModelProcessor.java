@@ -1,7 +1,7 @@
 package com.start.helm.domain.maven;
 
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.maven.resolvers.DependencyResoler;
+import com.start.helm.domain.maven.resolvers.DependencyResolver;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MavenModelProcessor {
 
-  private final List<DependencyResoler> dependencyMatchers;
+  private final List<DependencyResolver> dependencyMatchers;
 
   public HelmContext process(Model m) {
     List<Dependency> dependencies = m.getDependencies();

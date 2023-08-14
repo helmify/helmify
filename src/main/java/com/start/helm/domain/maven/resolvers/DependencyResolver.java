@@ -5,7 +5,7 @@ import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
 import java.util.Optional;
 
-public interface DependencyResoler {
+public interface DependencyResolver {
 
     List<String> matchOn();
 
