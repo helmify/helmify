@@ -2,12 +2,24 @@ package com.start.helm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class StartHelmApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(StartHelmApp.class, args);
-	}
+  public static void main(String[] args) {
+
+    ConfigurableApplicationContext run = SpringApplication.run(StartHelmApp.class, args);
+    Integer port = run.getEnvironment().getProperty("server.port", Integer.class, 8080);
+    print(port);
+  }
+
+  private static void print(int port) {
+    System.out.println("=============================================================");
+    System.out.println();
+    System.out.println("\t start at http://localhost:" + port + "/");
+    System.out.println();
+    System.out.println("=============================================================");
+  }
 
 }

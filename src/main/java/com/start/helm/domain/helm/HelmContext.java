@@ -1,6 +1,9 @@
 package com.start.helm.domain.helm;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +13,7 @@ import lombok.ToString;
  * Processing Context for new Helm Chart.
  * <p>
  * Here we prepare "things to do".
- * */
+ */
 @ToString
 public class HelmContext {
 
@@ -33,6 +36,13 @@ public class HelmContext {
 
   @Getter
   private final Set<HelmChartFragment> helmChartFragments = new HashSet<>();
+
+  @Getter
+  private final List<Map<String, Object>> valuesGlobalBlocks = new ArrayList<>();
+
+  public void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
+    this.valuesGlobalBlocks.add(valuesGlobalBlock);
+  }
 
   public void addHelmChartFragment(HelmChartFragment helmChartFragment) {
     this.helmChartFragments.add(helmChartFragment);

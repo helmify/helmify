@@ -4,7 +4,6 @@ import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
 import com.start.helm.domain.helm.HelmChartFragment;
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.helm.HelmDependency;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class SpringBootStarterAmqpResolver implements DependencyResolver {
+public class RabbitmqDependencyResolver implements DependencyResolver {
 
   @Override
   public String dependencyName() {
@@ -27,10 +26,6 @@ public class SpringBootStarterAmqpResolver implements DependencyResolver {
 
   @Override
   public Optional<HelmChartFragment> resolveDependency(HelmContext context) {
-    Map<String, String> preferredChart = getPreferredChart();
-    context.addHelmDependency(
-        new HelmDependency(preferredChart.get("name"), preferredChart.get("version"), preferredChart.get("repository"),
-            List.of()));
 
     HelmChartFragment fragment = new HelmChartFragment();
     fragment.setEnvironmentEntries(getEnvironmentEntries(context));
@@ -38,41 +33,7 @@ public class SpringBootStarterAmqpResolver implements DependencyResolver {
     fragment.setPreferredChart(getPreferredChart());
     fragment.setValuesEntries(getValuesEntries());
     fragment.setSecretEntries(getSecretEntries());
-
-    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName(), dependencyName());
-
-    fragment.setInitContainer(Map.of(
-        "name", name,
-        "image", "docker.io/busybox:stable",
-        "imagePullPolicy", "Always",
-        "securityContext", Map.of(
-            "allowPrivilegeEscalation", false,
-            "runAsUser", 1000,
-            "runAsGroup", 1000,
-            "runAsNonRoot", true
-        ),
-        "command", List.of(
-            "sh",
-            "-c",
-            """
-                echo 'Waiting for %s to become ready...'
-                until printf "." && nc -z -w 2 {{ .Values.global.hosts.%s }} {{ .Values.global.ports.%s }}; do
-                    sleep 2;
-                done;
-                echo '%s OK ✓'
-                """.formatted(dependencyName(), dependencyName(), dependencyName(), dependencyName())
-        ),
-        "resources", Map.of(
-            "requests", Map.of(
-                "cpu", "20m",
-                "memory", "32Mi"
-            ),
-            "limits", Map.of(
-                "cpu", "20m",
-                "memory", "32Mi"
-            )
-        )
-    ));
+    fragment.setInitContainer(initContainer(context));
 
     return Optional.of(fragment);
   }
@@ -107,7 +68,7 @@ public class SpringBootStarterAmqpResolver implements DependencyResolver {
   private Map<String, String> getDefaultConfig() {
     return Map.of(
         "spring.rabbitmq.host", "{{ .Values.global.hosts.rabbitmq }}",
-        "spring.rabbitmq.port", "{{ .Values.rabbitmq.port }}",
+        "spring.rabbitmq.port", "{{ .Values.global.ports.rabbitmq }}",
         "spring.rabbitmq.virtual-host", "{{ .Values.rabbitmq.vhost }}"
     );
   }
