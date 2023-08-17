@@ -34,7 +34,7 @@ public class HelmChartService {
     providers.forEach(p -> {
       String fileContent = p.getFileContent(context);
       String fileName = p.getFileName();
-      log.info("Adding File {} with content {}", fileName, fileContent);
+      log.info("Adding File {} with content:\r\n{}", fileName, fileContent);
       addZipEntry(fileName, fileContent, zipOutputStream);
     });
 
