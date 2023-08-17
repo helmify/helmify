@@ -8,6 +8,8 @@ import lombok.Setter;
 
 /**
  * Aggregation of sections touched by introducing a new dependency
+ * <p>
+ * Helm-Dependency-specific changes to the Helm Chart are collected here.
  * */
 @Getter
 @Setter

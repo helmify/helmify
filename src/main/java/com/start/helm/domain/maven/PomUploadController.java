@@ -1,12 +1,12 @@
 package com.start.helm.domain.maven;
 
+import static com.start.helm.domain.maven.MavenModelParser.parsePom;
+
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.HelmChartService;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.apache.maven.model.v4.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,13 +40,5 @@ public class PomUploadController {
     return "fragments :: pom-upload-form";
   }
 
-  private Optional<org.apache.maven.api.model.Model> parsePom(MultipartFile mavenPom) {
-    MavenXpp3Reader reader = new MavenXpp3Reader();
-    try {
-      return Optional.of(reader.read(mavenPom.getInputStream()));
-    } catch (XmlPullParserException | IOException e) {
-      return Optional.empty();
-    }
-  }
 
 }

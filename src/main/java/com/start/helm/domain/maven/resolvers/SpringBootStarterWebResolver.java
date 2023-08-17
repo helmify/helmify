@@ -7,7 +7,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SpringBootStarterWebResolver implements DependencyResoler {
+public class SpringBootStarterWebResolver implements DependencyResolver {
+
+  @Override
+  public String dependencyName() {
+    return "web";
+  }
 
   @Override
   public List<String> matchOn() {
