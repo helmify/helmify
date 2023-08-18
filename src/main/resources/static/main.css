@@ -11,3 +11,8 @@
 .pointer {
     cursor: pointer;
 }
+
+.bold {
+    font-weight: bold;
+    color: #14854f;
+}

@@ -1,6 +1,6 @@
 package com.start.helm.domain.maven.resolvers;
 
-import com.start.helm.domain.helm.HelmChartFragment;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ public interface DependencyResolver {
     return matchOn().stream().anyMatch(artifactId::contains);
   }
 
-  Optional<HelmChartFragment> resolveDependency(HelmContext context);
+  Optional<HelmChartSlice> resolveDependency(HelmContext context);
 
   String dependencyName();
 

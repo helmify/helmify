@@ -2,7 +2,7 @@ package com.start.helm.domain.maven.resolvers;
 
 import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
-import com.start.helm.domain.helm.HelmChartFragment;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +18,17 @@ public class PostgresDependencyResolver implements DependencyResolver {
   }
 
   @Override
-  public Optional<HelmChartFragment> resolveDependency(HelmContext context) {
-    HelmChartFragment fragment = new HelmChartFragment();
+  public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
+    HelmChartSlice slice = new HelmChartSlice();
 
-    fragment.setPreferredChart(getPreferredChart());
-    fragment.setValuesEntries(getValuesEntries(context));
-    fragment.setInitContainer(initContainer(context));
-    fragment.setDefaultConfig(getDefaultConfig());
-    fragment.setSecretEntries(getSecretEntries());
-    fragment.setEnvironmentEntries(getEnvironmentEntries(context));
+    slice.setPreferredChart(getPreferredChart());
+    slice.setValuesEntries(getValuesEntries(context));
+    slice.setInitContainer(initContainer(context));
+    slice.setDefaultConfig(getDefaultConfig());
+    slice.setSecretEntries(getSecretEntries());
+    slice.setEnvironmentEntries(getEnvironmentEntries(context));
 
-    return Optional.of(fragment);
+    return Optional.of(slice);
   }
 
   private List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
@@ -71,7 +71,8 @@ public class PostgresDependencyResolver implements DependencyResolver {
             ),
             "auth",
             Map.of("username", "postgres", "password", "postgres")),
-        "global", Map.of("hosts", Map.of("postgresql", "postgresql"), "ports", Map.of("postgresql", 5432))
+        "global",
+        Map.of("hosts", Map.of("postgresql", context.getAppName() + "-postgresql"), "ports", Map.of("postgresql", 5432))
     );
   }
 

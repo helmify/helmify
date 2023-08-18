@@ -9,10 +9,12 @@
               method="post">
             <div class="row">
 
-                <label class="button primary outline col card-label" for="upload-input">
+                <label class="button outline col card-label"
+                       th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
                     1. Upload Maven POM
                 </label>
-                <label class="button secondary outline col card-label">
+                <label class="button  outline col card-label"
+                       th:classappend="${helmContext == null ? 'default':'primary'}">
                     2. Provide Metadata
                 </label>
                 <label class="button default outline col card-label">
@@ -27,15 +29,73 @@
                        style="display: none;"
                        onchange="this.form.requestSubmit()"
                 >
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div th:if="${helmContext != null}">
+                        <pre style="
+                        max-height: 51em;
+                        max-width: 47em;
+                        overflow-y: scroll;
+                        font-size: 0.8em;"
+                             th:text="${helmContext.dependencyDescriptor}"></pre>
+                    </div>
+                </div>
+                <div class="col">
+                    <div th:if="${helmContext != null}">
+                        <h4>App Summary</h4>
+                        <div>
+                            <span>This is a <span class="bold">Maven</span> based Application called
+                                <span class="bold" th:text="${helmContext.appName}"></span>
+                                in Version
+                                <span class="bold" th:text="${helmContext.appVersion}"></span>
+                                built with
+                                <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
+                                <span th:if="${helmContext.createIngress}">
+                                    and should be exposed through an <span class="bold">Ingress</span>
+                                </span>.
+                                <span th:if="${helmContext.helmDependencies.size() > 0}">
+                                    It depends on
+                                    <span th:each="d,iter : ${helmContext.helmDependencies}">
+                                        <span class="bold" th:text="${d.name}"></span>
+                                        <span th:if="${iter.last == false}">, </span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                        <h4>Inputs required:</h4>
+                        <h5>Docker Image Coordinates</h5>
+                        <div>
+                            <label for="imageUrl">Docker Image Repository URL</label>
+                            <input type="text"
+                                   th:value="'registry.your-org.com/docker-registry/'+${helmContext.appName}"
+                                   name="customizations.dockerImageRepositoryUrl"
+                                   id="imageUrl">
+                        </div>
+                        <div style="margin-top: 1em">
+                            <label for="imageTag">Docker Image Tag</label>
+                            <input id="imageTag" th:value="'latest'" name="customizations.dockerImageTag" type="text">
+                        </div>
+                        <div style="margin-top: 1em">
+                            <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
+                            <input id="imagePullSecret" th:value="''" name="customizations.dockerImagePullSecret"
+                                   type="text">
+                        </div>
+                        <div style="padding: 2em; text-align: center; font-size: 1.5em">
+                            <a style="font-size: 2em;" class="button primary">Submit</a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col">
+
+                </div>
 
             </div>
         </form>
         <div id="pom-upload-message" hx-swap-oob="true">
-            <p th:if="${message != null}" th:text="'Server says: ' + ${message} " />
-
-            <p th:if="${dependencies != null}" th:text="'Dependencies: ' + ${dependencies} " />
-
-            <p th:if="${error != null}" th:text="'Server says Error: ' + ${error} " />
+            <p th:if="${message != null}" th:text="'Server says: ' + ${message} "/>
+            <p th:if="${error != null}" th:text="'Server says Error: ' + ${error} "/>
         </div>
     </div>
 </div>

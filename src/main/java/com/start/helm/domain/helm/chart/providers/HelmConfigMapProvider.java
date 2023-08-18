@@ -1,6 +1,6 @@
 package com.start.helm.domain.helm.chart.providers;
 
-import com.start.helm.domain.helm.HelmChartFragment;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
 import java.util.Set;
@@ -29,16 +29,12 @@ public class HelmConfigMapProvider implements HelmFileProvider {
   @Override
   public String getFileContent(HelmContext context) {
     String filledTemplate = template.replace("REPLACEME", context.getAppName());
-    return customize(filledTemplate, context.getHelmChartFragments());
+    return customize(filledTemplate, context.getHelmChartSlices());
   }
 
-  private String customize(String content, Set<HelmChartFragment> fragments) {
-
+  private String customize(String content, Set<HelmChartSlice> fragments) {
     StringBuffer patch = new StringBuffer();
-
-
     fragments.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
-
     return TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4);
   }
 
