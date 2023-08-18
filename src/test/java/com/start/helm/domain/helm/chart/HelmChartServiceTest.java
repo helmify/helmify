@@ -9,7 +9,9 @@ import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -61,9 +63,13 @@ class HelmChartServiceTest {
         () -> assertNotNull(fragment.getInitContainer())
     );
 
-    service.process(context);
-    // briefly wait
-    Thread.sleep(1000);
+    // write zip
+    ByteArrayOutputStream process = service.process(context);
+    FileOutputStream fos = new FileOutputStream("helm.zip");
+    fos.write(process.toByteArray());
+    fos.close();
+
+    // read in
     File f = new File("helm.zip");
     assertTrue(f.exists());
     assertTrue(f.length() > 0);
