@@ -3,7 +3,9 @@ package com.start.helm.domain.helm.chart.providers;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,8 +37,18 @@ public class HelmConfigMapProvider implements HelmFileProvider {
   private String customize(String content, Set<HelmChartSlice> fragments) {
     StringBuffer patch = new StringBuffer();
     fragments.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
-    return TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4);
+    return cleanup(TemplateStringPatcher.insertAfter(content, marker, patch.toString(), 4));
   }
+
+  private String cleanup(String content) {
+    return Arrays.stream(content
+            .replace(marker, "")
+            .split("\n"))
+        .filter(s -> !"".equals(s.trim()))
+        .collect(Collectors.joining("\n"));
+  }
+
+  private final String marker = "###@helm-start:configmap";
 
   @Override
   public String getFileName() {
