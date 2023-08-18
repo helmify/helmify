@@ -1,6 +1,7 @@
 package com.start.helm.domain.helm.chart.providers;
 
 import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
+import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.removeBetween;
 
 import com.start.helm.app.config.YamlConfig;
 import com.start.helm.domain.helm.HelmContext;
@@ -55,6 +56,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
                   - name: http
                     containerPort: {{ .Values.service.port }}
                     protocol: TCP
+      ###@helm-start:probes
                 livenessProbe:
                   httpGet:
                     path: /
@@ -63,6 +65,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
                   httpGet:
                     path: /
                     port: http
+      ###@helm-start:lifecycle
                 # allow for graceful shutdown
                 lifecycle:
                   preStop:
@@ -70,7 +73,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
                       command: ["sh", "-c", "sleep 10"]
                 volumeMounts:
                   - name: {{ include "REPLACEME.fullname" . }}-config-vol
-                    mountPath: /config/application.properties
+                    mountPath: /workspace/BOOT-INF/classes/application.properties
                     subPath: application.properties
                 resources:
                   {{- toYaml .Values.resources | nindent 12 }}
@@ -106,7 +109,37 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   }
 
   private String customize(String content, HelmContext context) {
-    final String withInitContainers = injectInitContainers(content, context);
+    String withInitContainers = injectInitContainers(content, context);
+    if (!context.isCreateIngress() || !context.isHasActuator()) {
+      // remove probes
+      withInitContainers = removeBetween("###@helm-start:probes", "###@helm-start:lifecycle", withInitContainers);
+    }
+
+    if (context.isCreateIngress() && context.isHasActuator()) {
+      // set probe paths
+      withInitContainers = removeBetween("###@helm-start:probes", "###@helm-start:lifecycle", withInitContainers);
+      withInitContainers = insertAfter(withInitContainers, "###@helm-start:probes", """
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+          """, 10);
+    }
+
     return injectEnvVars(withInitContainers, context);
   }
 

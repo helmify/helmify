@@ -18,6 +18,21 @@ public class TemplateStringPatcher {
     return -1;
   }
 
+
+  public static String removeBetween(String startMarker, String stopMarker, String content) {
+    final List<String> originalLines = new ArrayList<>(Arrays.asList(content.split("\n")));
+    final int startIndex = indexOfString(originalLines, startMarker) + 1;
+    final int stopIndex = indexOfString(originalLines, stopMarker) - 1;
+    List<String> patched = new ArrayList<>();
+    for (int i = 0; i < originalLines.size(); i++) {
+      if (i >= startIndex && i <= stopIndex) {
+        continue;
+      }
+      patched.add(originalLines.get(i));
+    }
+    return String.join("\n", patched);
+  }
+
   public static String insertAfter(String original, String marker, String patch, int leadingSpaces) {
     final List<String> originalLines = new ArrayList<>(Arrays.asList(original.split("\n")));
     final int index = indexOfString(originalLines, marker);

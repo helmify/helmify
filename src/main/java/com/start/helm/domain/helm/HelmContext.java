@@ -25,6 +25,10 @@ public class HelmContext {
 
   @Getter
   @Setter
+  private boolean hasActuator = false;
+
+  @Getter
+  @Setter
   private String appName;
 
   @Getter
