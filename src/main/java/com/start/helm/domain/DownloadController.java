@@ -39,7 +39,7 @@ public class DownloadController {
   public ResponseEntity<?> download(@RequestBody DownloadRequest request, Model model, @PathVariable("name") String name) {
 
     HelmContext helmContext = request.getHelmContext();
-    byte[] byteArray = helmChartService.process(helmContext).toByteArray();
+    byte[] byteArray = helmChartService.process(helmContext);
     ByteArrayResource resource = new ByteArrayResource(byteArray);
     String uuid = UUID.randomUUID() + "-" + name;
     cache.put(uuid, resource);
