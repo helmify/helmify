@@ -49,7 +49,8 @@ public class HelmValues {
   public static HelmValues getDefaultHelmValues(HelmContext context) {
     return HelmValues.builder()
         .replicaCount(1)
-        .image(new HelmValuesImage())
+        .image(
+            new HelmValuesImage("REPLACE_REPOSITORY", "REPLACE_TAG", HelmValuesImage.ImagePullPolicy.Always, new ArrayList<>()))
         .imagePullSecrets(new ArrayList<>())
         .nameOverride("")
         .fullnameOverride(context.getAppName())
@@ -132,10 +133,13 @@ public class HelmValues {
 
   @Getter
   @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
   public static class HelmValuesImage {
     private String repository;
     private String tag;
     private ImagePullPolicy pullPolicy;
+    private List<String> secrets;
 
     public enum ImagePullPolicy {
       Always, Never, IfNotPresent

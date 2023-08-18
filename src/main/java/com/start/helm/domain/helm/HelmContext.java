@@ -1,21 +1,22 @@
 package com.start.helm.domain.helm;
 
+import com.start.helm.JsonUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Processing Context for new Helm Chart.
  * <p>
  * Here we prepare "things to do".
  */
-@ToString
 public class HelmContext {
 
   @Getter
@@ -37,6 +38,10 @@ public class HelmContext {
   @Setter
   private String dependencyDescriptor;
 
+  @Getter
+  @Setter
+  private Boolean customized = false;
+
 
   @Getter
   private final Set<HelmDependency> helmDependencies = new HashSet<>();
@@ -50,6 +55,10 @@ public class HelmContext {
   @Getter
   @Setter
   private HelmContextCustomization customizations;
+
+  @Getter
+  @Setter
+  private String zipLink;
 
   public void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
     this.valuesGlobalBlocks.add(valuesGlobalBlock);
@@ -72,7 +81,9 @@ public class HelmContext {
 
   @Getter
   @Setter
-  public class HelmContextCustomization {
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class HelmContextCustomization {
 
     private String dockerImageRepositoryUrl;
     private String dockerImageTag;
@@ -82,4 +93,8 @@ public class HelmContext {
 
   }
 
+  @Override
+  public String toString() {
+    return JsonUtil.toJson(this);
+  }
 }
