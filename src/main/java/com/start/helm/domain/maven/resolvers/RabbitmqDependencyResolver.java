@@ -51,6 +51,8 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
         Map.of("enabled", true,
             "port", 5672,
             "vhost", "/",
+            "nameOverride", context.getAppName() + "-rabbitmq",
+            "fullnameOverride", context.getAppName() + "-rabbitmq",
             "auth", Map.of("username", "guest", "password", "guest")
         ),
         "global", Map.of("hosts", Map.of("rabbitmq", context.getAppName() + "-rabbitmq"), "ports", Map.of("rabbitmq", 5672))

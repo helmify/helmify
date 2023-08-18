@@ -58,8 +58,8 @@ public class PostgresDependencyResolver implements DependencyResolver {
     return Map.of("postgresql", Map.of(
             "enabled", true,
             "database", "postgres",
-            "fullnameOverride", "postgres",
-            "nameOverride", "postgres",
+            "fullnameOverride", context.getAppName() + "-postgres",
+            "nameOverride", context.getAppName() + "-postgres",
             "architecture", "standalone",
             "primary", Map.of(
                 "persistence", Map.of(
