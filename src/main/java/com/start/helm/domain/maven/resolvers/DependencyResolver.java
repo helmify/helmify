@@ -3,57 +3,43 @@ package com.start.helm.domain.maven.resolvers;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Interface defining a DependencyResolver.
+ * <p/>
+ * A DependencyResolver is responsible for resolving a Maven dependency to a Helm Dependency.
+ */
 public interface DependencyResolver {
 
+  /**
+   * List of Strings against which Maven ArtifactIds are checked with a contains-check.
+   */
   List<String> matchOn();
 
+  /**
+   * Method for contains-matching a Maven ArtifactId against the matchOn list.
+   */
   default boolean matches(String artifactId) {
     return matchOn().stream().anyMatch(artifactId::contains);
   }
 
+  /**
+   * Method for providing a {@link HelmChartSlice} through this DependencyResolver.
+   * <p/>
+   * The {@link Optional} may be empty if the Maven Dependency does not have an equivalent on
+   * the infrastructure side (such as "org.postgresql:postgresql" relating to a database). The
+   * {@link HelmContext} is still accessible here though to ie set properties.
+   * <p/>
+   * If the Maven Dependency has an equivalent on the infrastructure side, a {@link HelmChartSlice}
+   * must be returned.
+   */
   Optional<HelmChartSlice> resolveDependency(HelmContext context);
 
+  /**
+   * Name of the dependency.
+   */
   String dependencyName();
 
-  default Map<String, Object> initContainer(HelmContext context) {
-    String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(context.getAppName(), dependencyName());
-    return Map.of(
-        "name", name,
-        "image", "docker.io/busybox:stable",
-        "imagePullPolicy", "Always",
-        "securityContext", Map.of(
-            "allowPrivilegeEscalation", false,
-            "runAsUser", 1000,
-            "runAsGroup", 1000,
-            "runAsNonRoot", true
-        ),
-        "command", List.of(
-            "sh",
-            "-c",
-            """
-                echo 'Waiting for %s to become ready...'
-                until printf "." && nc -z -w 2 {{ .Values.global.hosts.%s }} {{ .Values.global.ports.%s }}; do
-                    sleep 2;
-                done;
-                echo '%s OK ✓'
-                """.formatted(dependencyName(), dependencyName(), dependencyName(), dependencyName())
-        ),
-        "resources", Map.of(
-            "requests", Map.of(
-                "cpu", "20m",
-                "memory", "32Mi"
-            ),
-            "limits", Map.of(
-                "cpu", "20m",
-                "memory", "32Mi"
-            )
-        )
-    );
-  }
-
-  ;
 
 }

@@ -3,22 +3,31 @@ package com.start.helm.domain;
 import static com.start.helm.JsonUtil.fromJson;
 
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.helm.chart.HelmChartService;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller for customizing a {@link HelmContext}.
+ * <p/>
+ * This is the second controller to be called by the client. Here we receive the few
+ * missing pieces we want to fill in on the Helm Chart, so we can offer a fully
+ * populated Helm Chart to the user in the next step.
+ */
 @Slf4j
 @Controller
-@RequiredArgsConstructor
 public class CustomizationController {
 
-  private final HelmChartService helmChartService;
-
+  /**
+   * Endpoint for handling customization of an existing {@link HelmContext}.
+   * <p/>
+   * Here we parse an existing {@link HelmContext} from the request body and
+   * set some properties on it after the user has entered data. Then we just
+   * put the updated {@link HelmContext} back into the View Model: {@link Model}
+   */
   @PostMapping("/customize")
   public String customize(@RequestBody Map<String, Object> map, Model viewModel) {
     log.info("Customization request: {}", map);
@@ -35,12 +44,10 @@ public class CustomizationController {
       ));
 
       helmContext.setZipLink("helm.zip");
-      helmChartService.process(helmContext);
       viewModel.addAttribute("helmContext", helmContext);
     }
 
     viewModel.addAttribute("customized", true);
-
 
     return "fragments :: pom-upload-form";
   }

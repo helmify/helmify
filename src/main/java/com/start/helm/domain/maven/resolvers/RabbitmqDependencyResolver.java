@@ -1,5 +1,6 @@
 package com.start.helm.domain.maven.resolvers;
 
+import static com.start.helm.HelmUtil.initContainer;
 import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
 import com.start.helm.domain.helm.HelmChartSlice;
@@ -10,6 +11,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * Resolver for spring rabbitmq dependency.
+ */
 @Slf4j
 @Component
 public class RabbitmqDependencyResolver implements DependencyResolver {
@@ -24,6 +28,9 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
     return List.of("spring-boot-starter-amqp", "spring-cloud-starter-stream-rabbit");
   }
 
+  /**
+   * HelmChartSlice for RabbitMQ.
+   */
   @Override
   public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
 
@@ -33,7 +40,7 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
     slice.setPreferredChart(getPreferredChart());
     slice.setValuesEntries(getValuesEntries(context));
     slice.setSecretEntries(getSecretEntries());
-    slice.setInitContainer(initContainer(context));
+    slice.setInitContainer(initContainer(context.getAppName(), dependencyName()));
 
     return Optional.of(slice);
   }

@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
+/**
+ * Resolver for spring web dependencies.
+ */
 @Component
 public class SpringBootStarterWebResolver implements DependencyResolver {
 
