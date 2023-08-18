@@ -1,50 +1,106 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       lang="en">
+
+<div th:fragment="header-row" id="header-row">
+    <div class="row">
+        <label class="button outline col card-label"
+               th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
+            1. Upload Maven POM
+        </label>
+        <label class="button  outline col card-label"
+               th:classappend="${helmContext != null && !helmContext.customized ? 'primary':'default'}">
+            2. Provide Metadata
+        </label>
+        <label class="button outline col card-label"
+               th:classappend="${helmContext != null && helmContext.customized ? 'primary':'default'}">
+            3. Profit
+        </label>
+    </div>
+</div>
+<div th:fragment="customization-input-form">
+    <form id="dockerImageForm"
+          hx-post="/customize"
+          hx-ext="json-enc"
+          hx-target="#pom-form"
+
+    >
+        <h4 th:if="${helmContext.customized == false}">Inputs required:</h4>
+        <h4 th:if="${helmContext.customized == true}" style="color: #14854F">Inputs provided:</h4>
+        <h5>Docker Image Coordinates</h5>
+        <div>
+            <label for="imageUrl">Docker Image Repository URL</label>
+            <input type="text"
+                   th:value="'registry.your-org.com/docker-registry/'+${helmContext.appName}"
+                   th:disabled="${helmContext.customized == true}"
+                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                   name="dockerImageRepositoryUrl"
+                   id="imageUrl">
+        </div>
+        <div style="margin-top: 1em">
+            <label for="imageTag">Docker Image Tag</label>
+            <input id="imageTag" th:value="'latest'" name="dockerImageTag"
+                   th:disabled="${helmContext.customized == true}"
+                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                   type="text">
+        </div>
+        <div style="margin-top: 1em">
+            <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
+            <input id="imagePullSecret" th:value="''" name="dockerImagePullSecret"
+                   th:disabled="${helmContext.customized == true}"
+                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                   type="text">
+            <input style="display: none;" id="helmContext" name="helmContext" th:value="${helmContext}"
+                   th:if="${helmContext.customized == false}"
+            >
+        </div>
+        <div style="padding: 2em; text-align: center; font-size: 1.5em">
+            <button style="font-size: 2em;"
+                    th:disabled="${helmContext.customized == true}"
+                    type="submit"
+                    class="button"
+                    th:classappend="${helmContext.customized == true ? 'primary outline' : 'primary'}"
+            >
+                <span th:text="${helmContext.customized ? 'Submitted' : 'Submit'}"></span>
+            </button>
+        </div>
+    </form>
+</div>
+
 <div th:fragment="pom-upload-form">
-    <div id="pom-form-container">
-        <form id="pom-form"
-              hx-encoding="multipart/form-data"
-              hx-post="/upload-pom"
-              method="post">
-            <div class="row">
+    <div id="pom-form">
+        <div th:insert="~{fragments :: header-row}"></div>
+        <div class="row">
+            <div class="col">
 
-                <label class="button outline col card-label"
-                       th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
-                    1. Upload Maven POM
-                </label>
-                <label class="button  outline col card-label"
-                       th:classappend="${helmContext == null ? 'default':'primary'}">
-                    2. Provide Metadata
-                </label>
-                <label class="button default outline col card-label">
-                    3. Profit
-                </label>
+                <form id="form"
+                      hx-encoding="multipart/form-data"
+                      hx-post="/upload-pom"
+                      hx-target="#pom-form"
+                      method="post">
+                    <input id="upload-input"
+                           type="file"
+                           name="pom"
+                           accept="application/xml"
+                           class="form-control-file"
+                           style="display: none;"
+                           onchange="this.form.requestSubmit()"
+                    >
+                </form>
 
-                <input id="upload-input"
-                       type="file"
-                       name="pom"
-                       accept="application/xml"
-                       class="form-control-file"
-                       style="display: none;"
-                       onchange="this.form.requestSubmit()"
-                >
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div th:if="${helmContext != null}">
+                <div th:if="${helmContext != null}">
                         <pre style="
                         max-height: 51em;
                         max-width: 47em;
                         overflow-y: scroll;
                         font-size: 0.8em;"
                              th:text="${helmContext.dependencyDescriptor}"></pre>
-                    </div>
                 </div>
-                <div class="col">
-                    <div th:if="${helmContext != null}">
-                        <h4>App Summary</h4>
-                        <div>
+            </div>
+            <div class="col">
+                <div th:if="${helmContext != null}">
+                    <h4>App Summary</h4>
+                    <div>
                             <span>This is a <span class="bold">Maven</span> based Application called
                                 <span class="bold" th:text="${helmContext.appName}"></span>
                                 in Version
@@ -62,37 +118,26 @@
                                     </span>
                                 </span>
                             </span>
-                        </div>
-                        <h4>Inputs required:</h4>
-                        <h5>Docker Image Coordinates</h5>
-                        <div>
-                            <label for="imageUrl">Docker Image Repository URL</label>
-                            <input type="text"
-                                   th:value="'registry.your-org.com/docker-registry/'+${helmContext.appName}"
-                                   name="customizations.dockerImageRepositoryUrl"
-                                   id="imageUrl">
-                        </div>
-                        <div style="margin-top: 1em">
-                            <label for="imageTag">Docker Image Tag</label>
-                            <input id="imageTag" th:value="'latest'" name="customizations.dockerImageTag" type="text">
-                        </div>
-                        <div style="margin-top: 1em">
-                            <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
-                            <input id="imagePullSecret" th:value="''" name="customizations.dockerImagePullSecret"
-                                   type="text">
-                        </div>
-                        <div style="padding: 2em; text-align: center; font-size: 1.5em">
-                            <a style="font-size: 2em;" class="button primary">Submit</a>
-                        </div>
-
+                    </div>
+                    <div th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
+                </div>
+            </div>
+            <div class="col">
+                <div th:if="${helmContext != null}" style="text-align: center">
+                    <div
+                            th:if="${helmContext.zipLink != null}"
+                            class="outline primary button"
+                            style="cursor: pointer; font-size: 1.6em; font-weight: bold; text-align: center; padding: 1.4em;margin-top: 3em;"
+                            th:text="'Download '+${helmContext.zipLink}"
+                            hx-trigger="click"
+                            hx-ext="json-enc"
+                            th:attrappend="hx-vars='helmContext: '+${helmContext}"
+                            th:attr="hx-post='/download/'+ ${helmContext.zipLink}"
+                    >
                     </div>
                 </div>
-                <div class="col">
-
-                </div>
-
             </div>
-        </form>
+        </div>
         <div id="pom-upload-message" hx-swap-oob="true">
             <p th:if="${message != null}" th:text="'Server says: ' + ${message} "/>
             <p th:if="${error != null}" th:text="'Server says Error: ' + ${error} "/>

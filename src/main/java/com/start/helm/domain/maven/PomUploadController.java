@@ -3,7 +3,6 @@ package com.start.helm.domain.maven;
 import static com.start.helm.domain.maven.MavenModelParser.parsePom;
 
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.helm.chart.HelmChartService;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class PomUploadController {
 
   private final MavenModelProcessor mavenModelProcessor;
-  private final HelmChartService helmChartService;
 
   @PostMapping("/upload-pom")
   public String uploadImage(Model viewModel, @RequestParam("pom") MultipartFile mavenPom) throws IOException {
@@ -34,9 +32,6 @@ public class PomUploadController {
           helmContext.setAppName(m.getArtifactId());
 
           setDescriptor(mavenPom, helmContext);
-
-
-          helmChartService.process(helmContext);
 
           viewModel.addAttribute("helmContext", helmContext);
         },

@@ -2,7 +2,7 @@ package com.start.helm.domain.helm.chart;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.providers.HelmFileProvider;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,12 +22,12 @@ public class HelmChartService {
   private final List<HelmFileProvider> providers;
 
   @SneakyThrows
-  public void process(HelmContext context) {
+  public ByteArrayOutputStream process(HelmContext context) {
 
     log.info("Got {} providers to process", providers.size());
 
-    FileOutputStream fileOutputStream = new FileOutputStream("helm.zip");
-    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
     zipOutputStream.putNextEntry(new ZipEntry("templates/"));
     zipOutputStream.closeEntry();
 
@@ -38,9 +38,7 @@ public class HelmChartService {
       addZipEntry(fileName, fileContent, zipOutputStream);
     });
 
-    zipOutputStream.close();
-    fileOutputStream.close();
-
+    return byteArrayOutputStream;
   }
 
   private void addZipEntry (String filename, String content, ZipOutputStream zipOutputStream) {

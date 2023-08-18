@@ -2,8 +2,11 @@ package com.start.helm.domain.helm.chart.providers;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.model.HelmValues;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -20,8 +23,26 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 
     mergeValuesGlobalsBlocks(context, buffer);
 
+    HelmValues defaultHelmValues = HelmValues.getDefaultHelmValues(context);
+
+    if (Optional.ofNullable(context.getCustomized()).orElse(false)) {
+      HelmContext.HelmContextCustomization customizations = context.getCustomizations();
+
+      List<String> secrets = new ArrayList<>();
+      if (customizations.getDockerImagePullSecret() != null && !"".equals(customizations.getDockerImagePullSecret().trim())) {
+        secrets.add(customizations.getDockerImagePullSecret());
+      }
+
+      defaultHelmValues.setImage(new HelmValues.HelmValuesImage(
+          customizations.getDockerImageRepositoryUrl(),
+          customizations.getDockerImageTag(),
+          HelmValues.HelmValuesImage.ImagePullPolicy.Always,
+          secrets
+      ));
+    }
+
     buffer.append(yaml.dumpAsMap(
-        HelmValues.getDefaultHelmValues(context)
+        defaultHelmValues
     ));
     buffer.append("\n");
 
