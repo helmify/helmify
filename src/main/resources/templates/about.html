@@ -46,10 +46,25 @@
 </header>
 <div class="col-12">
     <h3>Why</h3>
-    The motivation for this app is rooted in the experience of an application developer maintaining
-    a collection of spring boot services which are deployed through helm charts. Due to appearent lack of
-    standardization towards building Helm Charts in an enterprise environment, this app provides an opinionated
-    Helm Chart based on an application's dependency descriptor.
+    <h5>So you can <i>start</i> on integration</h5>
+    Many developers across organizations today write applications which run on Kubernetes <i>[citation needed]</i>.
+    <br/>
+    While <i>helm create</i> certainly provides a good starting point for a Helm Chart, it is blind to the context
+    in which it is being called. That is, it cannot take application-specific needs into consideration. <br/>
+    <br/>
+    This app aims to change that.
+    <br/>
+    <br/>
+    The goal of this app, ultimately, is to enable <i>you</i> as a developer to easily provide a Helm Chart for
+    an artifact you may be responsible for without having to do too much of a deep dive into Helm.<br/>
+    This may look like this:
+    <pre>
+        $ // build docker image of your app
+        $ // upload pom to start-helm.com
+        $ // enter docker image repository
+        $ // download helm chart
+        $ unzip helm.zip && cd helm && helm dependency update &&  helm install my-app -f ./values.yaml -f ./Chart.yaml .
+    </pre>
     <h3>How</h3>
     This app takes into consideration the dependency list of an application which should be deployable through
     a Helm Chart. This takes care of things like:
