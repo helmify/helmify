@@ -9,15 +9,13 @@ import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,24 +61,18 @@ class HelmChartServiceTest {
         () -> assertNotNull(fragment.getInitContainer())
     );
 
-    // write zip
-    ByteArrayOutputStream process = service.process(context);
-    FileOutputStream fos = new FileOutputStream("helm.zip");
-    fos.write(process.toByteArray());
-    fos.close();
+    context.setCustomizations(new HelmContext.HelmContextCustomization(
+        "test", "latest", null, Map.of()
+    ));
+    context.setCustomized(true);
 
-    // read in
-    File f = new File("helm.zip");
-    assertTrue(f.exists());
-    assertTrue(f.length() > 0);
-    ZipFile zipFile = new ZipFile(f);
-    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+    byte[] process = service.process(context);
+    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
 
     List<String> names = new ArrayList<>();
-
-    while (entries.hasMoreElements()) {
-      ZipEntry zipEntry = entries.nextElement();
-      String name = zipEntry.getName();
+    ZipEntry entry;
+    while ((entry = zipInputStream.getNextEntry()) != null) {
+      String name = entry.getName();
       names.add(name);
     }
 

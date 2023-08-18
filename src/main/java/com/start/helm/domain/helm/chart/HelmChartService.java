@@ -20,14 +20,15 @@ import org.springframework.stereotype.Component;
 public class HelmChartService {
 
   private final List<HelmFileProvider> providers;
+  private final String filename = "helm.zip";
 
   @SneakyThrows
-  public ByteArrayOutputStream process(HelmContext context) {
+  public byte[] process(HelmContext context) {
 
     log.info("Got {} providers to process", providers.size());
 
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
+    ByteArrayOutputStream fileOutputStream = new ByteArrayOutputStream();
+    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
     zipOutputStream.putNextEntry(new ZipEntry("templates/"));
     zipOutputStream.closeEntry();
 
@@ -38,7 +39,10 @@ public class HelmChartService {
       addZipEntry(fileName, fileContent, zipOutputStream);
     });
 
-    return byteArrayOutputStream;
+    zipOutputStream.close();
+    fileOutputStream.close();
+
+    return fileOutputStream.toByteArray();
   }
 
   private void addZipEntry (String filename, String content, ZipOutputStream zipOutputStream) {
