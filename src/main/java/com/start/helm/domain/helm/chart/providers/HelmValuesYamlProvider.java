@@ -25,7 +25,7 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
     ));
     buffer.append("\n");
 
-    context.getHelmChartFragments().forEach(f -> f.getValuesEntries().forEach((k, v) -> {
+    context.getHelmChartSlices().forEach(f -> f.getValuesEntries().forEach((k, v) -> {
       if (!k.equals("global")) {
         buffer.append(yaml.dumpAsMap(Map.of(k, v)));
         buffer.append("\n");
@@ -39,12 +39,12 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
     Map<Object, Object> globalMap = new HashMap<>();
 
     // prepare map
-    context.getHelmChartFragments().stream().filter(f -> f.getValuesEntries().containsKey("global"))
+    context.getHelmChartSlices().stream().filter(f -> f.getValuesEntries().containsKey("global"))
         .flatMap(f -> ((Map<String, Object>) f.getValuesEntries().get("global")).keySet().stream())
         .forEach(k -> globalMap.put(k, new HashMap<>()));
 
     // merge values
-    context.getHelmChartFragments().forEach(f -> {
+    context.getHelmChartSlices().forEach(f -> {
       Map<String, Object> valuesEntries = f.getValuesEntries();
       if (valuesEntries.containsKey("global")) {
         Map<String, Object> block = (Map<String, Object>) valuesEntries.get("global");

@@ -113,7 +113,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   private static String injectInitContainers(String content, HelmContext context) {
     StringBuffer buffer = new StringBuffer();
     Yaml yaml = YamlConfig.getInstance();
-    context.getHelmChartFragments().forEach(f -> buffer.append(yaml.dump(List.of(f.getInitContainer()))).append("\n"));
+    context.getHelmChartSlices().forEach(f -> buffer.append(yaml.dump(List.of(f.getInitContainer()))).append("\n"));
     String withInitContainer = insertAfter(content, "###@helm-start:initcontainers", buffer.toString(), 6);
     return insertAfter(withInitContainer, "###@helm-start:initcontainers", "initContainers:\n", 6)
         .replace("'\"", "\"")
@@ -123,7 +123,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   private static String injectEnvVars(String content, HelmContext context) {
     StringBuffer buffer = new StringBuffer();
     Yaml yaml = YamlConfig.getInstance();
-    context.getHelmChartFragments().forEach(f -> buffer.append(yaml.dump(f.getEnvironmentEntries())).append("\n"));
+    context.getHelmChartSlices().forEach(f -> buffer.append(yaml.dump(f.getEnvironmentEntries())).append("\n"));
     String withEnvVars = insertAfter(content, "###@helm-start:envblock", buffer.toString(), 10);
     return insertAfter(withEnvVars, "###@helm-start:envblock", "env:\n", 10)
         .replace("'{{", "{{")

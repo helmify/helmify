@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.start.helm.domain.helm.HelmChartFragment;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
@@ -45,11 +45,11 @@ class HelmChartServiceTest {
     context.setAppVersion("1.0.0");
 
     assertNotNull(context);
-    assertEquals(1, context.getHelmChartFragments().size());
+    assertEquals(1, context.getHelmChartSlices().size());
     assertEquals(1, context.getValuesGlobalBlocks().size());
     assertEquals(1, context.getHelmDependencies().size());
 
-    HelmChartFragment fragment = context.getHelmChartFragments().iterator().next();
+    HelmChartSlice fragment = context.getHelmChartSlices().iterator().next();
     assertAll(
         () -> assertNotNull(fragment.getPreferredChart()),
         () -> assertNotNull(fragment.getValuesEntries()),

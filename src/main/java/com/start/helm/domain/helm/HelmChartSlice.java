@@ -10,11 +10,11 @@ import lombok.Setter;
  * Aggregation of sections touched by introducing a new dependency
  * <p>
  * Helm-Dependency-specific changes to the Helm Chart are collected here.
- * */
+ */
 @Getter
 @Setter
 @EqualsAndHashCode
-public class HelmChartFragment {
+public class HelmChartSlice {
 
   private List<Map<String, Object>> environmentEntries;
   private Map<String, String> defaultConfig;

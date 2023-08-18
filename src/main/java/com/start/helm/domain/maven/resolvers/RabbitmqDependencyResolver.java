@@ -2,7 +2,7 @@ package com.start.helm.domain.maven.resolvers;
 
 import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
-import com.start.helm.domain.helm.HelmChartFragment;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import java.util.List;
 import java.util.Map;
@@ -25,17 +25,17 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
   }
 
   @Override
-  public Optional<HelmChartFragment> resolveDependency(HelmContext context) {
+  public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
 
-    HelmChartFragment fragment = new HelmChartFragment();
-    fragment.setEnvironmentEntries(getEnvironmentEntries(context));
-    fragment.setDefaultConfig(getDefaultConfig());
-    fragment.setPreferredChart(getPreferredChart());
-    fragment.setValuesEntries(getValuesEntries());
-    fragment.setSecretEntries(getSecretEntries());
-    fragment.setInitContainer(initContainer(context));
+    HelmChartSlice slice = new HelmChartSlice();
+    slice.setEnvironmentEntries(getEnvironmentEntries(context));
+    slice.setDefaultConfig(getDefaultConfig());
+    slice.setPreferredChart(getPreferredChart());
+    slice.setValuesEntries(getValuesEntries(context));
+    slice.setSecretEntries(getSecretEntries());
+    slice.setInitContainer(initContainer(context));
 
-    return Optional.of(fragment);
+    return Optional.of(slice);
   }
 
   private static Map<String, Object> getSecretEntries() {
@@ -45,7 +45,7 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
     );
   }
 
-  private Map<String, Object> getValuesEntries() {
+  private Map<String, Object> getValuesEntries(HelmContext context) {
     return Map.of(
         "rabbitmq",
         Map.of("enabled", true,
@@ -53,7 +53,7 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
             "vhost", "/",
             "auth", Map.of("username", "guest", "password", "guest")
         ),
-        "global", Map.of("hosts", Map.of("rabbitmq", "rabbitmq"), "ports", Map.of("rabbitmq", 5672))
+        "global", Map.of("hosts", Map.of("rabbitmq", context.getAppName() + "-rabbitmq"), "ports", Map.of("rabbitmq", 5672))
     );
   }
 

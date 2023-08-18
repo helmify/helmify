@@ -7,6 +7,7 @@ import com.start.helm.domain.helm.chart.HelmChartService;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,8 @@ public class PomUploadController {
   private final MavenModelProcessor mavenModelProcessor;
   private final HelmChartService helmChartService;
 
-  @PostMapping("/upload-pom") public String uploadImage(Model viewModel, @RequestParam("pom") MultipartFile mavenPom) throws IOException {
+  @PostMapping("/upload-pom")
+  public String uploadImage(Model viewModel, @RequestParam("pom") MultipartFile mavenPom) throws IOException {
     int length = mavenPom.getBytes().length;
     viewModel.addAttribute("message", "Uploaded pom.xml of length " + length + " bytes");
 
@@ -31,13 +33,21 @@ public class PomUploadController {
           helmContext.setAppVersion(m.getVersion());
           helmContext.setAppName(m.getArtifactId());
 
+          setDescriptor(mavenPom, helmContext);
+
+
           helmChartService.process(helmContext);
 
-          viewModel.addAttribute("dependencies", helmContext);
+          viewModel.addAttribute("helmContext", helmContext);
         },
         () -> viewModel.addAttribute("error", "Could not parse pom.xml"));
 
     return "fragments :: pom-upload-form";
+  }
+
+  @SneakyThrows
+  private static void setDescriptor(MultipartFile mavenPom, HelmContext helmContext) {
+    helmContext.setDependencyDescriptor(new String(mavenPom.getBytes()));
   }
 
 
