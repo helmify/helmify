@@ -1,10 +1,8 @@
 package com.start.helm.domain.helm.chart.providers;
 
-import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -31,12 +29,13 @@ public class HelmConfigMapProvider implements HelmFileProvider {
   @Override
   public String getFileContent(HelmContext context) {
     String filledTemplate = template.replace("REPLACEME", context.getAppName());
-    return customize(filledTemplate, context.getHelmChartSlices());
+    return customize(filledTemplate, context);
   }
 
-  private String customize(String content, Set<HelmChartSlice> fragments) {
+  private String customize(String content, HelmContext context) {
     StringBuffer patch = new StringBuffer();
-    fragments.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
+    context.getHelmChartSlices()
+        .forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
     return cleanup(TemplateStringPatcher.insertAfter(content, marker, patch.toString(), 4));
   }
 
