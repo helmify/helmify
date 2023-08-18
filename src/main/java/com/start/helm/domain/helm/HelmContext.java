@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Processing Context for new Helm Chart.
+ * Processing Context for a new Helm Chart.
  * <p>
- * Here we prepare "things to do".
+ * This is populated based on a provided dependency descriptor, like a Maven pom.xml file.
  */
 public class HelmContext {
 
@@ -53,9 +53,26 @@ public class HelmContext {
   @Getter
   private final Set<HelmChartSlice> helmChartSlices = new HashSet<>();
 
+  /**
+   * List of config blocks which will be merged into values.yaml.
+   * <p/>
+   * i.e:
+   * <pre>
+   *   global:
+   *     hosts:
+   *       rabbitmq: rabbitmq
+   *       postgresql: postgresql
+   *     ports:
+   *       rabbitmq: 5672
+   *       postgresql: 5432
+   * </pre>
+   */
   @Getter
   private final List<Map<String, Object>> valuesGlobalBlocks = new ArrayList<>();
 
+  /**
+   * Any last missing data to be populated before the Helm Chart is generated.
+   */
   @Getter
   @Setter
   private HelmContextCustomization customizations;

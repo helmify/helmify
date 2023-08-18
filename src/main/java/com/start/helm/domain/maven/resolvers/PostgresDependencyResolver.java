@@ -1,5 +1,6 @@
 package com.start.helm.domain.maven.resolvers;
 
+import static com.start.helm.HelmUtil.initContainer;
 import static com.start.helm.HelmUtil.makeSecretKeyRef;
 
 import com.start.helm.domain.helm.HelmChartSlice;
@@ -9,6 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
+/**
+ * Resolver for spring postgres dependency.
+ */
 @Component
 public class PostgresDependencyResolver implements DependencyResolver {
 
@@ -17,13 +21,16 @@ public class PostgresDependencyResolver implements DependencyResolver {
     return List.of("postgres");
   }
 
+  /**
+   * HelmChartSlice for Postgres.
+   */
   @Override
   public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
     HelmChartSlice slice = new HelmChartSlice();
 
     slice.setPreferredChart(getPreferredChart());
     slice.setValuesEntries(getValuesEntries(context));
-    slice.setInitContainer(initContainer(context));
+    slice.setInitContainer(initContainer(context.getAppName(), dependencyName()));
     slice.setDefaultConfig(getDefaultConfig());
     slice.setSecretEntries(getSecretEntries());
     slice.setEnvironmentEntries(getEnvironmentEntries(context));
