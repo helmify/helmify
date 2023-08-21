@@ -1,7 +1,7 @@
 services:
   start-helm:
-    image: starthelm/start-helm:latest
-    container_name: start-helm
+    image: helmstart/helm-start:latest
+    container_name: helm-start
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
       TZ: "Europe/Berlin"
