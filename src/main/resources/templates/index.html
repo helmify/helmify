@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://unpkg.com/chota">
 
     <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <link rel="stylesheet" href="/main.css"/>
 
 </head>
 <style>
@@ -35,6 +37,8 @@
         <div class="nav-right">
             <div class="tabs">
                 <a class="active" href="https://github.com/psalg-dev/start-helm">Github</a>
+                <a href="https://jenil.github.io/chota/#docs">Chota</a>
+                <a href="https://htmx.org/docs/">htmx</a>
             </div>
         </div>
     </nav>
@@ -43,7 +47,8 @@
     <div hx-boost="true">
         <div>
             <p>
-                Upload a Maven pom.xml file so we can generate a suitable Helm Chart for you :)
+                Upload a Maven pom.xml file and enter some data, so we can generate a suitable Helm Chart for you :) <a
+                    href="/about">Tell me more ..</a>
             </p>
         </div>
         <div th:insert="~{fragments :: pom-upload-form}"></div>

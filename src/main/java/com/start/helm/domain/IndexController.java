@@ -1,10 +1,15 @@
-package com.start.helm;
+package com.start.helm.domain;
 
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+/**
+ * Controller for index page.
+ * <p>
+ * Users visiting the application will talk to this controller first.
+ */
 @Controller
 public class IndexController {
 
@@ -12,6 +17,11 @@ public class IndexController {
   public String index(Model model) {
     model.addAttribute("message", "hello world");
     return "index";
+  }
+
+  @GetMapping("/about")
+  public String about() {
+    return "about";
   }
 
 }
