@@ -8,11 +8,11 @@ import org.springframework.context.ConfigurableApplicationContext;
  * Application Entry Point.
  */
 @SpringBootApplication
-public class StartHelmApp {
+public class HelmStartApp {
 
   public static void main(String[] args) {
 
-    ConfigurableApplicationContext run = SpringApplication.run(StartHelmApp.class, args);
+    ConfigurableApplicationContext run = SpringApplication.run(HelmStartApp.class, args);
     Integer port = run.getEnvironment().getProperty("server.port", Integer.class, 8080);
     print(port);
   }
