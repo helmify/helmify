@@ -1,6 +1,6 @@
-package com.start.helm.domain;
+package com.start.helm.domain.ui;
 
-import static com.start.helm.JsonUtil.fromJson;
+import static com.start.helm.util.JsonUtil.fromJson;
 
 import com.start.helm.domain.helm.HelmContext;
 import java.util.Map;

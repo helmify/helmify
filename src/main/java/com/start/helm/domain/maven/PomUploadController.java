@@ -1,12 +1,8 @@
 package com.start.helm.domain.maven;
 
-import static com.start.helm.domain.maven.MavenModelParser.parsePom;
-
-import com.start.helm.domain.UploadService;
 import com.start.helm.domain.helm.HelmContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PomUploadController {
 
-  private final UploadService uploadService;
+  private final PomUploadService pomUploadService;
 
   /**
    * Method which handles a file upload from the client.
@@ -36,7 +32,7 @@ public class PomUploadController {
    */
   @PostMapping("/upload-pom")
   public String uploadPom(Model viewModel, @RequestParam("pom") MultipartFile mavenPom) throws IOException {
-    return uploadService.processPom(viewModel, new String(mavenPom.getBytes(), StandardCharsets.UTF_8));
+    return pomUploadService.processPom(viewModel, new String(mavenPom.getBytes(), StandardCharsets.UTF_8));
   }
 
 }

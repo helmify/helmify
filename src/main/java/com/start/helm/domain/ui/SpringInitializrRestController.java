@@ -1,5 +1,6 @@
-package com.start.helm.domain;
+package com.start.helm.domain.ui;
 
+import com.start.helm.domain.maven.PomUploadService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class SpringInitializrRestController {
 
   private final RestTemplate restTemplate;
-  private final UploadService uploadService;
+  private final PomUploadService pomUploadService;
 
   @Getter
   @Setter
@@ -51,7 +52,7 @@ public class SpringInitializrRestController {
 
     viewModel.addAttribute("springInitializrLink", springInitializrLink);
 
-    return uploadService.processPom(viewModel, pomXml);
+    return pomUploadService.processPom(viewModel, pomXml);
   }
 
   @SneakyThrows
