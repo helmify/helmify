@@ -4,7 +4,6 @@ import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.HelmDependency;
 import com.start.helm.domain.maven.resolvers.DependencyResolver;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,7 @@ public class MavenModelProcessor {
    * We also add a {@link com.start.helm.domain.helm.HelmChartSlice} for each dependency
    * which contains the dependency-specific changes to a Helm Chart, so we can
    * merge those changes later.
-   * */
+   */
   public HelmContext process(Model m) {
     List<Dependency> dependencies = m.getDependencies();
 
