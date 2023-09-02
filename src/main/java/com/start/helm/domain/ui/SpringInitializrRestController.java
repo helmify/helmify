@@ -134,7 +134,7 @@ public class SpringInitializrRestController {
     @Override
     public HelmContext process() {
       final String pomXml = readPomFromZip(body).orElseThrow();
-      return mavenFileUploadService.processPom(pomXml);
+      return mavenFileUploadService.processBuildFile(pomXml);
     }
 
     @Override
