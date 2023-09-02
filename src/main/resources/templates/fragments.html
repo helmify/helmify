@@ -17,6 +17,33 @@
             3. Profit
         </label>
     </div>
+    <div class="row">
+        <div class="col">
+            <div th:if="${helmContext == null}"
+                 style="width: 100%; opacity: 80%; font-size: 1.1em; text-align: center; padding: 0.5em"
+                 class="default">
+                Or
+            </div>
+            <div th:if="${helmContext == null}" style="width: 100%">
+                <label>
+                    <input
+                            hx-trigger="keyup changed delay:500ms"
+                            hx-post="/spring-initializr-link"
+                            hx-ext="json-enc"
+                            hx-target="#pom-form"
+                            id="springInitializrLink"
+                            name="springInitializrLink"
+                            type="text"
+                            placeholder="1.1 Paste Spring Initializr Link"/>
+                    <span style="font-size: 0.8em;">
+                        Note: only Maven Projects are supported currently.
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="col"></div>
+        <div class="col"></div>
+    </div>
 </div>
 <div th:fragment="customization-input-form">
     <form id="dockerImageForm"
@@ -87,7 +114,11 @@
                            onchange="this.form.requestSubmit()"
                     >
                 </form>
-
+                <div th:if="${springInitializrLink != null}">
+                    <a th:href="${springInitializrLink}" target="_blank">
+                        Spring Initalizr Link
+                    </a>
+                </div>
                 <div th:if="${helmContext != null}">
                         <pre style="
                         max-height: 51em;

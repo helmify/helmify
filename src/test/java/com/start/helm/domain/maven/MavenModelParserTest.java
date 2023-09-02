@@ -3,6 +3,7 @@ package com.start.helm.domain.maven;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.start.helm.TestUtil;
 import java.io.IOException;
 import java.util.Optional;
 import org.apache.maven.api.model.Model;
@@ -18,13 +19,13 @@ class MavenModelParserTest {
         getClass().getClassLoader().getResourceAsStream("pom-with-rabbit.xml")
     );
 
-    Optional<Model> model = MavenModelParser.parsePom(mock);
+    Optional<Model> model = MavenModelParser.parsePom(TestUtil.inputStreamToString(mock.getInputStream()));
     assertTrue(model.isPresent());
 
     mock = new MockMultipartFile("pom-invalid.xml", "pom-invalid.xml", "text/plain",
         getClass().getClassLoader().getResourceAsStream("pom-invalid.xml")
     );
-    model = MavenModelParser.parsePom(mock);
+    model = MavenModelParser.parsePom(TestUtil.inputStreamToString(mock.getInputStream()));
     assertFalse(model.isPresent());
 
   }

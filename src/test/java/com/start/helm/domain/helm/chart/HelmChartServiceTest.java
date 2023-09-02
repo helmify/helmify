@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.start.helm.TestUtil;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,6 +24,8 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +40,12 @@ class HelmChartServiceTest {
   @Autowired
   private MavenModelProcessor mavenModelProcessor;
 
+
   @Test
   void process() throws Exception {
     String filename = "pom-with-rabbit-postgres-web-actuator.xml";
     Optional<Model> model = MavenModelParser.parsePom(
-        new MockMultipartFile(filename, filename, "text/plain",
-            getClass().getClassLoader().getResourceAsStream(filename)
-        )
+        TestUtil.inputStreamToString(getClass().getClassLoader().getResourceAsStream(filename))
     );
     assertTrue(model.isPresent());
     Model m = model.get();
