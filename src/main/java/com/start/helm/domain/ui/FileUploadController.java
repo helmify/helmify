@@ -1,7 +1,8 @@
-package com.start.helm.domain.maven;
+package com.start.helm.domain.ui;
 
-import com.start.helm.domain.gradle.GradleUploadService;
+import com.start.helm.domain.gradle.GradleFileUploadService;
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.GradleUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Controller for handling upload of a pom.xml file.
+ * Controller for handling upload of a pom.xml / build.gradle file.
  * <p/>
  * This is the first controller to be called by the client upon a user action.
  * The user is expected to upload a Maven pom.xml file. We parse this file
@@ -23,8 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileUploadController {
 
-  private final PomUploadService pomUploadService;
-  private final GradleUploadService gradleUploadService;
+  private final MavenFileUploadService mavenFileUploadService;
+  private final GradleFileUploadService gradleFileUploadService;
 
   /**
    * Method which handles a file upload from the client.
@@ -43,12 +44,12 @@ public class FileUploadController {
 
     if (fileName.contains(".gradle")) {
       HelmContext helmContext =
-          gradleUploadService.processGradleBuild(buildFile, "my-project", GradleUtil.extractVersion(buildFile));
+          gradleFileUploadService.processBuildFile(buildFile);
       viewModel.addAttribute("helmContext", helmContext);
     }
 
     if (fileName.contains(".xml")) {
-      HelmContext helmContext = pomUploadService.processPom(buildFile);
+      HelmContext helmContext = mavenFileUploadService.processBuildFile(buildFile);
       viewModel.addAttribute("helmContext", helmContext);
     }
 

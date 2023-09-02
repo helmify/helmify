@@ -1,8 +1,8 @@
 package com.start.helm.domain.ui;
 
-import com.start.helm.domain.gradle.GradleUploadService;
+import com.start.helm.domain.gradle.GradleFileUploadService;
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.maven.PomUploadService;
+import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.GradleUtil;
 import com.start.helm.util.ZipUtil;
 import java.io.ByteArrayInputStream;
@@ -29,8 +29,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class SpringInitializrRestController {
 
   private final RestTemplate restTemplate;
-  private final PomUploadService pomUploadService;
-  private final GradleUploadService gradleUploadService;
+  private final MavenFileUploadService mavenFileUploadService;
+  private final GradleFileUploadService gradleFileUploadService;
 
   @Getter
   @Setter
@@ -58,8 +58,8 @@ public class SpringInitializrRestController {
     byte[] body = response.getBody();
 
     HelmContext helmContext =
-        Stream.of(new GradleBuildProcessor(body, gradleUploadService, isUsingKotlinScript),
-                new MavenBuildProcessor(body, pomUploadService))
+        Stream.of(new GradleBuildProcessor(body, gradleFileUploadService, isUsingKotlinScript),
+                new MavenBuildProcessor(body, mavenFileUploadService))
             .filter(processor -> springInitializrLink.contains(processor.matchOn()))
             .findFirst()
             .map(BuildProcessor::process)
@@ -89,7 +89,7 @@ public class SpringInitializrRestController {
   static
   class GradleBuildProcessor implements BuildProcessor {
     private final byte[] body;
-    private final GradleUploadService gradleUploadService;
+    private final GradleFileUploadService gradleFileUploadService;
     private final boolean isKotlinScript;
 
     private String getBuildGradle() {
@@ -114,7 +114,7 @@ public class SpringInitializrRestController {
         String settings = settingsGradle.orElseThrow();
         final String name = GradleUtil.extractName(settings);
 
-        return gradleUploadService.processGradleBuild(build, name, version);
+        return gradleFileUploadService.processBuildFile(build, name, version);
       }).orElseThrow();
     }
 
@@ -129,12 +129,12 @@ public class SpringInitializrRestController {
   class MavenBuildProcessor implements BuildProcessor {
 
     private final byte[] body;
-    private final PomUploadService pomUploadService;
+    private final MavenFileUploadService mavenFileUploadService;
 
     @Override
     public HelmContext process() {
       final String pomXml = readPomFromZip(body).orElseThrow();
-      return pomUploadService.processPom(pomXml);
+      return mavenFileUploadService.processPom(pomXml);
     }
 
     @Override
