@@ -1,4 +1,4 @@
-package com.start.helm.domain;
+package com.start.helm.domain.ui;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.HelmChartService;

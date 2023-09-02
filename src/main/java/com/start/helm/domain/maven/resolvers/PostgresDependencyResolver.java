@@ -1,7 +1,7 @@
 package com.start.helm.domain.maven.resolvers;
 
-import static com.start.helm.HelmUtil.initContainer;
-import static com.start.helm.HelmUtil.makeSecretKeyRef;
+import static com.start.helm.util.HelmUtil.initContainer;
+import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;

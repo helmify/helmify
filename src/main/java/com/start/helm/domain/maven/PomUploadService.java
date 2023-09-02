@@ -1,4 +1,4 @@
-package com.start.helm.domain;
+package com.start.helm.domain.maven;
 
 
 import static com.start.helm.domain.maven.MavenModelParser.parsePom;
@@ -14,7 +14,7 @@ import org.springframework.ui.Model;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UploadService {
+public class PomUploadService {
 
   private final MavenModelProcessor mavenModelProcessor;
 
