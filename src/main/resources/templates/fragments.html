@@ -6,7 +6,7 @@
     <div class="row">
         <label class="button outline col card-label"
                th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
-            1. Upload Maven POM
+            1. Upload Maven / Gradle file
         </label>
         <label class="button  outline col card-label"
                th:classappend="${helmContext != null && !helmContext.customized ? 'primary':'default'}">
@@ -36,7 +36,7 @@
                             type="text"
                             placeholder="1.1 Paste Spring Initializr Link"/>
                     <span style="font-size: 0.8em;">
-                        Note: only Maven Projects are supported currently.
+                        Maven / Gradle (Groovy) / Gradle (Kotlin) are supported
                     </span>
                 </label>
             </div>
@@ -102,13 +102,12 @@
 
                 <form id="form"
                       hx-encoding="multipart/form-data"
-                      hx-post="/upload-pom"
+                      hx-post="/upload-file"
                       hx-target="#pom-form"
                       method="post">
                     <input id="upload-input"
                            type="file"
-                           name="pom"
-                           accept="application/xml"
+                           name="file"
                            class="form-control-file"
                            style="display: none;"
                            onchange="this.form.requestSubmit()"

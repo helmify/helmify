@@ -81,15 +81,25 @@ public class HelmContext {
   @Setter
   private String zipLink;
 
-  public void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
+  public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
+    this.helmChartSlices.add(helmChartSlice);
+
+    Map<String, String> preferredChart = helmChartSlice.getPreferredChart();
+    this.addHelmDependency(
+        new HelmDependency(preferredChart.get("name"), preferredChart.get("version"), preferredChart.get("repository"),
+            List.of()));
+
+    Map<String, Object> valuesBlocks = helmChartSlice.getValuesEntries();
+    if (valuesBlocks.containsKey("global")) {
+      this.addValuesGlobalBlock((Map<String, Object>) valuesBlocks.get("global"));
+    }
+  }
+
+  private void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
     this.valuesGlobalBlocks.add(valuesGlobalBlock);
   }
 
-  public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
-    this.helmChartSlices.add(helmChartSlice);
-  }
-
-  public void addHelmDependency(HelmDependency helmDependency) {
+  private void addHelmDependency(HelmDependency helmDependency) {
     this.helmDependencies.add(helmDependency);
   }
 
