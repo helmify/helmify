@@ -10,7 +10,7 @@ name: Build Spring Docker Container, Push, Deploy
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
   pull_request:
     branches: [ "main", "develop" ]
 
