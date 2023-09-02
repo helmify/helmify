@@ -18,10 +18,10 @@ public class MavenModelParser {
    * If the file provided is a valid pom.xml, {@link Optional}'s isPresent() will be true,
    * false otherwise.
    */
-  public static Optional<Model> parsePom(MultipartFile mavenPom) {
+  public static Optional<Model> parsePom(String mavenPom) {
     MavenXpp3Reader reader = new MavenXpp3Reader();
     try {
-      return Optional.of(reader.read(mavenPom.getInputStream()));
+      return Optional.of(reader.read(new java.io.StringReader(mavenPom)));
     } catch (XmlPullParserException | IOException e) {
       return Optional.empty();
     }
