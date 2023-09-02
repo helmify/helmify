@@ -3,6 +3,7 @@ package com.start.helm.domain.maven;
 
 import static com.start.helm.domain.maven.MavenModelParser.parsePom;
 
+import com.start.helm.domain.FileUploadService;
 import com.start.helm.domain.helm.HelmContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +12,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PomUploadService {
+public class MavenFileUploadService implements FileUploadService {
 
   private final MavenModelProcessor mavenModelProcessor;
 
-  public HelmContext processPom(String pomXml) {
+  public HelmContext processBuildFile(String pomXml) {
     org.apache.maven.api.model.Model m = parsePom(pomXml).orElseThrow();
     HelmContext helmContext = mavenModelProcessor.process(m);
     helmContext.setAppVersion(m.getVersion());
@@ -26,4 +27,11 @@ public class PomUploadService {
   }
 
 
+  @Override
+  public HelmContext processBuildFile(String buildFile, String appName, String appVersion) {
+    HelmContext helmContext = processBuildFile(buildFile);
+    helmContext.setAppVersion(appVersion);
+    helmContext.setAppName(appName);
+    return helmContext;
+  }
 }

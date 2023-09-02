@@ -1,7 +1,9 @@
 package com.start.helm.domain.gradle;
 
+import com.start.helm.domain.FileUploadService;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.resolvers.DependencyResolver;
+import com.start.helm.util.GradleUtil;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,9 +14,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GradleUploadService {
+public class GradleFileUploadService implements FileUploadService {
 
   private final List<DependencyResolver> resolvers;
+
+  public HelmContext processBuildFile(String buildFile) {
+    return processBuildFile(buildFile, "my-project", GradleUtil.extractVersion(buildFile));
+  }
 
   /**
    * Method which accepts a build.gradle file as String and builds a {@link HelmContext} from it.
@@ -23,7 +29,7 @@ public class GradleUploadService {
    * After looking into gradle's tooling api, this simpler approach has proven as effective
    * in extracting the few bits of data we need to populate a {@link HelmContext}.
    */
-  public HelmContext processGradleBuild(String buildFile, String appName, String appVersion) {
+  public HelmContext processBuildFile(String buildFile, String appName, String appVersion) {
     log.info("Processing Gradle Build: {}", buildFile);
 
     HelmContext context = new HelmContext();
