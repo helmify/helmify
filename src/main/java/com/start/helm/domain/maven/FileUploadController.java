@@ -37,6 +37,8 @@ public class FileUploadController {
   public String uploadFile(Model viewModel, @RequestParam("file") MultipartFile file) throws IOException {
 
     final String fileName = file.getOriginalFilename();
+    validateFilename(fileName);
+
     final String buildFile = new String(file.getBytes(), StandardCharsets.UTF_8);
 
     if (fileName.contains(".gradle")) {
@@ -51,6 +53,12 @@ public class FileUploadController {
     }
 
     return "fragments :: pom-upload-form";
+  }
+
+  private static void validateFilename(String fileName) {
+    if (fileName == null) {
+      throw new IllegalArgumentException("File name is null");
+    }
   }
 
 }
