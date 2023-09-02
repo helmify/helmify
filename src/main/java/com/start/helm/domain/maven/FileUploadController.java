@@ -1,6 +1,8 @@
 package com.start.helm.domain.maven;
 
+import com.start.helm.domain.gradle.GradleUploadService;
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.util.GradleUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequiredArgsConstructor
-public class PomUploadController {
+public class FileUploadController {
 
   private final PomUploadService pomUploadService;
+  private final GradleUploadService gradleUploadService;
 
   /**
    * Method which handles a file upload from the client.
@@ -30,9 +33,24 @@ public class PomUploadController {
    * The provided pom is parsed and a {@link HelmContext} is populated from it
    * which is then put into the View Model: {@link Model} to expose to the client.
    */
-  @PostMapping("/upload-pom")
-  public String uploadPom(Model viewModel, @RequestParam("pom") MultipartFile mavenPom) throws IOException {
-    return pomUploadService.processPom(viewModel, new String(mavenPom.getBytes(), StandardCharsets.UTF_8));
+  @PostMapping("/upload-file")
+  public String uploadFile(Model viewModel, @RequestParam("file") MultipartFile file) throws IOException {
+
+    final String fileName = file.getOriginalFilename();
+    final String buildFile = new String(file.getBytes(), StandardCharsets.UTF_8);
+
+    if (fileName.contains(".gradle")) {
+      HelmContext helmContext =
+          gradleUploadService.processGradleBuild(buildFile, "my-project", GradleUtil.extractVersion(buildFile));
+      viewModel.addAttribute("helmContext", helmContext);
+    }
+
+    if (fileName.contains(".xml")) {
+      HelmContext helmContext = pomUploadService.processPom(buildFile);
+      viewModel.addAttribute("helmContext", helmContext);
+    }
+
+    return "fragments :: pom-upload-form";
   }
 
 }

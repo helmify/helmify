@@ -42,30 +42,15 @@ public class MavenModelProcessor {
 
     dependencies.stream()
         .filter(d -> !"test".equals(d.getScope()))
-        .map(d -> resolvers
+        .flatMap(d -> resolvers
             .stream()
             .filter(matcher -> matcher.matches(d.getArtifactId()))
-            .findFirst()
+            .map(matcher -> matcher.resolveDependency(context))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
         )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(d -> d.resolveDependency(context))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
         .collect(Collectors.toSet())
-        .forEach(f -> {
-          Map<String, String> preferredChart = f.getPreferredChart();
-
-          context.addHelmDependency(
-              new HelmDependency(preferredChart.get("name"), preferredChart.get("version"), preferredChart.get("repository"),
-                  List.of()));
-          context.addHelmChartFragment(f);
-
-          Map<String, Object> valuesBlocks = f.getValuesEntries();
-          if (valuesBlocks.containsKey("global")) {
-            context.addValuesGlobalBlock((Map<String, Object>) valuesBlocks.get("global"));
-          }
-        });
+        .forEach(context::addHelmChartFragment);
 
     return context;
   }
