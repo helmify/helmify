@@ -10,7 +10,7 @@ name: Build Spring Docker Container, Push, Deploy
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -47,7 +47,7 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         script: |
           docker pull helmstart/helm-start:latest && 
-          wget -O docker-compose.yml https://raw.githubusercontent.com/psalg-dev/helm-start/develop/docker-compose.yml &&
+          wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/develop/docker-compose.yml &&
           docker compose up -d --force-recreate
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive

@@ -58,7 +58,7 @@ public class HelmStartAppTests {
 				resourceLoader.getResource("classpath:pom-with-rabbit.xml").getContentAsString(StandardCharsets.UTF_8);
 
 		// send file with mockmvc
-		build.perform(multipart("/upload-pom").file("pom", pom.getBytes())).andExpect(status().isOk());
+		build.perform(multipart("/upload-file").file("file", pom.getBytes())).andExpect(status().isOk());
 	}
 
 	@Test
@@ -71,6 +71,6 @@ public class HelmStartAppTests {
 				resourceLoader.getResource("classpath:pom-with-postgres.xml").getContentAsString(StandardCharsets.UTF_8);
 
 		// send file with mockmvc
-		build.perform(multipart("/upload-pom").file("pom", pom.getBytes())).andExpect(status().isOk());
+		build.perform(multipart("/upload-file").file("file", pom.getBytes())).andExpect(status().isOk());
 	}
 }
