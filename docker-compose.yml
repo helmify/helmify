@@ -16,6 +16,8 @@ services:
       - traefik.http.routers.helm-start.tls=true
       - traefik.http.routers.helm-start.tls.certresolver=lets-encrypt
       - traefik.port=7070
+    volumes:
+      - /home/deploy/helm-start-data:/workspace
 
   traefik:
     image: traefik:v2.2
