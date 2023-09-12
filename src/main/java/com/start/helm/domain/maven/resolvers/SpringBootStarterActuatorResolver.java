@@ -2,9 +2,11 @@ package com.start.helm.domain.maven.resolvers;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Resolver for spring actuator dependency.
@@ -14,7 +16,7 @@ public class SpringBootStarterActuatorResolver implements DependencyResolver {
 
   @Override
   public String dependencyName() {
-    return "web";
+    return "actuator";
   }
 
   @Override
@@ -25,6 +27,11 @@ public class SpringBootStarterActuatorResolver implements DependencyResolver {
   @Override
   public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
     context.setHasActuator(true);
-    return Optional.empty();
+    HelmChartSlice slice = new HelmChartSlice();
+    slice.setValuesEntries(Map.of("healthcheck", Map.of(
+            "port", 8090,
+            "name", "healthcheck"
+    )));
+    return Optional.of(slice);
   }
 }

@@ -1,16 +1,12 @@
 package com.start.helm.domain.helm;
 
 import com.start.helm.util.JsonUtil;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.*;
 
 /**
  * Processing Context for a new Helm Chart.
@@ -83,16 +79,20 @@ public class HelmContext {
 
   public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
     this.helmChartSlices.add(helmChartSlice);
-
     Map<String, String> preferredChart = helmChartSlice.getPreferredChart();
-    this.addHelmDependency(
-        new HelmDependency(preferredChart.get("name"), preferredChart.get("version"), preferredChart.get("repository"),
-            List.of()));
 
-    Map<String, Object> valuesBlocks = helmChartSlice.getValuesEntries();
-    if (valuesBlocks.containsKey("global")) {
-      this.addValuesGlobalBlock((Map<String, Object>) valuesBlocks.get("global"));
+    if (preferredChart != null) {
+      this.addHelmDependency(
+              new HelmDependency(preferredChart.get("name"), preferredChart.get("version"), preferredChart.get("repository"),
+                      List.of()));
+
+      Map<String, Object> valuesBlocks = helmChartSlice.getValuesEntries();
+      if (valuesBlocks.containsKey("global")) {
+        this.addValuesGlobalBlock((Map<String, Object>) valuesBlocks.get("global"));
+      }
     }
+
+
   }
 
   private void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
