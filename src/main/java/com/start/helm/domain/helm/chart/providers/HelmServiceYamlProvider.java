@@ -12,23 +12,23 @@ import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher
 public class HelmServiceYamlProvider implements HelmFileProvider {
 
   private static final String template = """
-      apiVersion: v1
-      kind: Service
-      metadata:
-            name: {{ include "%s.fullname" . }}
-            labels:
-              {{- include "%s.labels" . | nindent 4 }}
-          spec:
-            type: {{ .Values.service.type }}
-            ports:
-              - port: {{ .Values.service.port }}
-                targetPort: http
-                protocol: TCP
-                name: http
+          apiVersion: v1
+          kind: Service
+          metadata:
+              name: {{ include "%s.fullname" . }}
+                labels:
+                  {{- include "%s.labels" . | nindent 4 }}
+              spec:
+                type: {{ .Values.service.type }}
+                ports:
+                  - port: {{ .Values.service.port }}
+                    targetPort: http
+                    protocol: TCP
+                    name: http
           ###@helm-start:healthcheckport
-            selector:
-              {{- include "%s.selectorLabels" . | nindent 4 }}
-          """;
+                selector:
+                  {{- include "%s.selectorLabels" . | nindent 4 }}
+              """;
 
   private static final String healthCheckPortPatch = """
           - port: {{ .Values.healthcheck.port }}
@@ -47,7 +47,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
   }
 
   private String addHealthCheckPort(String content) {
-    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 4);
+    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 8);
   }
 
   @Override
