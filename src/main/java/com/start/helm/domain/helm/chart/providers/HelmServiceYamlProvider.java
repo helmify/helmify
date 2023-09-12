@@ -15,19 +15,19 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
           apiVersion: v1
           kind: Service
           metadata:
-              name: {{ include "%s.fullname" . }}
-                labels:
-                  {{- include "%s.labels" . | nindent 4 }}
-              spec:
-                type: {{ .Values.service.type }}
-                ports:
-                  - port: {{ .Values.service.port }}
-                    targetPort: http
-                    protocol: TCP
-                    name: http
+            name: {{ include "%s.fullname" . }}
+              labels:
+                {{- include "%s.labels" . | nindent 4 }}
+            spec:
+              type: {{ .Values.service.type }}
+              ports:
+                - port: {{ .Values.service.port }}
+                  targetPort: http
+                  protocol: TCP
+                  name: http
           ###@helm-start:healthcheckport
-                selector:
-                  {{- include "%s.selectorLabels" . | nindent 4 }}
+              selector:
+                {{- include "%s.selectorLabels" . | nindent 4 }}
               """;
 
   private static final String healthCheckPortPatch = """
