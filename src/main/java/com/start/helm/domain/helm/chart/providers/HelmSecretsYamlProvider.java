@@ -26,8 +26,9 @@ public class HelmSecretsYamlProvider implements HelmFileProvider{
     StringBuffer patch = new StringBuffer();
 
     context
-        .getHelmChartSlices()
-        .stream()
+            .getHelmChartSlices()
+            .stream()
+            .filter(f -> f.getSecretEntries() != null)
         .flatMap(f -> f.getSecretEntries().entrySet().stream())
         .forEach(e -> patch.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
 

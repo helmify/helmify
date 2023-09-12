@@ -2,8 +2,7 @@ package com.start.helm.domain.helm.chart.providers;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.start.helm.util.HelmUtil;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,25 +28,26 @@ public class HelmConfigMapProvider implements HelmFileProvider {
   @Override
   public String getFileContent(HelmContext context) {
     String filledTemplate = template.replace("REPLACEME", context.getAppName());
-    return customize(filledTemplate, context);
+    return HelmUtil.removeMarkers(customize(filledTemplate, context));
   }
 
   private String customize(String content, HelmContext context) {
     StringBuffer patch = new StringBuffer();
     context.getHelmChartSlices()
-        .forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
-    return cleanup(TemplateStringPatcher.insertAfter(content, marker, patch.toString(), 4));
-  }
+            .stream().filter(f -> f.getDefaultConfig() != null)
+            .forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
+    // set separate port for actuator, we don't want to expose actuator through an ingress
+    if (context.isHasActuator()) {
+      patch.append("management.server.port={{ .Values.healthcheck.port }}\n");
+    }
 
-  private String cleanup(String content) {
-    return Arrays.stream(content
-            .replace(marker, "")
-            .split("\n"))
-        .filter(s -> !"".equals(s.trim()))
-        .collect(Collectors.joining("\n"));
-  }
+    // set server port
+    if (context.isCreateIngress()) {
+      patch.append("server.port={{ .Values.service.port }}\n");
+    }
 
-  private final String marker = "###@helm-start:configmap";
+    return HelmUtil.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4));
+  }
 
   @Override
   public String getFileName() {
