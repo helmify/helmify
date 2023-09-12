@@ -1,9 +1,40 @@
 services:
-  start-helm:
+
+  helm-start:
     image: helmstart/helm-start:latest
     container_name: helm-start
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
+      SERVER_PORT: 7070
       TZ: "Europe/Berlin"
+    expose:
+      - 7070
+    networks:
+      - web
+    labels:
+      - traefik.http.routers.helm-start.rule=Host(`helm-start.com`)
+      - traefik.http.routers.helm-start.tls=true
+      - traefik.http.routers.helm-start.tls.certresolver=lets-encrypt
+      - traefik.port=7070
+
+  traefik:
+    image: traefik:v2.2
+    container_name: traefik
+    restart: always
     ports:
       - "80:80"
+      - "443:443"
+    networks:
+      - web
+    volumes:
+      - /opt/traefik/traefik.toml:/traefik.toml
+      - /opt/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
+      - /opt/traefik/acme.json:/acme.json #note: needs chmod 600
+      - /var/run/docker.sock:/var/run/docker.sock
+
+
+networks:
+  web:
+    external: true
+    #  internal:
+    #    external: false

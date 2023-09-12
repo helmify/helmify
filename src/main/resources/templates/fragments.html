@@ -6,7 +6,7 @@
     <div class="row">
         <label class="button outline col card-label"
                th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
-            1. Upload Maven POM
+            1. Upload Maven / Gradle file
         </label>
         <label class="button  outline col card-label"
                th:classappend="${helmContext != null && !helmContext.customized ? 'primary':'default'}">
@@ -16,6 +16,33 @@
                th:classappend="${helmContext != null && helmContext.customized ? 'primary':'default'}">
             3. Profit
         </label>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div th:if="${helmContext == null}"
+                 style="width: 100%; opacity: 80%; font-size: 1.1em; text-align: center; padding: 0.5em"
+                 class="default">
+                Or
+            </div>
+            <div th:if="${helmContext == null}" style="width: 100%">
+                <label>
+                    <input
+                            hx-trigger="keyup changed delay:500ms"
+                            hx-post="/spring-initializr-link"
+                            hx-ext="json-enc"
+                            hx-target="#pom-form"
+                            id="springInitializrLink"
+                            name="springInitializrLink"
+                            type="text"
+                            placeholder="1.1 Paste Spring Initializr Link"/>
+                    <span style="font-size: 0.8em;">
+                        Maven / Gradle (Groovy) / Gradle (Kotlin) are supported
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="col"></div>
+        <div class="col"></div>
     </div>
 </div>
 <div th:fragment="customization-input-form">
@@ -75,19 +102,22 @@
 
                 <form id="form"
                       hx-encoding="multipart/form-data"
-                      hx-post="/upload-pom"
+                      hx-post="/upload-file"
                       hx-target="#pom-form"
                       method="post">
                     <input id="upload-input"
                            type="file"
-                           name="pom"
-                           accept="application/xml"
+                           name="file"
                            class="form-control-file"
                            style="display: none;"
                            onchange="this.form.requestSubmit()"
                     >
                 </form>
-
+                <div th:if="${springInitializrLink != null}">
+                    <a th:href="${springInitializrLink}" target="_blank">
+                        Spring Initalizr Link
+                    </a>
+                </div>
                 <div th:if="${helmContext != null}">
                         <pre style="
                         max-height: 51em;

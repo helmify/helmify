@@ -1,31 +1,25 @@
 package com.start.helm.domain.helm.chart;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import com.start.helm.TestUtil;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
+import org.apache.maven.api.model.Model;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import org.apache.maven.api.model.Model;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class HelmChartServiceTest {
@@ -35,13 +29,12 @@ class HelmChartServiceTest {
   @Autowired
   private MavenModelProcessor mavenModelProcessor;
 
+
   @Test
   void process() throws Exception {
     String filename = "pom-with-rabbit-postgres-web-actuator.xml";
     Optional<Model> model = MavenModelParser.parsePom(
-        new MockMultipartFile(filename, filename, "text/plain",
-            getClass().getClassLoader().getResourceAsStream(filename)
-        )
+        TestUtil.inputStreamToString(getClass().getClassLoader().getResourceAsStream(filename))
     );
     assertTrue(model.isPresent());
     Model m = model.get();
@@ -51,7 +44,7 @@ class HelmChartServiceTest {
     context.setAppVersion("1.0.0");
 
     assertNotNull(context);
-    assertEquals(2, context.getHelmChartSlices().size());
+    assertEquals(3, context.getHelmChartSlices().size());
     assertEquals(2, context.getValuesGlobalBlocks().size());
     assertEquals(2, context.getHelmDependencies().size());
     assertTrue(context.isHasActuator());
@@ -59,21 +52,23 @@ class HelmChartServiceTest {
 
     boolean rabbitmq = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("rabbitmq"));
     boolean postgresql =
-        context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("postgresql"));
+            context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("postgresql"));
     assertTrue(rabbitmq);
     assertTrue(postgresql);
 
-    context.getHelmChartSlices().forEach(s ->
-        assertAll(
-            () -> assertNotNull(s.getPreferredChart()),
-            () -> assertNotNull(s.getValuesEntries()),
-            () -> assertNotNull(s.getValuesEntries().get("global")),
-            () -> assertNotNull(s.getSecretEntries()),
-            () -> assertNotNull(s.getDefaultConfig()),
-            () -> assertNotNull(s.getEnvironmentEntries()),
-            () -> assertNotNull(s.getInitContainer())
-        )
-    );
+    context.getHelmChartSlices()
+            .stream().filter(slice -> slice.getPreferredChart() != null)
+            .forEach(s ->
+                    assertAll(
+                            () -> assertNotNull(s.getPreferredChart()),
+                            () -> assertNotNull(s.getValuesEntries()),
+                            () -> assertNotNull(s.getValuesEntries().get("global")),
+                            () -> assertNotNull(s.getSecretEntries()),
+                            () -> assertNotNull(s.getDefaultConfig()),
+                            () -> assertNotNull(s.getEnvironmentEntries()),
+                            () -> assertNotNull(s.getInitContainer())
+                    )
+            );
 
     context.setCustomizations(new HelmContext.HelmContextCustomization(
         "test", "latest", null, Map.of()

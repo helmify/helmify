@@ -1,14 +1,16 @@
 package com.start.helm.domain.helm.chart.providers;
 
-import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
-import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.removeBetween;
-
 import com.start.helm.app.config.YamlConfig;
 import com.start.helm.domain.helm.HelmContext;
-import java.util.List;
+import com.start.helm.util.HelmUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+
+import java.util.List;
+
+import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
+import static com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher.removeBetween;
 
 @Component
 @RequiredArgsConstructor
@@ -100,7 +102,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   @Override
   public String getFileContent(HelmContext context) {
     String filledTemplate = template.replace("REPLACEME", context.getAppName());
-    return customize(filledTemplate, context);
+    return HelmUtil.removeMarkers(customize(filledTemplate, context));
   }
 
   @Override
@@ -110,34 +112,39 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
   private String customize(String content, HelmContext context) {
     String withInitContainers = injectInitContainers(content, context);
-    if (!context.isCreateIngress() || !context.isHasActuator()) {
-      // remove probes
+
+    // remove http probes if it's not a webapp
+    if (!context.isCreateIngress()) {
       withInitContainers = removeBetween("###@helm-start:probes", "###@helm-start:lifecycle", withInitContainers);
     }
 
+    // if it's a webapp and we have an actuator..
     if (context.isCreateIngress() && context.isHasActuator()) {
-      // set probe paths
+      // remove default probe
       withInitContainers = removeBetween("###@helm-start:probes", "###@helm-start:lifecycle", withInitContainers);
       withInitContainers = insertAfter(withInitContainers, "###@helm-start:probes", """
-          livenessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-            failureThreshold: 3
-            httpGet:
-              path: /actuator/health/liveness
-              port: http
-          readinessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-            failureThreshold: 3
-            httpGet:
-              path: /actuator/health/readiness
-              port: http
-          """, 10);
+                - name: healthcheck
+                  containerPort: {{ .Values.healthcheck.port }}
+                  protocol: TCP
+              livenessProbe:
+                initialDelaySeconds: 10
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+                failureThreshold: 3
+                httpGet:
+                  path: /actuator/health/liveness
+                  port: healthcheck
+              readinessProbe:
+                initialDelaySeconds: 10
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+                failureThreshold: 3
+                httpGet:
+                  path: /actuator/health/readiness
+                  port: healthcheck
+              """, 10);
     }
 
     return injectEnvVars(withInitContainers, context);
@@ -146,21 +153,25 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   private static String injectInitContainers(String content, HelmContext context) {
     StringBuffer buffer = new StringBuffer();
     Yaml yaml = YamlConfig.getInstance();
-    context.getHelmChartSlices().forEach(f -> buffer.append(yaml.dump(List.of(f.getInitContainer()))).append("\n"));
+    context.getHelmChartSlices()
+            .stream().filter(f -> f.getInitContainer() != null)
+            .forEach(slice -> buffer.append(yaml.dump(List.of(slice.getInitContainer()))).append("\n"));
     String withInitContainer = insertAfter(content, "###@helm-start:initcontainers", buffer.toString(), 6);
     return insertAfter(withInitContainer, "###@helm-start:initcontainers", "initContainers:\n", 6)
-        .replace("'\"", "\"")
-        .replace("\"'", "\"");
+            .replace("'\"", "\"")
+            .replace("\"'", "\"");
   }
 
   private static String injectEnvVars(String content, HelmContext context) {
     StringBuffer buffer = new StringBuffer();
     Yaml yaml = YamlConfig.getInstance();
-    context.getHelmChartSlices().forEach(f -> buffer.append(yaml.dump(f.getEnvironmentEntries())).append("\n"));
+    context.getHelmChartSlices()
+            .stream().filter(f -> f.getEnvironmentEntries() != null)
+            .forEach(slice -> buffer.append(yaml.dump(slice.getEnvironmentEntries())).append("\n"));
     String withEnvVars = insertAfter(content, "###@helm-start:envblock", buffer.toString(), 10);
     return insertAfter(withEnvVars, "###@helm-start:envblock", "env:\n", 10)
-        .replace("'{{", "{{")
-        .replace("}}'", "}}");
+            .replace("'{{", "{{")
+            .replace("}}'", "}}");
   }
 
 }
