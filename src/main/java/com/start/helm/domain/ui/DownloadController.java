@@ -1,10 +1,8 @@
 package com.start.helm.domain.ui;
 
+import com.start.helm.domain.ChartCountTracker;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.HelmChartService;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,11 +12,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Controller for File Download.
@@ -33,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DownloadController {
 
   private final HelmChartService helmChartService;
+  private final ChartCountTracker chartCountTracker;
 
   private Map<String, ByteArrayResource> cache = new HashMap<>();
 
@@ -64,6 +63,7 @@ public class DownloadController {
   @GetMapping(path = "/download/execute")
   public ResponseEntity<Resource> download(@RequestParam("key") String key) {
     ByteArrayResource resource = cache.remove(key);
+    chartCountTracker.increment();
     return ResponseEntity.ok().headers(this.headers("helm.zip")).contentLength(resource.contentLength())
         .contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
   }
