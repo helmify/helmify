@@ -16,6 +16,7 @@
         text-align: center;
         border-bottom: 0.1rem solid #d1d1d1;
     }
+
     body {
         --bg-color: #333;
         --bg-secondary-color: #131316;
@@ -24,37 +25,47 @@
         --color-darkGrey: #777;
         padding: 1em;
     }
+
     .brand {
         padding-left: 0 !important;
     }
 </style>
-<body class="row" style="margin-right: 0">
-<header id="header" class="col-12">
-    <nav class="nav">
-        <div class="nav-left">
-            <a class="brand" href="/">helm-start</a>
-        </div>
-        <div class="nav-right">
-            <div class="tabs">
-                <a class="active" href="https://github.com/psalg-dev/start-helm">Github</a>
-                <a href="https://jenil.github.io/chota/#docs">Chota</a>
-                <a href="https://htmx.org/docs/">htmx</a>
+<body>
+<div class="row">
+    <header id="header" class="col-12">
+        <nav class="nav">
+            <div class="nav-left">
+                <a class="brand" href="/">helm-start</a>
             </div>
+            <div class="nav-right">
+                <div class="tabs">
+                    <a class="active" href="https://github.com/psalg-dev/start-helm">Github</a>
+                    <a href="https://jenil.github.io/chota/#docs">Chota</a>
+                    <a href="https://htmx.org/docs/">htmx</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div hx-boost="true">
+            <div>
+                <p>
+                    Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart
+                    for
+                    you :) <a
+                        href="/about">Tell me more ..</a>
+                </p>
+            </div>
+            <div th:insert="~{fragments :: pom-upload-form}"></div>
         </div>
-    </nav>
-</header>
-<div class="col-12">
-    <div hx-boost="true">
-        <div>
-            <p>
-                Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart for
-                you :) <a
-                    href="/about">Tell me more ..</a>
-            </p>
-        </div>
-        <div th:insert="~{fragments :: pom-upload-form}"></div>
     </div>
 </div>
-
+<div style="bottom: 25px;height:25px;position: absolute;width: 98%;padding: 5px;">
+    <div class="col-12" style="text-align: center">
+        Helm Charts generated: <span th:text="${chartsGenerated}"></span>
+    </div>
+</div>
 </body>
 </html>
