@@ -17,13 +17,19 @@ public class ChartCountTracker {
 
     @SneakyThrows
     private File getStore() {
-        Path path = Paths.get("chart-count.json");
-        if (!Files.exists(path)) {
-            Files.createFile(path);
-            String json = this.objectMapper.writeValueAsString(new ChartCount(0));
-            Files.write(path, json.getBytes());
+        Path dataDirectory = Paths.get("helm-start-data");
+        if (!Files.exists(dataDirectory)) {
+            Files.createDirectory(dataDirectory);
         }
-        return path.toFile();
+
+        Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count.json");
+        if (!Files.exists(filePath)) {
+            Files.createFile(filePath);
+            String json = this.objectMapper.writeValueAsString(new ChartCount(0));
+            Files.write(filePath, json.getBytes());
+        }
+
+        return filePath.toFile();
     }
 
     @SneakyThrows
