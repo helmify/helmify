@@ -2,14 +2,15 @@ package com.start.helm.domain.helm.chart;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.providers.HelmFileProvider;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Service for generating helm charts based on input
@@ -27,9 +28,13 @@ public class HelmChartService {
    */
   @SneakyThrows
   public byte[] process(HelmContext context) {
+    return this.process(context, new ByteArrayOutputStream(), false);
+  }
 
-    ByteArrayOutputStream fileOutputStream = new ByteArrayOutputStream();
-    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+  @SneakyThrows
+  public byte[] process(HelmContext context, ByteArrayOutputStream outputStream, boolean addParentDirectory) {
+    ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+
     zipOutputStream.putNextEntry(new ZipEntry("templates/"));
     zipOutputStream.closeEntry();
 
@@ -40,9 +45,9 @@ public class HelmChartService {
     });
 
     zipOutputStream.close();
-    fileOutputStream.close();
+    outputStream.close();
 
-    return fileOutputStream.toByteArray();
+    return outputStream.toByteArray();
   }
 
   private void addZipEntry(String filename, String content, ZipOutputStream zipOutputStream) {
