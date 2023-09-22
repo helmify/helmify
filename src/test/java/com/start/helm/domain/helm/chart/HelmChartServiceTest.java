@@ -165,15 +165,21 @@ class HelmChartServiceTest {
     assertTrue(chartYaml.contains("appVersion: " + context.getAppVersion()));
     assertTrue(chartYaml.contains("type: application"));
     assertTrue(chartYaml.contains("version: 0.1.0"));
+    //@formatter:off
     assertTrue(chartYaml.contains("""
-          - condition: postgresql.enabled
-            name: postgresql
+          - name: postgresql
+            version: 11.9.2
             repository: https://charts.bitnami.com/bitnami
+            condition: postgresql.enabled
+            tags: []
         """));
+    //@formatter:off
     assertTrue(chartYaml.contains("""
-          - condition: rabbitmq.enabled
-            name: rabbitmq
+          - name: rabbitmq
+            version: 11.9.0
             repository: https://charts.bitnami.com/bitnami
+            condition: rabbitmq.enabled
+            tags: []
         """));
   }
 }
