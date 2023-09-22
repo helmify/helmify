@@ -5,6 +5,7 @@ import com.start.helm.domain.helm.chart.HelmChartService;
 import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.DownloadUtil;
 import com.start.helm.util.ZipUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,10 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 
@@ -49,13 +46,14 @@ public class SpringInitializrProxy {
     }
 
     @GetMapping(value = "/spring/starter.zip")
-    public Object getStarter(@RequestParam Map<String, String> requestParams) throws IOException {
+    public Object getStarter(HttpServletRequest request) throws IOException {
+
         RestTemplate restTemplate = new RestTemplate();
 
-        Map<String, List<String>> collected = requestParams
+        Map<String, List<String>> collected = request.getParameterMap()
                 .keySet()
                 .stream()
-                .collect(Collectors.toMap(k -> k, k -> List.of(requestParams.get(k))));
+                .collect(Collectors.toMap(k -> k, k -> Arrays.asList(request.getParameterMap().get(k))));
 
         URI uri = UriComponentsBuilder.fromHttpUrl("https://start.spring.io/starter.zip")
                 .queryParams(new MultiValueMapAdapter<>(collected))
