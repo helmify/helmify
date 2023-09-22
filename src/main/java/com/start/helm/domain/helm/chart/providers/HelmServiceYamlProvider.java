@@ -16,18 +16,18 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
           kind: Service
           metadata:
             name: {{ include "%s.fullname" . }}
-              labels:
-                {{- include "%s.labels" . | nindent 4 }}
-            spec:
-              type: {{ .Values.service.type }}
-              ports:
-                - port: {{ .Values.service.port }}
-                  targetPort: http
-                  protocol: TCP
-                  name: http
+            labels:
+              {{- include "%s.labels" . | nindent 4 }}
+          spec:
+            type: {{ .Values.service.type }}
+            ports:
+              - port: {{ .Values.service.port }}
+                targetPort: http
+                protocol: TCP
+                name: http
           ###@helm-start:healthcheckport
-              selector:
-                {{- include "%s.selectorLabels" . | nindent 4 }}
+            selector:
+              {{- include "%s.selectorLabels" . | nindent 4 }}
               """;
 
   private static final String healthCheckPortPatch = """
