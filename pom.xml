@@ -48,6 +48,12 @@
 			<version>4.0.0-alpha-7</version>
 		</dependency>
 		<dependency>
+			<groupId>org.zeroturnaround</groupId>
+			<artifactId>zt-zip</artifactId>
+			<version>1.16</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
 			<groupId>org.webjars.npm</groupId>
 			<artifactId>htmx.org</artifactId>
 			<version>${htmx.org.version}</version>
