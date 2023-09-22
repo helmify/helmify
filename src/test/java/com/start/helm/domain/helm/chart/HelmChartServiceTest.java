@@ -71,16 +71,15 @@ class HelmChartServiceTest {
             );
 
     context.setCustomizations(new HelmContext.HelmContextCustomization(
-        "test", "latest", null, Map.of()
+            "test", "latest", null, Map.of()
     ));
     context.setCustomized(true);
 
     byte[] process = service.process(context);
-    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
-
     Files.write(Paths.get("helm.zip"), process);
-    ZipFile zipFile = new ZipFile(new File("helm.zip"));
-
+    File helmFile = new File("helm.zip");
+    ZipFile zipFile = new ZipFile(helmFile);
+    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
     Map<String, String> contents = new HashMap<>();
     List<String> names = new ArrayList<>();
     ZipEntry entry;
@@ -110,10 +109,10 @@ class HelmChartServiceTest {
 
     assertTrue(contents.keySet().containsAll(names));
 
-    checkChartYaml(context, contents);
+
     checkConfigMapYaml(contents);
     checkDeploymentYaml(contents);
-
+    checkChartYaml(context, contents);
   }
 
   private static void checkDeploymentYaml(Map<String, String> contents) {

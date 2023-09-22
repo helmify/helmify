@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class SpringInitializrProxy {
     }
 
     @GetMapping(value = "/spring/starter.zip")
-    public Object getStarter(HttpServletRequest request) throws IOException {
+    public ResponseEntity<?> getStarter(HttpServletRequest request) throws IOException {
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -66,7 +67,8 @@ public class SpringInitializrProxy {
 
             byte[] body = forEntity.getBody();
             String uuid = UUID.randomUUID().toString();
-            File parentDir = Paths.get(System.getProperty("java.io.tmpdir"), uuid).toFile();
+            Path dataDirectory = Paths.get("helm-start-data");
+            File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp", uuid).toFile();
             parentDir.mkdirs();
             File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
             helmDir.mkdirs();
