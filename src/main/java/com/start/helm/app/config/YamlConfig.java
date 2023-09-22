@@ -16,8 +16,6 @@ public class YamlConfig {
 
   private static DumperOptions getOptions() {
     DumperOptions options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    options.setPrettyFlow(true);
     options.setIndicatorIndent(2);
     options.setIndentWithIndicator(true);
     return options;

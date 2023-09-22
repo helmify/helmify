@@ -35,7 +35,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
             targetPort: {{ .Values.healthcheck.port }}
             protocol: TCP
             name: healthcheck
-          """;
+                """;
 
   @Override
   public String getFileContent(HelmContext context) {
@@ -47,7 +47,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
   }
 
   private String addHealthCheckPort(String content) {
-    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 6);
+    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 2);
   }
 
   @Override
