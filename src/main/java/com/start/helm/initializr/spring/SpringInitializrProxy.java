@@ -17,18 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 
-import static com.start.helm.util.ZipUtil.merge;
 
 @Slf4j
 @RestController
@@ -69,12 +67,23 @@ public class SpringInitializrProxy {
         if (forEntity.getStatusCode().is2xxSuccessful() && forEntity.getBody() != null) {
 
             byte[] body = forEntity.getBody();
-            ZipInputStream original = new ZipInputStream(new ByteArrayInputStream(body));
+            String uuid = UUID.randomUUID().toString();
+            File parentDir = Paths.get(System.getProperty("java.io.tmpdir"), uuid).toFile();
+            parentDir.mkdirs();
+            File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
+            helmDir.mkdirs();
 
-            ByteArrayResource helmChart = this.generateHelmChart(new ByteArrayResource(forEntity.getBody()));
-            ZipInputStream patchedStream = new ZipInputStream(helmChart.getInputStream());
+            org.zeroturnaround.zip.ZipUtil.unpack(new ByteArrayInputStream(body), parentDir);
 
-            ByteArrayResource merged = merge(original, patchedStream, "helm");
+            ByteArrayResource helmChart = this.generateHelmChart(new ByteArrayResource(body));
+
+            org.zeroturnaround.zip.ZipUtil.unpack(helmChart.getInputStream(), helmDir);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(body.length);
+
+            org.zeroturnaround.zip.ZipUtil.pack(parentDir, outputStream);
+
+            ByteArrayResource merged = new ByteArrayResource(outputStream.toByteArray());
 
             return ResponseEntity.ok().headers(DownloadUtil.headers("starter.zip"))
                     .contentLength(merged.contentLength())
