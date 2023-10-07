@@ -1,15 +1,12 @@
 package com.start.helm.domain.helm.chart.model;
 
 import com.start.helm.domain.helm.HelmContext;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Model for Helm values.yaml
@@ -50,7 +47,7 @@ public class HelmValues {
     return HelmValues.builder()
         .replicaCount(1)
         .image(
-            new HelmValuesImage("REPLACE_REPOSITORY", "REPLACE_TAG", HelmValuesImage.ImagePullPolicy.Always, new ArrayList<>()))
+                new HelmValuesImage(context.getAppName(), context.getAppVersion(), HelmValuesImage.ImagePullPolicy.IfNotPresent, new ArrayList<>()))
         .imagePullSecrets(new ArrayList<>())
         .nameOverride("")
         .fullnameOverride(context.getAppName())
