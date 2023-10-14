@@ -43,7 +43,7 @@ public class RedisDependencyResolver implements DependencyResolver {
   }
 
   private String getRedisHost(HelmContext context) {
-    return context.getAppName() + "-redis";
+    return context.getAppName() + "-redis-master";
   }
 
   public Map<String, String> getPreferredChart() {
@@ -62,7 +62,15 @@ public class RedisDependencyResolver implements DependencyResolver {
   }
 
   @Override
-  public String initContainerCheckEndpoint(HelmContext context) {
-    return getRedisHost(context) + "-master " + getRedisPort();
+  public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
+    String appName = context.getAppName();
+    Map<String, Object> redisPasswordRef = Map.of("name", "SPRING_REDIS_PASSWORD", "valueFrom", Map.of(
+            "secretKeyRef", Map.of(
+                    "name", "REPLACEME-redis".replace("REPLACEME", appName),
+                    "key", "redis-password",
+                    "optional", false
+            )
+    ));
+    return List.of(redisPasswordRef);
   }
 }
