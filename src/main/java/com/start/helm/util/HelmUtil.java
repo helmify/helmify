@@ -29,7 +29,7 @@ public final class HelmUtil {
         ));
     }
 
-    public static Map<String, Object> initContainer(String appName, String dependencyName) {
+    public static Map<String, Object> initContainer(String appName, String dependencyName, String endpoint) {
         String name = "\"{{ include \"%s.fullname\" . }}-%schecker\"".formatted(appName, dependencyName);
         return Map.of(
                 "name", name,
@@ -46,11 +46,11 @@ public final class HelmUtil {
                         "-c",
                         """
                                 echo 'Waiting for %s to become ready...'
-                                until printf "." && nc -z -w 2 {{ .Values.global.hosts.%s }} {{ .Values.global.ports.%s }}; do
+                                until printf "." && nc -z -w 2 %s; do
                                     sleep 2;
                                 done;
                                 echo '%s OK ✓'
-                                """.formatted(dependencyName, dependencyName, dependencyName, dependencyName)
+                                """.formatted(dependencyName, endpoint, dependencyName)
                 ),
                 "resources", Map.of(
                         "requests", Map.of(

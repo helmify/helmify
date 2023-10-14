@@ -1,6 +1,7 @@
 package com.start.helm.domain.helm.chart.providers;
 
 import com.start.helm.app.config.YamlConfig;
+import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.util.HelmUtil;
 import lombok.RequiredArgsConstructor;
@@ -165,13 +166,20 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
   private static String injectEnvVars(String content, HelmContext context) {
     StringBuffer buffer = new StringBuffer();
     Yaml yaml = YamlConfig.getInstance();
-    context.getHelmChartSlices()
-            .stream().filter(f -> f.getEnvironmentEntries() != null)
-            .forEach(slice -> buffer.append(yaml.dump(slice.getEnvironmentEntries())).append("\n"));
-    String withEnvVars = insertAfter(content, "###@helm-start:envblock", buffer.toString(), 10);
-    return insertAfter(withEnvVars, "###@helm-start:envblock", "env:\n", 10)
-            .replace("'{{", "{{")
-            .replace("}}'", "}}");
+    List<HelmChartSlice> slicesWithEnvEntries = context.getHelmChartSlices()
+            .stream()
+            .filter(f -> f.getEnvironmentEntries() != null && !f.getEnvironmentEntries().isEmpty())
+            .toList();
+
+    if (!slicesWithEnvEntries.isEmpty()) {
+      slicesWithEnvEntries.forEach(slice -> buffer.append(yaml.dump(slice.getEnvironmentEntries())).append("\n"));
+      String withEnvVars = insertAfter(content, "###@helm-start:envblock", buffer.toString(), 10);
+      return insertAfter(withEnvVars, "###@helm-start:envblock", "env:\n", 10)
+              .replace("'{{", "{{")
+              .replace("}}'", "}}");
+    }
+
+    return content;
   }
 
 }
