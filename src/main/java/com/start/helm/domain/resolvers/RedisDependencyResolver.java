@@ -1,4 +1,4 @@
-package com.start.helm.domain.maven.resolvers;
+package com.start.helm.domain.resolvers;
 
 import com.start.helm.domain.helm.HelmContext;
 import lombok.extern.slf4j.Slf4j;
