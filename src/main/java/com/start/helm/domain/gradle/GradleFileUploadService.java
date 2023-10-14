@@ -2,7 +2,7 @@ package com.start.helm.domain.gradle;
 
 import com.start.helm.domain.FileUploadService;
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.maven.resolvers.DependencyResolver;
+import com.start.helm.domain.resolvers.DependencyResolver;
 import com.start.helm.util.GradleUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

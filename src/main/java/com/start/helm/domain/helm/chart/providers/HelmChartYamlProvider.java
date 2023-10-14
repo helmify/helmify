@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,8 +32,8 @@ public class HelmChartYamlProvider implements HelmFileProvider {
         .version("0.1.0")
         .appVersion(context.getAppVersion())
         .description("A Helm chart for Kubernetes")
-        .type(HelmChart.HelmChartType.application)
-        .build();
+            .type(HelmChart.HelmChartType.application)
+            .build();
     return customize(chart, context);
   }
 
@@ -41,7 +42,17 @@ public class HelmChartYamlProvider implements HelmFileProvider {
     return "Chart.yaml";
   }
 
-  private String customize (HelmChart helmChart, HelmContext context) {
+  private static HelmChart.HelmChartDependency getBitnamiCommonDependency() {
+    HelmChart.HelmChartDependency helmChartDependency = new HelmChart.HelmChartDependency();
+    helmChartDependency.setName("common");
+    helmChartDependency.setVersion("2.x.x");
+    helmChartDependency.setRepository("oci://registry-1.docker.io/bitnamicharts");
+    helmChartDependency.setTags(List.of("bitnami-common"));
+    helmChartDependency.setCondition("true");
+    return helmChartDependency;
+  }
+
+  private String customize(HelmChart helmChart, HelmContext context) {
 
     if (helmChart.getDependencies() == null) {
       helmChart.setDependencies(new ArrayList<>());
@@ -56,6 +67,8 @@ public class HelmChartYamlProvider implements HelmFileProvider {
       helmChartDependency.setTags(Optional.ofNullable(d.tags()).orElse(new ArrayList<>()));
       helmChart.getDependencies().add(helmChartDependency);
     });
+
+    helmChart.getDependencies().add(getBitnamiCommonDependency());
 
     return yaml.dumpAsMap(JsonUtil.fromJson(JsonUtil.toJson(helmChart), Map.class));
   }
