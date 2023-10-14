@@ -132,7 +132,7 @@ class HelmChartServiceTest {
     assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_PASSWORD"));
     assertTrue(deploymentYaml.contains("key: rabbitmq-password"));
 
-    assertTrue(deploymentYaml.contains("name: SPRING_REDIS_PASSWORD"));
+    assertTrue(deploymentYaml.contains("name: SPRING_DATA_REDIS_PASSWORD"));
     assertTrue(deploymentYaml.contains("key: redis-password"));
 
     assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));

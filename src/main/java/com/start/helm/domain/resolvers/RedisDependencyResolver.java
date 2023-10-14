@@ -56,15 +56,15 @@ public class RedisDependencyResolver implements DependencyResolver {
 
   public Map<String, String> getDefaultConfig() {
     return Map.of(
-            "spring.redis.host", "{{ .Values.global.hosts.redis }}",
-            "spring.redis.port", "{{ .Values.global.ports.redis }}"
+            "spring.data.redis.host", "{{ .Values.global.hosts.redis }}",
+            "spring.data.redis.port", "{{ .Values.global.ports.redis }}"
     );
   }
 
   @Override
   public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
     String appName = context.getAppName();
-    Map<String, Object> redisPasswordRef = Map.of("name", "SPRING_REDIS_PASSWORD", "valueFrom", Map.of(
+    Map<String, Object> redisPasswordRef = Map.of("name", "SPRING_DATA_REDIS_PASSWORD", "valueFrom", Map.of(
             "secretKeyRef", Map.of(
                     "name", "REPLACEME-redis".replace("REPLACEME", appName),
                     "key", "redis-password",
