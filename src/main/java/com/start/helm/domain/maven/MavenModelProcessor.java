@@ -2,14 +2,15 @@ package com.start.helm.domain.maven;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.HelmDependency;
-import com.start.helm.domain.maven.resolvers.DependencyResolver;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.start.helm.domain.resolvers.DependencyResolver;
 import lombok.RequiredArgsConstructor;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service for populating a {@link HelmContext} from a given Maven {@link Model}.

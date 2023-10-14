@@ -1,4 +1,4 @@
-package com.start.helm.domain.maven.resolvers;
+package com.start.helm.domain.resolvers;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmChartSliceBuilder;
