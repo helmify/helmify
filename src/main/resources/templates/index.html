@@ -12,6 +12,14 @@
 
 </head>
 <style>
+    #footer {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        border-top: 0.1rem solid #d1d1d1;
+        width: 99%;
+    }
+
     #header {
         text-align: center;
         border-bottom: 0.1rem solid #d1d1d1;
@@ -57,11 +65,13 @@
     <div class="col-4" style="text-align: right">
         Helm Charts generated: <span th:text="${chartsGenerated}"></span>
     </div>
-    <div class="col-12">
+    <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
+</div>
+<div class="row" id="footer">
+    <div class="col-12" style="padding-top: 0.5em;">
         <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
         Spring Initializr URL in your IDE.
     </div>
-    <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
 </div>
 </body>
 </html>
