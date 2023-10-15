@@ -163,8 +163,8 @@ class HelmChartServiceTest {
     assertTrue(configmapYaml.contains("    spring.rabbitmq.host="));
     assertTrue(configmapYaml.contains("    spring.rabbitmq.port="));
     assertTrue(configmapYaml.contains("    spring.datasource.url="));
-    assertTrue(configmapYaml.contains("    spring.redis.host="));
-    assertTrue(configmapYaml.contains("    spring.redis.port="));
+    assertTrue(configmapYaml.contains("    spring.data.redis.host="));
+    assertTrue(configmapYaml.contains("    spring.data.redis.port="));
   }
 
   private static void checkChartYaml(HelmContext context, Map<String, String> contents) {
