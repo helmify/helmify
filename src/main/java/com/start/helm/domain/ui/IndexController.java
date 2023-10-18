@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class IndexController {
 
   private final ChartCountTracker chartCountTracker;
+  private final BuildInfoProvider buildInfoProvider;
 
   @GetMapping("/")
   public String index(Model model) {
     model.addAttribute("message", "hello world");
     model.addAttribute("chartsGenerated", chartCountTracker.getChartCount());
+    model.addAttribute("buildInfo", buildInfoProvider.getBuildInfo());
     return "index";
   }
 
