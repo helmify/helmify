@@ -4,7 +4,7 @@ services:
     image: helmstart/helm-start:latest
     container_name: helm-start
     environment:
-      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_PROFILES_ACTIVE: "prod"cd
       SERVER_PORT: 7070
       TZ: "Europe/Berlin"
     expose:
@@ -19,7 +19,7 @@ services:
     volumes:
       - type: bind
         source: /mnt/volume_fra1_01/helm-start-data/
-        target: /workspace/helm-start-data
+        target: /helm-start-data
 
   traefik:
     image: traefik:v2.2
