@@ -49,7 +49,14 @@ public class BuildInfoProvider {
 
     private static void addBuildTime(BuildInfo buildInfo, Properties properties) {
         if (properties.containsKey("git.build.time")) {
-            OffsetDateTime parse = OffsetDateTime.parse(properties.getProperty("git.build.time").replace("0200", "02:00"));
+            String p = properties.getProperty("git.build.time");
+
+            // fix weird +0000 timezone format
+            if (p.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\+(\\d{4})")) {
+                p = new StringBuffer(p).insert(p.length() - 2, ":").toString();
+            }
+
+            OffsetDateTime parse = OffsetDateTime.parse(p);
             buildInfo.setDate(Date.from(parse.toInstant()));
         } else {
             buildInfo.setDate(new Date(0));
