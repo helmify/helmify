@@ -1,10 +1,11 @@
-package com.start.helm.domain.maven.resolvers;
+package com.start.helm.domain.resolvers;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
 
 /**
  * Resolver for spring web dependencies.

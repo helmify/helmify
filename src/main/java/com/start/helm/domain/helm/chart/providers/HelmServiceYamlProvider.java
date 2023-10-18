@@ -16,18 +16,18 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
           kind: Service
           metadata:
             name: {{ include "%s.fullname" . }}
-              labels:
-                {{- include "%s.labels" . | nindent 4 }}
-            spec:
-              type: {{ .Values.service.type }}
-              ports:
-                - port: {{ .Values.service.port }}
-                  targetPort: http
-                  protocol: TCP
-                  name: http
+            labels:
+              {{- include "%s.labels" . | nindent 4 }}
+          spec:
+            type: {{ .Values.service.type }}
+            ports:
+              - port: {{ .Values.service.port }}
+                targetPort: http
+                protocol: TCP
+                name: http
           ###@helm-start:healthcheckport
-              selector:
-                {{- include "%s.selectorLabels" . | nindent 4 }}
+            selector:
+              {{- include "%s.selectorLabels" . | nindent 4 }}
               """;
 
   private static final String healthCheckPortPatch = """
@@ -35,7 +35,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
             targetPort: {{ .Values.healthcheck.port }}
             protocol: TCP
             name: healthcheck
-          """;
+                """;
 
   @Override
   public String getFileContent(HelmContext context) {
@@ -47,7 +47,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
   }
 
   private String addHealthCheckPort(String content) {
-    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 6);
+    return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 2);
   }
 
   @Override

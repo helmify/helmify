@@ -12,10 +12,19 @@
 
 </head>
 <style>
+    #footer {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        border-top: 0.1rem solid #d1d1d1;
+        width: 99%;
+    }
+
     #header {
         text-align: center;
         border-bottom: 0.1rem solid #d1d1d1;
     }
+
     body {
         --bg-color: #333;
         --bg-secondary-color: #131316;
@@ -24,37 +33,54 @@
         --color-darkGrey: #777;
         padding: 1em;
     }
+
     .brand {
         padding-left: 0 !important;
     }
 </style>
-<body class="row" style="margin-right: 0">
-<header id="header" class="col-12">
-    <nav class="nav">
-        <div class="nav-left">
-            <a class="brand" href="/">helm-start</a>
-        </div>
-        <div class="nav-right">
-            <div class="tabs">
-                <a class="active" href="https://github.com/psalg-dev/start-helm">Github</a>
-                <a href="https://jenil.github.io/chota/#docs">Chota</a>
-                <a href="https://htmx.org/docs/">htmx</a>
+<body>
+<div class="row">
+    <header id="header" class="col-12">
+        <nav class="nav">
+            <div class="nav-left">
+                <a class="brand" href="/">helm-start</a>
             </div>
-        </div>
-    </nav>
-</header>
-<div class="col-12">
-    <div hx-boost="true">
+            <div class="nav-right">
+                <div class="tabs">
+                    <a class="active" href="https://github.com/helm-start/helm-start">Github</a>
+                    <a href="https://jenil.github.io/chota/#docs">Chota</a>
+                    <a href="https://htmx.org/docs/">htmx</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+</div>
+<div class="row" hx-boost="true">
+    <div class="col-8">
+        Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart
+        for
+        you :) <a
+            href="/about">Tell me more ..</a>
+    </div>
+    <div class="col-4" style="text-align: right">
+        Helm Charts generated: <span th:text="${chartsGenerated}"></span>
+    </div>
+    <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
+</div>
+<div class="row" id="footer">
+    <div class="col-4" style="padding-top: 0.5em; text-align: left">
         <div>
-            <p>
-                Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart for
-                you :) <a
-                    href="/about">Tell me more ..</a>
-            </p>
+            Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
         </div>
-        <div th:insert="~{fragments :: pom-upload-form}"></div>
+        <div>
+            Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
+        </div>
+
+    </div>
+    <div class="col-4" style="padding-top: 1.4em;">
+        <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
+        Spring Initializr URL in your IDE.
     </div>
 </div>
-
 </body>
 </html>
