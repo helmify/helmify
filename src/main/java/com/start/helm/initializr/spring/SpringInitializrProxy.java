@@ -1,5 +1,6 @@
 package com.start.helm.initializr.spring;
 
+import com.start.helm.domain.events.ChartDownloadedEvent;
 import com.start.helm.domain.gradle.GradleFileUploadService;
 import com.start.helm.domain.helm.chart.HelmChartService;
 import com.start.helm.domain.maven.MavenFileUploadService;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.util.MultiValueMapAdapter;
@@ -34,6 +36,7 @@ public class SpringInitializrProxy {
     private final MavenFileUploadService mavenFileUploadService;
     private final GradleFileUploadService gradleFileUploadService;
     private final HelmChartService helmChartService;
+    private final ApplicationEventPublisher publisher;
 
     @GetMapping(value = "/spring")
     public Object getCapabilities() {
@@ -84,6 +87,8 @@ public class SpringInitializrProxy {
             org.zeroturnaround.zip.ZipUtil.pack(parentDir, outputStream);
 
             ByteArrayResource merged = new ByteArrayResource(outputStream.toByteArray());
+
+            publisher.publishEvent(new ChartDownloadedEvent());
 
             return ResponseEntity.ok().headers(DownloadUtil.headers("starter.zip"))
                     .contentLength(merged.contentLength())
