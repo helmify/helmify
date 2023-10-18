@@ -43,7 +43,7 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         script: |
           docker pull helmstart/helm-start:latest && 
-          wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/feature/graalvm/docker-compose.yml &&
+          wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/develop/docker-compose.yml &&
           docker compose up -d --force-recreate --no-deps helm-start
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
