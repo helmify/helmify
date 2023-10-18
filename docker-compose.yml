@@ -19,7 +19,7 @@ services:
     volumes:
       - type: bind
         source: /mnt/volume_fra1_01/helm-start-data/
-        target: /helm-start-data
+        target: /workspace/helm-start-data
 
   traefik:
     image: traefik:v2.2
