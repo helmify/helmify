@@ -102,6 +102,7 @@ class HelmChartServiceTest {
         () -> assertTrue(names.contains("templates/_helpers.tpl")),
         () -> assertTrue(names.contains("templates/hpa.yaml")),
         () -> assertTrue(names.contains(".helmignore")),
+        () -> assertTrue(names.contains("README.MD")),
         () -> assertTrue(names.contains("templates/ingress.yaml")),
         () -> assertTrue(names.contains("templates/NOTES.txt")),
         () -> assertTrue(names.contains("templates/secrets.yaml")),
