@@ -2,6 +2,7 @@ package com.start.helm.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -15,9 +16,12 @@ public class ChartCountTracker {
 
     private final ObjectMapper objectMapper;
 
+    @Value("${helm-start.data-directory:helm-start-data}")
+    private String dataDirectory;
+
     @SneakyThrows
     private File getStore() {
-        Path dataDirectory = Paths.get("helm-start-data");
+        Path dataDirectory = Paths.get(this.dataDirectory);
         if (!Files.exists(dataDirectory)) {
             Files.createDirectory(dataDirectory);
         }
