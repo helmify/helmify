@@ -1,12 +1,14 @@
 spring:
   application:
-    name: start-helm
+    name: helm-start
   devtools:
     restart:
       additional-paths: src/main/resources/static
+  threads:
+    virtual:
+      enabled: true
 
 logging:
   level:
     web: DEBUG
-
 
