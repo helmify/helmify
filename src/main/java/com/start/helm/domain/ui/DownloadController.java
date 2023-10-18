@@ -1,11 +1,13 @@
 package com.start.helm.domain.ui;
 
 import com.start.helm.domain.ChartCountTracker;
+import com.start.helm.domain.events.ChartDownloadedEvent;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.HelmChartService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +34,7 @@ public class DownloadController {
 
   private final HelmChartService helmChartService;
   private final ChartCountTracker chartCountTracker;
+  private final ApplicationEventPublisher publisher;
 
   private Map<String, ByteArrayResource> cache = new HashMap<>();
 
@@ -63,7 +66,7 @@ public class DownloadController {
   @GetMapping(path = "/download/execute")
   public ResponseEntity<Resource> download(@RequestParam("key") String key) {
     ByteArrayResource resource = cache.remove(key);
-    chartCountTracker.increment();
+    publisher.publishEvent(new ChartDownloadedEvent());
     return ResponseEntity.ok().headers(this.headers("helm.zip")).contentLength(resource.contentLength())
         .contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
   }

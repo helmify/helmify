@@ -1,8 +1,10 @@
 package com.start.helm.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.start.helm.domain.events.ChartDownloadedEvent;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -48,9 +50,14 @@ public class ChartCountTracker {
     }
 
     @SneakyThrows
-    public void increment() {
+    private void increment() {
         int incremented = this.getChartCount() + 1;
         this.setChartCount(incremented);
+    }
+
+    @EventListener
+    public void onIncrementEvent(ChartDownloadedEvent evt) {
+        this.increment();
     }
 
 
