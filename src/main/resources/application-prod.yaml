@@ -2,4 +2,4 @@ server:
   port: 7070
 
 helm-start:
-  data-directory: /helm-start-data
+  data-directory: /workspace/helm-start-data/
