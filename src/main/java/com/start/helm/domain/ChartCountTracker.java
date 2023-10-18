@@ -17,7 +17,7 @@ public class ChartCountTracker {
 
     @SneakyThrows
     private File getStore() {
-        Path dataDirectory = Paths.get("helm-start-data");
+        Path dataDirectory = Paths.get("/helm-start-data");
         if (!Files.exists(dataDirectory)) {
             Files.createDirectory(dataDirectory);
         }
