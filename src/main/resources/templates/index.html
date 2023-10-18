@@ -68,7 +68,16 @@
     <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
 </div>
 <div class="row" id="footer">
-    <div class="col-12" style="padding-top: 0.5em;">
+    <div class="col-4" style="padding-top: 0.5em; text-align: left">
+        <div>
+            Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
+        </div>
+        <div>
+            Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
+        </div>
+
+    </div>
+    <div class="col-4" style="padding-top: 1.4em;">
         <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
         Spring Initializr URL in your IDE.
     </div>
