@@ -44,17 +44,19 @@ class HelmChartServiceTest {
     context.setAppVersion("1.0.0");
 
     assertNotNull(context);
-    assertEquals(4, context.getHelmChartSlices().size());
-    assertEquals(3, context.getValuesGlobalBlocks().size());
-    assertEquals(3, context.getHelmDependencies().size());
+    assertEquals(5, context.getHelmChartSlices().size());
+    assertEquals(4, context.getValuesGlobalBlocks().size());
+    assertEquals(4, context.getHelmDependencies().size());
     assertTrue(context.isHasActuator());
     assertTrue(context.isCreateIngress());
 
 
+    boolean mysql = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("mysql"));
     boolean redis = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("redis"));
     boolean rabbitmq = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("rabbitmq"));
     boolean postgresql =
             context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("postgresql"));
+    assertTrue(mysql);
     assertTrue(rabbitmq);
     assertTrue(postgresql);
     assertTrue(redis);
@@ -126,6 +128,8 @@ class HelmChartServiceTest {
     assertTrue(deploymentYaml.contains("-rabbitmqchecker"));
     assertTrue(deploymentYaml.contains("-postgresqlchecker"));
     assertTrue(deploymentYaml.contains("-redischecker"));
+    assertTrue(deploymentYaml.contains("-mysqlchecker"));
+
 
     // look for env vars
     assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_USERNAME"));
@@ -137,9 +141,9 @@ class HelmChartServiceTest {
     assertTrue(deploymentYaml.contains("key: redis-password"));
 
     assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-    assertTrue(deploymentYaml.contains("key: postgres-username"));
+    assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username"));
     assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-    assertTrue(deploymentYaml.contains("key: postgres-password"));
+    assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password"));
 
     // look for probes
     assertTrue(deploymentYaml.contains("readinessProbe"));
