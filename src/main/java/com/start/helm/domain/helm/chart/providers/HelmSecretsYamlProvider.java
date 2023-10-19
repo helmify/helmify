@@ -2,6 +2,7 @@ package com.start.helm.domain.helm.chart.providers;
 
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
+import com.start.helm.util.HelmUtil;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,10 +30,11 @@ public class HelmSecretsYamlProvider implements HelmFileProvider{
             .getHelmChartSlices()
             .stream()
             .filter(f -> f.getSecretEntries() != null)
-        .flatMap(f -> f.getSecretEntries().entrySet().stream())
-        .forEach(e -> patch.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
+            .flatMap(f -> f.getSecretEntries().entrySet().stream())
+            .forEach(e -> patch.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
 
-    return TemplateStringPatcher.insertAfter(template, "###@helm-start:secrets", patch.toString(), 2);
+    String patched = TemplateStringPatcher.insertAfter(template, "###@helm-start:secrets", patch.toString(), 2);
+    return HelmUtil.removeMarkers(patched);
   }
 
   @Override
