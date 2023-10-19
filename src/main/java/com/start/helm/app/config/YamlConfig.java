@@ -8,24 +8,23 @@ import org.yaml.snakeyaml.Yaml;
 @Configuration
 public class YamlConfig {
 
-  private static final Yaml yaml = new Yaml(getOptions());
 
-  public static Yaml getInstance() {
-    return yaml;
-  }
+    private static final Yaml yaml = new Yaml(getOptions());
 
-  private static DumperOptions getOptions() {
-    DumperOptions options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    options.setPrettyFlow(true);
-    options.setIndicatorIndent(2);
-    options.setIndentWithIndicator(true);
-    return options;
-  }
+    private static DumperOptions getOptions() {
+        DumperOptions options = new DumperOptions();
+        options.setIndicatorIndent(2);
+        options.setIndentWithIndicator(true);
+        return options;
+    }
 
-  @Bean
-  public Yaml yaml() {
-    return getInstance();
-  }
+    public static Yaml getInstance() {
+        return yaml;
+    }
+
+    @Bean
+    public Yaml yaml() {
+        return yaml;
+    }
 
 }

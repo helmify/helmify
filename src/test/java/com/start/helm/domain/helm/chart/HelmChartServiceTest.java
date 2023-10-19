@@ -32,9 +32,9 @@ class HelmChartServiceTest {
 
   @Test
   void process() throws Exception {
-    String filename = "pom-with-rabbit-postgres-web-actuator.xml";
+    String filename = "pom-with-all.xml";
     Optional<Model> model = MavenModelParser.parsePom(
-        TestUtil.inputStreamToString(getClass().getClassLoader().getResourceAsStream(filename))
+            TestUtil.inputStreamToString(getClass().getClassLoader().getResourceAsStream(filename))
     );
     assertTrue(model.isPresent());
     Model m = model.get();
@@ -44,17 +44,22 @@ class HelmChartServiceTest {
     context.setAppVersion("1.0.0");
 
     assertNotNull(context);
-    assertEquals(3, context.getHelmChartSlices().size());
-    assertEquals(2, context.getValuesGlobalBlocks().size());
-    assertEquals(2, context.getHelmDependencies().size());
+    assertEquals(5, context.getHelmChartSlices().size());
+    assertEquals(4, context.getValuesGlobalBlocks().size());
+    assertEquals(4, context.getHelmDependencies().size());
     assertTrue(context.isHasActuator());
     assertTrue(context.isCreateIngress());
 
+
+    boolean mysql = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("mysql"));
+    boolean redis = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("redis"));
     boolean rabbitmq = context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("rabbitmq"));
     boolean postgresql =
             context.getHelmChartSlices().stream().anyMatch(s -> s.getValuesEntries().keySet().contains("postgresql"));
+    assertTrue(mysql);
     assertTrue(rabbitmq);
     assertTrue(postgresql);
+    assertTrue(redis);
 
     context.getHelmChartSlices()
             .stream().filter(slice -> slice.getPreferredChart() != null)
@@ -71,16 +76,15 @@ class HelmChartServiceTest {
             );
 
     context.setCustomizations(new HelmContext.HelmContextCustomization(
-        "test", "latest", null, Map.of()
+            "test", "latest", null, Map.of()
     ));
     context.setCustomized(true);
 
     byte[] process = service.process(context);
-    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
-
     Files.write(Paths.get("helm.zip"), process);
-    ZipFile zipFile = new ZipFile(new File("helm.zip"));
-
+    File helmFile = new File("helm.zip");
+    ZipFile zipFile = new ZipFile(helmFile);
+    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
     Map<String, String> contents = new HashMap<>();
     List<String> names = new ArrayList<>();
     ZipEntry entry;
@@ -100,6 +104,7 @@ class HelmChartServiceTest {
         () -> assertTrue(names.contains("templates/_helpers.tpl")),
         () -> assertTrue(names.contains("templates/hpa.yaml")),
         () -> assertTrue(names.contains(".helmignore")),
+        () -> assertTrue(names.contains("README.MD")),
         () -> assertTrue(names.contains("templates/ingress.yaml")),
         () -> assertTrue(names.contains("templates/NOTES.txt")),
         () -> assertTrue(names.contains("templates/secrets.yaml")),
@@ -110,10 +115,10 @@ class HelmChartServiceTest {
 
     assertTrue(contents.keySet().containsAll(names));
 
-    checkChartYaml(context, contents);
+
     checkConfigMapYaml(contents);
     checkDeploymentYaml(contents);
-
+    checkChartYaml(context, contents);
   }
 
   private static void checkDeploymentYaml(Map<String, String> contents) {
@@ -122,6 +127,9 @@ class HelmChartServiceTest {
     // look for init containers
     assertTrue(deploymentYaml.contains("-rabbitmqchecker"));
     assertTrue(deploymentYaml.contains("-postgresqlchecker"));
+    assertTrue(deploymentYaml.contains("-redischecker"));
+    assertTrue(deploymentYaml.contains("-mysqlchecker"));
+
 
     // look for env vars
     assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_USERNAME"));
@@ -129,10 +137,13 @@ class HelmChartServiceTest {
     assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_PASSWORD"));
     assertTrue(deploymentYaml.contains("key: rabbitmq-password"));
 
+    assertTrue(deploymentYaml.contains("name: SPRING_DATA_REDIS_PASSWORD"));
+    assertTrue(deploymentYaml.contains("key: redis-password"));
+
     assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-    assertTrue(deploymentYaml.contains("key: postgres-username"));
+    assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username"));
     assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-    assertTrue(deploymentYaml.contains("key: postgres-password"));
+    assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password"));
 
     // look for probes
     assertTrue(deploymentYaml.contains("readinessProbe"));
@@ -157,6 +168,8 @@ class HelmChartServiceTest {
     assertTrue(configmapYaml.contains("    spring.rabbitmq.host="));
     assertTrue(configmapYaml.contains("    spring.rabbitmq.port="));
     assertTrue(configmapYaml.contains("    spring.datasource.url="));
+    assertTrue(configmapYaml.contains("    spring.data.redis.host="));
+    assertTrue(configmapYaml.contains("    spring.data.redis.port="));
   }
 
   private static void checkChartYaml(HelmContext context, Map<String, String> contents) {
@@ -165,15 +178,29 @@ class HelmChartServiceTest {
     assertTrue(chartYaml.contains("appVersion: " + context.getAppVersion()));
     assertTrue(chartYaml.contains("type: application"));
     assertTrue(chartYaml.contains("version: 0.1.0"));
+    //@formatter:off
     assertTrue(chartYaml.contains("""
-          - condition: postgresql.enabled
-            name: postgresql
+          - name: postgresql
+            version: 11.9.2
             repository: https://charts.bitnami.com/bitnami
+            condition: postgresql.enabled
+            tags: []
         """));
+    //@formatter:off
     assertTrue(chartYaml.contains("""
-          - condition: rabbitmq.enabled
-            name: rabbitmq
+          - name: rabbitmq
+            version: 11.9.0
             repository: https://charts.bitnami.com/bitnami
+            condition: rabbitmq.enabled
+            tags: []
+        """));
+    //@formatter:off
+    assertTrue(chartYaml.contains("""
+          - name: redis
+            version: 18.1.2
+            repository: https://charts.bitnami.com/bitnami
+            condition: redis.enabled
+            tags: []
         """));
   }
 }

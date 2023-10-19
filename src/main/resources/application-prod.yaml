@@ -1,2 +1,5 @@
 server:
   port: 7070
+
+helm-start:
+  data-directory: /workspace/helm-start-data/
