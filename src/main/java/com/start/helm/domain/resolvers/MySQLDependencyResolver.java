@@ -46,7 +46,7 @@ public class MySQLDependencyResolver implements DependencyResolver {
     public Map<String, Object> getValuesEntries(HelmContext context) {
         return Map.of("mysql", Map.of(
                         "enabled", true,
-                        "database", "app",
+                        "database", "my_database",
                         "fullnameOverride", context.getAppName() + "-mysql",
                         "nameOverride", context.getAppName() + "-mysql",
                         "architecture", "standalone",
