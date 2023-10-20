@@ -25,10 +25,12 @@ jobs:
         with:
           website: jdk.java.net
           release: 21
-      - name: Set Release Version
+      - name: Set Build Version
+        run: mvn versions:set -DgenerateBackupPoms=false -DremoveSnapshot=true
+      - name: Store Release Version
         id: version
         run: |
-          echo "resolved-version=$(mvn --quiet --non-recursive exec:exec -Dexec.executable=echo -Dexec.args='${project.version}' | sed 's/-SNAPSHOT//')" >> "${GITHUB_OUTPUT}"
+          echo "resolved-version=$(mvn --quiet --non-recursive exec:exec -Dexec.executable=echo -Dexec.args='${project.version}')" >> "${GITHUB_OUTPUT}"
       - name: Build with Maven
         run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmstart/helm-start
       - name: Tag Image
