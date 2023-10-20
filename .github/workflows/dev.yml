@@ -6,14 +6,13 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build Spring Docker Container, Push, Deploy
+name: DEV Build
 
 on:
   push:
-    branches: [ "main", "develop", "feature/**", "fix/**" ]
+    branches: [ "develop", "feature/**", "fix/**" ]
   pull_request:
-    branches: [ "main", "develop" ]
-
+    branches: [ "develop" ]
 
 jobs:
   build:
@@ -44,7 +43,7 @@ jobs:
         script: |
           docker pull helmstart/helm-start:latest && 
           wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/develop/docker-compose.yml &&
-          docker compose up -d --force-recreate --no-deps helm-start
+          docker compose up -d --force-recreate --no-deps helm-start-dev
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
