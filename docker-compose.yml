@@ -3,6 +3,7 @@ services:
   traefik:
     image: "traefik:v2.10"
     container_name: "traefik"
+    restart: always
     command:
       - "--api.dashboard=true"
       - "--log.level=DEBUG"
@@ -40,6 +41,7 @@ services:
   helm-start-dev:
     image: helmstart/helm-start:latest
     container_name: helm-start-dev
+    restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
       SERVER_PORT: 7080
@@ -62,6 +64,7 @@ services:
   helm-start:
     image: helmstart/helm-start:prod
     container_name: helm-start
+    restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
       SERVER_PORT: 7070
