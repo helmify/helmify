@@ -60,7 +60,7 @@ services:
 
 
   helm-start:
-    image: helmstart/helm-start:prod
+    image: helmstart/helm-start:latest
     container_name: helm-start
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
