@@ -43,11 +43,15 @@ class HelmChartServiceTest {
 		context.setAppVersion("1.0.0");
 
 		assertNotNull(context);
-		assertEquals(6, context.getHelmChartSlices().size());
-		assertEquals(5, context.getValuesGlobalBlocks().size());
-		assertEquals(5, context.getHelmDependencies().size());
+		assertEquals(7, context.getHelmChartSlices().size());
+		assertEquals(6, context.getValuesGlobalBlocks().size());
+		assertEquals(6, context.getHelmDependencies().size());
 		assertTrue(context.isHasActuator());
 		assertTrue(context.isCreateIngress());
+
+		boolean mariadb = context.getHelmChartSlices()
+			.stream()
+			.anyMatch(s -> s.getValuesEntries().keySet().contains("mariadb"));
 
 		boolean mongodb = context.getHelmChartSlices()
 			.stream()
@@ -69,6 +73,7 @@ class HelmChartServiceTest {
 		assertTrue(postgresql);
 		assertTrue(redis);
 		assertTrue(mongodb);
+		assertTrue(mariadb);
 
 		context.getHelmChartSlices()
 			.stream()
@@ -121,6 +126,7 @@ class HelmChartServiceTest {
 		String deploymentYaml = contents.get("templates/deployment.yaml");
 
 		// look for init containers
+		assertTrue(deploymentYaml.contains("-mariadbchecker"));
 		assertTrue(deploymentYaml.contains("-mongodbchecker"));
 		assertTrue(deploymentYaml.contains("-rabbitmqchecker"));
 		assertTrue(deploymentYaml.contains("-postgresqlchecker"));
@@ -137,9 +143,11 @@ class HelmChartServiceTest {
 		assertTrue(deploymentYaml.contains("key: redis-password"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username"));
+		assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username")
+				|| deploymentYaml.contains("key: mariadb-username"));
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password"));
+		assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password")
+				|| deploymentYaml.contains("key: mariadb-password"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_USERNAME"));
 		assertTrue(deploymentYaml.contains("key: mongodb-username"));
