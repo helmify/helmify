@@ -5,6 +5,7 @@ import com.start.helm.domain.gradle.GradleFileUploadService;
 import com.start.helm.domain.helm.chart.HelmChartService;
 import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.DownloadUtil;
+import com.start.helm.util.GradleUtil;
 import com.start.helm.util.ZipUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -109,13 +110,38 @@ public class SpringInitializrProxy {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(content.length);
 
 		Optional<String> buildFile = tryReadBuildFile(body.getInputStream());
-		buildFile
-			.map(f -> f.trim().startsWith("<?xml") ? mavenFileUploadService.processBuildFile(f)
-					: gradleFileUploadService.processBuildFile(f))
-			.map(helmContext -> this.helmChartService.process(helmContext, outputStream, true))
-			.orElseThrow();
+		buildFile.map(f -> {
+			if (f.trim().startsWith("<?xml")) {
+				return mavenFileUploadService.processBuildFile(f);
+			}
+			else {
+				try {
+					String appName = getGradleAppName(body.getInputStream());
+					return gradleFileUploadService.processBuildFile(f, appName, GradleUtil.extractVersion(f));
+				}
+				catch (Exception e) {
+					log.error("Error processing build file", e);
+				}
+				return null;
+			}
+		}).map(helmContext -> this.helmChartService.process(helmContext, outputStream, true)).orElseThrow();
 
 		return new ByteArrayResource(outputStream.toByteArray());
+	}
+
+	private String getGradleAppName(InputStream inputStream) {
+		resetStream(inputStream);
+		Optional<String> zipContent = ZipUtil.getZipContent("settings.gradle", new ZipInputStream(inputStream));
+		return zipContent.map(s -> s.replace("rootProject.name = ", ""))
+			.map(SpringInitializrProxy::cleanupAppName)
+			.orElse("my-project");
+	}
+
+	private static String cleanupAppName(String name) {
+		return name.replace("'", "")
+			.replaceAll("[^\\x00-\\x7F]", "")
+			.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "")
+			.replaceAll("\\p{C}", "");
 	}
 
 	@SneakyThrows
