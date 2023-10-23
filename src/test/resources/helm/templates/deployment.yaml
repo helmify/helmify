@@ -1,0 +1,206 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "demo18.fullname" . }}
+  labels:
+    {{- include "demo18.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "demo18.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "demo18.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "demo18.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - image: docker.io/busybox:stable
+          securityContext: { runAsUser: 1000, runAsGroup: 1000, runAsNonRoot: true, allowPrivilegeEscalation: false }
+          imagePullPolicy: Always
+          name: "{{ include "demo18.fullname" . }}-mariadbchecker"
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Waiting for mariadb to become ready...'
+              until printf "." && nc -z -w 2 {{ .Values.global.hosts.mariadb }} {{ .Values.global.ports.mariadb }}; do
+                  sleep 2;
+              done;
+              echo 'mariadb OK ✓'
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { cpu: 20m, memory: 32Mi }
+
+        - image: docker.io/busybox:stable
+          securityContext: { runAsUser: 1000, runAsGroup: 1000, runAsNonRoot: true, allowPrivilegeEscalation: false }
+          imagePullPolicy: Always
+          name: "{{ include "demo18.fullname" . }}-postgresqlchecker"
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Waiting for postgresql to become ready...'
+              until printf "." && nc -z -w 2 {{ .Values.global.hosts.postgresql }} {{ .Values.global.ports.postgresql }}; do
+                  sleep 2;
+              done;
+              echo 'postgresql OK ✓'
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { cpu: 20m, memory: 32Mi }
+
+        - image: docker.io/busybox:stable
+          securityContext: { runAsUser: 1000, runAsGroup: 1000, runAsNonRoot: true, allowPrivilegeEscalation: false }
+          imagePullPolicy: Always
+          name: "{{ include "demo18.fullname" . }}-redischecker"
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Waiting for redis to become ready...'
+              until printf "." && nc -z -w 2 {{ .Values.global.hosts.redis }} {{ .Values.global.ports.redis }}; do
+                  sleep 2;
+              done;
+              echo 'redis OK ✓'
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { cpu: 20m, memory: 32Mi }
+
+        - image: docker.io/busybox:stable
+          securityContext: { runAsUser: 1000, runAsGroup: 1000, runAsNonRoot: true, allowPrivilegeEscalation: false }
+          imagePullPolicy: Always
+          name: "{{ include "demo18.fullname" . }}-mysqlchecker"
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Waiting for mysql to become ready...'
+              until printf "." && nc -z -w 2 {{ .Values.global.hosts.mysql }} {{ .Values.global.ports.mysql }}; do
+                  sleep 2;
+              done;
+              echo 'mysql OK ✓'
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { cpu: 20m, memory: 32Mi }
+
+        - image: docker.io/busybox:stable
+          securityContext: { runAsUser: 1000, runAsGroup: 1000, runAsNonRoot: true, allowPrivilegeEscalation: false }
+          imagePullPolicy: Always
+          name: "{{ include "demo18.fullname" . }}-rabbitmqchecker"
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Waiting for rabbitmq to become ready...'
+              until printf "." && nc -z -w 2 {{ .Values.global.hosts.rabbitmq }} {{ .Values.global.ports.rabbitmq }}; do
+                  sleep 2;
+              done;
+              echo 'rabbitmq OK ✓'
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { cpu: 20m, memory: 32Mi }
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: mariadb-username }
+              name: SPRING_DATASOURCE_USERNAME
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: mariadb-password }
+              name: SPRING_DATASOURCE_PASSWORD
+
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: postgres-username }
+              name: SPRING_DATASOURCE_USERNAME
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: postgres-password }
+              name: SPRING_DATASOURCE_PASSWORD
+
+            - valueFrom:
+                secretKeyRef: { optional: false, name: demo18-redis, key: redis-password }
+              name: SPRING_DATA_REDIS_PASSWORD
+
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: mysql-username }
+              name: SPRING_DATASOURCE_USERNAME
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: mysql-password }
+              name: SPRING_DATASOURCE_PASSWORD
+
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: rabbitmq-username }
+              name: SPRING_RABBITMQ_USERNAME
+            - valueFrom:
+                secretKeyRef: { optional: false, name: {{ include "demo18.fullname" . }}, key: rabbitmq-password }
+              name: SPRING_RABBITMQ_PASSWORD
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: healthcheck
+              containerPort: {{ .Values.healthcheck.port }}
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: healthcheck
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: healthcheck
+          # allow for graceful shutdown
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 10" ]
+          volumeMounts:
+            - name: {{ include "demo18.fullname" . }}-config-vol
+              mountPath: /workspace/BOOT-INF/classes/application.properties
+              subPath: application.properties
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: {{ include "demo18.fullname" . }}-config-vol
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "demo18.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
