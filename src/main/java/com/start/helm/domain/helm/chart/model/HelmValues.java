@@ -10,148 +10,183 @@ import java.util.Map;
 
 /**
  * Model for Helm values.yaml
- * */
+ */
 @Builder
 @Getter
 @Setter
 public class HelmValues {
 
-  private Integer replicaCount;
+	private Integer replicaCount;
 
-  private HelmValuesImage image;
+	private HelmValuesImage image;
 
-  private List<String> imagePullSecrets;
+	private List<String> imagePullSecrets;
 
-  private String nameOverride;
-  private String fullnameOverride;
+	private String nameOverride;
 
-  private HelmValuesServiceAccount serviceAccount;
+	private String fullnameOverride;
 
-  private Map<String, Object> podAnnotations;
-  private Map<String, Object> podSecurityContext;
-  private Map<String, Object> securityContext;
+	private HelmValuesServiceAccount serviceAccount;
 
-  private HelmValuesService service;
+	private Map<String, Object> podAnnotations;
 
-  private HelmValuesIngress ingress;
+	private Map<String, Object> podSecurityContext;
 
-  private Map<String, Object> resources;
+	private Map<String, Object> securityContext;
 
-  private HelmValuesAutoscaling autoscaling;
+	private HelmValuesService service;
 
-  private Map<String, Object> nodeSelector;
-  private List<?> tolerations;
-  private Map<String, Object> affinity;
+	private HelmValuesIngress ingress;
 
-  public static HelmValues getDefaultHelmValues(HelmContext context) {
-    return HelmValues.builder()
-        .replicaCount(1)
-        .image(
-                new HelmValuesImage(context.getAppName(), context.getAppVersion(), HelmValuesImage.ImagePullPolicy.IfNotPresent, new ArrayList<>()))
-        .imagePullSecrets(new ArrayList<>())
-        .nameOverride("")
-        .fullnameOverride(context.getAppName())
-        .serviceAccount(new HelmValuesServiceAccount())
-        .podAnnotations(new HashMap<>())
-        .podSecurityContext(new HashMap<>())
-        .securityContext(new HashMap<>())
-        .service(new HelmValuesService())
-        .ingress(new HelmValuesIngress())
-        .resources(new HashMap<>())
-        .autoscaling(new HelmValuesAutoscaling())
-        .nodeSelector(new HashMap<>())
-        .tolerations(new ArrayList<>())
-        .affinity(new HashMap<>())
-        .build();
-  }
+	private Map<String, Object> resources;
 
-  @Getter
-  @Setter
-  public static class HelmValuesAutoscaling {
-    private Boolean enabled = false;
-    private Integer minReplicas = 1;
-    private Integer maxReplicas = 100;
-    private Integer targetCPUUtilizationPercentage = 80;
-  }
+	private HelmValuesAutoscaling autoscaling;
 
-  @Getter
-  @Setter
-  public static class HelmValuesIngress {
-    private Boolean enabled = false;
-    private String className = "";
-    private Map<String, Object> annotations = new HashMap<>();
-    private List<HelmValuesIngressHost> hosts = new ArrayList<>(List.of(
-        new HelmValuesIngressHost()
-    ));
-    private List<HelmValuesIngressTls> tls = new ArrayList<>();
+	private Map<String, Object> nodeSelector;
 
-    @Getter
-    @Setter
-    public static class HelmValuesIngressTls {
-      private String secretName;
-      private List<String> hosts;
-    }
+	private List<?> tolerations;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class HelmValuesIngressHost {
-      private String host = "chart-example.local";
-      private List<HelmValuesIngressPath> paths = new ArrayList<>(
-          List.of(new HelmValuesIngressPath())
-      );
-    }
+	private Map<String, Object> affinity;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class HelmValuesIngressPath {
-      private String path = "/";
-      private HelmValuesIngressPathType pathType = HelmValuesIngressPathType.ImplementationSpecific;
+	public static HelmValues getDefaultHelmValues(HelmContext context) {
+		return HelmValues.builder()
+			.replicaCount(1)
+			.image(new HelmValuesImage(context.getAppName(), context.getAppVersion(),
+					HelmValuesImage.ImagePullPolicy.IfNotPresent, new ArrayList<>()))
+			.imagePullSecrets(new ArrayList<>())
+			.nameOverride("")
+			.fullnameOverride(context.getAppName())
+			.serviceAccount(new HelmValuesServiceAccount())
+			.podAnnotations(new HashMap<>())
+			.podSecurityContext(new HashMap<>())
+			.securityContext(new HashMap<>())
+			.service(new HelmValuesService())
+			.ingress(new HelmValuesIngress())
+			.resources(new HashMap<>())
+			.autoscaling(new HelmValuesAutoscaling())
+			.nodeSelector(new HashMap<>())
+			.tolerations(new ArrayList<>())
+			.affinity(new HashMap<>())
+			.build();
+	}
 
-      public enum HelmValuesIngressPathType {
-        ImplementationSpecific, Exact, Prefix
-      }
-    }
+	@Getter
+	@Setter
+	public static class HelmValuesAutoscaling {
 
-  }
+		private Boolean enabled = false;
 
-  @Getter
-  @Setter
-  public static class HelmValuesService {
-    private HelmValuesServiceType type = HelmValuesServiceType.ClusterIP;
-    private Integer port = 8080;
+		private Integer minReplicas = 1;
 
-    public enum HelmValuesServiceType {
-      ClusterIP, NodePort, LoadBalancer, ExternalName
-    }
-  }
+		private Integer maxReplicas = 100;
 
-  @Getter
-  @Setter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class HelmValuesImage {
-    private String repository;
-    private String tag;
-    private ImagePullPolicy pullPolicy;
-    private List<String> secrets;
+		private Integer targetCPUUtilizationPercentage = 80;
 
-    public enum ImagePullPolicy {
-      Always, Never, IfNotPresent
-    }
-  }
+	}
 
-  @Getter
-  @Setter
-  public static class HelmValuesServiceAccount {
+	@Getter
+	@Setter
+	public static class HelmValuesIngress {
 
-    private Boolean create = false;
-    private Map<String, Object> annotations = new HashMap<>();
-    private String name = "";
+		private Boolean enabled = false;
 
-  }
+		private String className = "";
 
+		private Map<String, Object> annotations = new HashMap<>();
+
+		private List<HelmValuesIngressHost> hosts = new ArrayList<>(List.of(new HelmValuesIngressHost()));
+
+		private List<HelmValuesIngressTls> tls = new ArrayList<>();
+
+		@Getter
+		@Setter
+		public static class HelmValuesIngressTls {
+
+			private String secretName;
+
+			private List<String> hosts;
+
+		}
+
+		@Getter
+		@Setter
+		@NoArgsConstructor
+		public static class HelmValuesIngressHost {
+
+			private String host = "chart-example.local";
+
+			private List<HelmValuesIngressPath> paths = new ArrayList<>(List.of(new HelmValuesIngressPath()));
+
+		}
+
+		@Getter
+		@Setter
+		@NoArgsConstructor
+		@AllArgsConstructor
+		public static class HelmValuesIngressPath {
+
+			private String path = "/";
+
+			private HelmValuesIngressPathType pathType = HelmValuesIngressPathType.ImplementationSpecific;
+
+			public enum HelmValuesIngressPathType {
+
+				ImplementationSpecific, Exact, Prefix
+
+			}
+
+		}
+
+	}
+
+	@Getter
+	@Setter
+	public static class HelmValuesService {
+
+		private HelmValuesServiceType type = HelmValuesServiceType.ClusterIP;
+
+		private Integer port = 8080;
+
+		public enum HelmValuesServiceType {
+
+			ClusterIP, NodePort, LoadBalancer, ExternalName
+
+		}
+
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class HelmValuesImage {
+
+		private String repository;
+
+		private String tag;
+
+		private ImagePullPolicy pullPolicy;
+
+		private List<String> secrets;
+
+		public enum ImagePullPolicy {
+
+			Always, Never, IfNotPresent
+
+		}
+
+	}
+
+	@Getter
+	@Setter
+	public static class HelmValuesServiceAccount {
+
+		private Boolean create = false;
+
+		private Map<String, Object> annotations = new HashMap<>();
+
+		private String name = "";
+
+	}
 
 }
