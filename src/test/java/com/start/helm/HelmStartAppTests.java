@@ -33,6 +33,7 @@ public class HelmStartAppTests {
 	ResourceLoader resourceLoader;
 
 	WebClient webClient;
+
 	MockMvc mvc;
 
 	@LocalServerPort
@@ -50,8 +51,7 @@ public class HelmStartAppTests {
 	@BeforeEach
 	void before() {
 		this.webClient = MockMvcWebClientBuilder.webAppContextSetup(ctx).build();
-		this.mvc = MockMvcBuilders.webAppContextSetup(ctx)
-				.alwaysDo(MockMvcResultHandlers.print()).build();
+		this.mvc = MockMvcBuilders.webAppContextSetup(ctx).alwaysDo(MockMvcResultHandlers.print()).build();
 	}
 
 	@Test
@@ -62,15 +62,16 @@ public class HelmStartAppTests {
 
 		HtmlPage page = webClient.getPage("http://localhost:" + port + "/");
 		Assertions.assertTrue(page.getWebResponse().getContentAsString().contains("hello world"));
-		Assertions.assertTrue(page.getWebResponse().getContentAsString().contains("Helm Charts generated: <span>" + i + "</span>"));
+		Assertions.assertTrue(
+				page.getWebResponse().getContentAsString().contains("Helm Charts generated: <span>" + i + "</span>"));
 
 	}
 
 	@Test
 	public void testUploadRabbit() throws Exception {
 
-		String pom =
-				resourceLoader.getResource("classpath:pom-with-rabbit.xml").getContentAsString(StandardCharsets.UTF_8);
+		String pom = resourceLoader.getResource("classpath:pom-with-rabbit.xml")
+			.getContentAsString(StandardCharsets.UTF_8);
 
 		// send file with mockmvc
 		this.mvc.perform(multipart("/upload-file").file("file", pom.getBytes())).andExpect(status().isOk());
@@ -79,10 +80,11 @@ public class HelmStartAppTests {
 	@Test
 	public void testUploadPostgres() throws Exception {
 
-		String pom =
-				resourceLoader.getResource("classpath:pom-with-postgres.xml").getContentAsString(StandardCharsets.UTF_8);
+		String pom = resourceLoader.getResource("classpath:pom-with-postgres.xml")
+			.getContentAsString(StandardCharsets.UTF_8);
 
 		// send file with mockmvc
 		this.mvc.perform(multipart("/upload-file").file("file", pom.getBytes())).andExpect(status().isOk());
 	}
+
 }

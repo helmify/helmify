@@ -27,84 +27,95 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SpringInitializrProxyTest {
 
-    WebClient webClient;
-    MockMvc mvc;
+	WebClient webClient;
 
-    @LocalServerPort
-    int port;
+	MockMvc mvc;
 
-    @Autowired
-    WebApplicationContext ctx;
+	@LocalServerPort
+	int port;
 
-    @BeforeEach
-    void before() {
-        this.webClient = MockMvcWebClientBuilder.webAppContextSetup(ctx).build();
-        this.mvc = MockMvcBuilders.webAppContextSetup(ctx)
-                .alwaysDo(MockMvcResultHandlers.print()).build();
-    }
+	@Autowired
+	WebApplicationContext ctx;
 
-    @Test
-    @SneakyThrows
-    void getCapabilities() {
-        this.mvc.perform(get("/spring"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/vnd.initializr.v2.2+json"))
-                .andExpect(jsonPath("$._links").isNotEmpty())
-                .andExpect(jsonPath("$.dependencies").isNotEmpty())
-                .andExpect(jsonPath("$.type").isNotEmpty())
-                .andExpect(jsonPath("$.packaging").isNotEmpty())
-                .andExpect(jsonPath("$.javaVersion").isNotEmpty())
-                .andExpect(jsonPath("$.language").isNotEmpty())
-                .andExpect(jsonPath("$.bootVersion").isNotEmpty())
-                .andExpect(jsonPath("$.groupId").isNotEmpty())
-                .andExpect(jsonPath("$.artifactId").isNotEmpty())
-                .andExpect(jsonPath("$.version").isNotEmpty())
-                .andExpect(jsonPath("$.name").isNotEmpty())
-                .andExpect(jsonPath("$.description").isNotEmpty())
-                .andExpect(jsonPath("$.packageName").isNotEmpty());
+	@BeforeEach
+	void before() {
+		this.webClient = MockMvcWebClientBuilder.webAppContextSetup(ctx).build();
+		this.mvc = MockMvcBuilders.webAppContextSetup(ctx).alwaysDo(MockMvcResultHandlers.print()).build();
+	}
 
-    }
+	@Test
+	@SneakyThrows
+	void getCapabilities() {
+		this.mvc.perform(get("/spring"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/vnd.initializr.v2.2+json"))
+			.andExpect(jsonPath("$._links").isNotEmpty())
+			.andExpect(jsonPath("$.dependencies").isNotEmpty())
+			.andExpect(jsonPath("$.type").isNotEmpty())
+			.andExpect(jsonPath("$.packaging").isNotEmpty())
+			.andExpect(jsonPath("$.javaVersion").isNotEmpty())
+			.andExpect(jsonPath("$.language").isNotEmpty())
+			.andExpect(jsonPath("$.bootVersion").isNotEmpty())
+			.andExpect(jsonPath("$.groupId").isNotEmpty())
+			.andExpect(jsonPath("$.artifactId").isNotEmpty())
+			.andExpect(jsonPath("$.version").isNotEmpty())
+			.andExpect(jsonPath("$.name").isNotEmpty())
+			.andExpect(jsonPath("$.description").isNotEmpty())
+			.andExpect(jsonPath("$.packageName").isNotEmpty());
 
-    @Test
-    @SneakyThrows
-    void getStarter() {
-        String url = "/spring/starter.zip?bootVersion=3.1.4&javaVersion=17&groupId=com.example&name=demo10&description=demo10&artifactId=demo10&language=java&packaging=jar&packageName=com.example.demo&type=gradle-project&version=0.0.1-SNAPSHOT&dependencies=amqp,postgresql,web";
-        this.mvc.perform(get(url))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/octet-stream"))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=starter.zip"))
-                .andDo(result -> {
-                    byte[] content = result.getResponse().getContentAsByteArray();
-                    assertNotNull(content);
-                    assertTrue(content.length > 0);
+	}
 
-                    File parent = Paths.get(System.getProperty("java.io.tmpdir"), "test-" + System.currentTimeMillis()).toFile();
-                    parent.mkdirs();
+	@Test
+	@SneakyThrows
+	void getStarter() {
+		String url = "/spring/starter.zip?bootVersion=3.1.4&javaVersion=17&groupId=com.example&name=demo10&description=demo10&artifactId=demo10&language=java&packaging=jar&packageName=com.example.demo&type=gradle-project&version=0.0.1-SNAPSHOT&dependencies=amqp,postgresql,web";
+		this.mvc.perform(get(url))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/octet-stream"))
+			.andExpect(header().string("Content-Disposition", "attachment; filename=starter.zip"))
+			.andDo(result -> {
+				byte[] content = result.getResponse().getContentAsByteArray();
+				assertNotNull(content);
+				assertTrue(content.length > 0);
 
-                    File file = Paths.get(parent.getAbsolutePath(), "starter.zip").toFile();
-                    Files.write(file.toPath(), content);
-                    assertTrue(file.exists());
+				File parent = Paths.get(System.getProperty("java.io.tmpdir"), "test-" + System.currentTimeMillis())
+					.toFile();
+				parent.mkdirs();
 
-                    File extracted = Paths.get(file.getParentFile().getAbsolutePath(), "extracted").toFile();
-                    extracted.mkdirs();
+				File file = Paths.get(parent.getAbsolutePath(), "starter.zip").toFile();
+				Files.write(file.toPath(), content);
+				assertTrue(file.exists());
 
-                    ZipUtil.unpack(file, extracted);
+				File extracted = Paths.get(file.getParentFile().getAbsolutePath(), "extracted").toFile();
+				extracted.mkdirs();
 
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "Chart.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "values.yaml")));
+				ZipUtil.unpack(file, extracted);
 
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "deployment.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "ingress.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "service.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "configmap.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "secrets.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "hpa.yaml")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "_helpers.tpl")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "NOTES.txt")));
-                    Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "serviceaccount.yaml")));
+				Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm")));
+				Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "Chart.yaml")));
+				Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "values.yaml")));
 
-                });
-    }
+				Assertions.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "deployment.yaml")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "ingress.yaml")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "service.yaml")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "configmap.yaml")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "secrets.yaml")));
+				Assertions
+					.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "hpa.yaml")));
+				Assertions.assertTrue(
+						Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "_helpers.tpl")));
+				Assertions
+					.assertTrue(Files.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "NOTES.txt")));
+				Assertions.assertTrue(Files
+					.exists(Paths.get(extracted.getAbsolutePath(), "helm", "templates", "serviceaccount.yaml")));
+
+			});
+	}
+
 }
