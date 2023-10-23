@@ -50,8 +50,8 @@ class HelmChartServiceTest {
 		assertTrue(context.isCreateIngress());
 
 		boolean mariadb = context.getHelmChartSlices()
-				.stream()
-				.anyMatch(s -> s.getValuesEntries().keySet().contains("mariadb"));
+			.stream()
+			.anyMatch(s -> s.getValuesEntries().keySet().contains("mariadb"));
 
 		boolean mongodb = context.getHelmChartSlices()
 			.stream()
@@ -143,9 +143,11 @@ class HelmChartServiceTest {
 		assertTrue(deploymentYaml.contains("key: redis-password"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username") || deploymentYaml.contains("key: mariadb-username"));
+		assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username")
+				|| deploymentYaml.contains("key: mariadb-username"));
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password") || deploymentYaml.contains("key: mariadb-password"));
+		assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password")
+				|| deploymentYaml.contains("key: mariadb-password"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_USERNAME"));
 		assertTrue(deploymentYaml.contains("key: mongodb-username"));
