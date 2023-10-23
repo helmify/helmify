@@ -5,15 +5,7 @@ import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.GradleUtil;
 import com.start.helm.util.ZipUtil;
-import java.io.ByteArrayInputStream;
-import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,139 +15,152 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.zip.ZipInputStream;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class SpringInitializrRestController {
 
-  private final RestTemplate restTemplate;
-  private final MavenFileUploadService mavenFileUploadService;
-  private final GradleFileUploadService gradleFileUploadService;
+	private final RestTemplate restTemplate;
 
-  @Getter
-  @Setter
-  @ToString
-  public static class SpringInitializrRequest {
-    private String springInitializrLink;
-  }
+	private final MavenFileUploadService mavenFileUploadService;
 
-  @SneakyThrows
-  @PostMapping("/spring-initializr-link")
-  public String generate(Model viewModel, @RequestBody SpringInitializrRequest request) {
-    log.info("Generate request: {}", request);
+	private final GradleFileUploadService gradleFileUploadService;
 
-    final String springInitializrLink = request.getSpringInitializrLink();
-    validateLink(springInitializrLink);
+	@Getter
+	@Setter
+	@ToString
+	public static class SpringInitializrRequest {
 
-    final String zipLink = springInitializrLink.replace("https://start.spring.io/#!", "https://start.spring.io/starter.zip?");
+		private String springInitializrLink;
 
-    ResponseEntity<byte[]> response = restTemplate.getForEntity(zipLink, byte[].class);
-    log.info("Received Response, Code {}", response.getStatusCode());
-    validateResponseCode(response);
+	}
 
-    boolean isUsingKotlinScript = springInitializrLink.contains("gradle-project-kotlin");
+	@SneakyThrows
+	@PostMapping("/spring-initializr-link")
+	public String generate(Model viewModel, @RequestBody SpringInitializrRequest request) {
+		log.info("Generate request: {}", request);
 
-    byte[] body = response.getBody();
+		final String springInitializrLink = request.getSpringInitializrLink();
+		validateLink(springInitializrLink);
 
-    HelmContext helmContext =
-        Stream.of(new GradleBuildProcessor(body, gradleFileUploadService, isUsingKotlinScript),
-                new MavenBuildProcessor(body, mavenFileUploadService))
-            .filter(processor -> springInitializrLink.contains(processor.matchOn()))
-            .findFirst()
-            .map(BuildProcessor::process)
-            .orElseThrow();
+		final String zipLink = springInitializrLink.replace("https://start.spring.io/#!",
+				"https://start.spring.io/starter.zip?");
 
-    viewModel.addAttribute("helmContext", helmContext);
-    viewModel.addAttribute("springInitializrLink", springInitializrLink);
+		ResponseEntity<byte[]> response = restTemplate.getForEntity(zipLink, byte[].class);
+		log.info("Received Response, Code {}", response.getStatusCode());
+		validateResponseCode(response);
 
-    return "fragments :: pom-upload-form";
-  }
+		boolean isUsingKotlinScript = springInitializrLink.contains("gradle-project-kotlin");
 
-  private static void validateResponseCode(ResponseEntity<byte[]> response) {
-    if (!response.getStatusCode().is2xxSuccessful()) {
-      throw new ResponseStatusException(
-          org.springframework.http.HttpStatus.BAD_REQUEST, "Could not download zip"
-      );
-    }
-  }
+		byte[] body = response.getBody();
 
-  interface BuildProcessor {
-    HelmContext process();
+		HelmContext helmContext = Stream
+			.of(new GradleBuildProcessor(body, gradleFileUploadService, isUsingKotlinScript),
+					new MavenBuildProcessor(body, mavenFileUploadService))
+			.filter(processor -> springInitializrLink.contains(processor.matchOn()))
+			.findFirst()
+			.map(BuildProcessor::process)
+			.orElseThrow();
 
-    String matchOn();
-  }
+		viewModel.addAttribute("helmContext", helmContext);
+		viewModel.addAttribute("springInitializrLink", springInitializrLink);
 
-  @RequiredArgsConstructor
-  static
-  class GradleBuildProcessor implements BuildProcessor {
-    private final byte[] body;
-    private final GradleFileUploadService gradleFileUploadService;
-    private final boolean isKotlinScript;
+		return "fragments :: pom-upload-form";
+	}
 
-    private String getBuildGradle() {
-      return isKotlinScript ? "build.gradle.kts" : "build.gradle";
-    }
+	private static void validateResponseCode(ResponseEntity<byte[]> response) {
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+					"Could not download zip");
+		}
+	}
 
-    private String getSettingsGradle() {
-      return isKotlinScript ? "settings.gradle.kts" : "settings.gradle";
-    }
+	interface BuildProcessor {
 
-    @Override
-    public HelmContext process() {
-      ByteArrayInputStream in = new ByteArrayInputStream(body);
-      Optional<String> buildGradle = ZipUtil.getZipContent(getBuildGradle(), new ZipInputStream(in));
-      in.reset();
-      Optional<String> settingsGradle = ZipUtil.getZipContent(getSettingsGradle(), new ZipInputStream(in));
+		HelmContext process();
 
-      return buildGradle.map(build -> {
+		String matchOn();
 
-        final String version = GradleUtil.extractVersion(build);
+	}
 
-        String settings = settingsGradle.orElseThrow();
-        final String name = GradleUtil.extractName(settings);
+	@RequiredArgsConstructor
+	static class GradleBuildProcessor implements BuildProcessor {
 
-        return gradleFileUploadService.processBuildFile(build, name, version);
-      }).orElseThrow();
-    }
+		private final byte[] body;
 
-    @Override
-    public String matchOn() {
-      return "type=gradle";
-    }
-  }
+		private final GradleFileUploadService gradleFileUploadService;
 
-  @RequiredArgsConstructor
-  static
-  class MavenBuildProcessor implements BuildProcessor {
+		private final boolean isKotlinScript;
 
-    private final byte[] body;
-    private final MavenFileUploadService mavenFileUploadService;
+		private String getBuildGradle() {
+			return isKotlinScript ? "build.gradle.kts" : "build.gradle";
+		}
 
-    @Override
-    public HelmContext process() {
-      final String pomXml = readPomFromZip(body).orElseThrow();
-      return mavenFileUploadService.processBuildFile(pomXml);
-    }
+		private String getSettingsGradle() {
+			return isKotlinScript ? "settings.gradle.kts" : "settings.gradle";
+		}
 
-    @Override
-    public String matchOn() {
-      return "type=maven";
-    }
-  }
+		@Override
+		public HelmContext process() {
+			ByteArrayInputStream in = new ByteArrayInputStream(body);
+			Optional<String> buildGradle = ZipUtil.getZipContent(getBuildGradle(), new ZipInputStream(in));
+			in.reset();
+			Optional<String> settingsGradle = ZipUtil.getZipContent(getSettingsGradle(), new ZipInputStream(in));
 
+			return buildGradle.map(build -> {
 
-  @SneakyThrows
-  private static Optional<String> readPomFromZip(byte[] response) {
-    ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(response));
-    return ZipUtil.getZipContent("pom.xml", zipInputStream);
-  }
+				final String version = GradleUtil.extractVersion(build);
 
-  private static void validateLink(String springInitializrLink) {
-    if (!springInitializrLink.startsWith("https://start.spring.io/")) {
-      throw new ResponseStatusException(
-          org.springframework.http.HttpStatus.BAD_REQUEST, "Not a spring initializr link"
-      );
-    }
-  }
+				String settings = settingsGradle.orElseThrow();
+				final String name = GradleUtil.extractName(settings);
+
+				return gradleFileUploadService.processBuildFile(build, name, version);
+			}).orElseThrow();
+		}
+
+		@Override
+		public String matchOn() {
+			return "type=gradle";
+		}
+
+	}
+
+	@RequiredArgsConstructor
+	static class MavenBuildProcessor implements BuildProcessor {
+
+		private final byte[] body;
+
+		private final MavenFileUploadService mavenFileUploadService;
+
+		@Override
+		public HelmContext process() {
+			final String pomXml = readPomFromZip(body).orElseThrow();
+			return mavenFileUploadService.processBuildFile(pomXml);
+		}
+
+		@Override
+		public String matchOn() {
+			return "type=maven";
+		}
+
+	}
+
+	@SneakyThrows
+	private static Optional<String> readPomFromZip(byte[] response) {
+		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(response));
+		return ZipUtil.getZipContent("pom.xml", zipInputStream);
+	}
+
+	private static void validateLink(String springInitializrLink) {
+		if (!springInitializrLink.startsWith("https://start.spring.io/")) {
+			throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+					"Not a spring initializr link");
+		}
+	}
 
 }

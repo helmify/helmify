@@ -1,10 +1,11 @@
 package com.start.helm.domain.helm;
 
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Aggregation of sections of Helm Chart files affected by introducing a new dependency
@@ -16,12 +17,16 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class HelmChartSlice {
 
-  private List<Map<String, Object>> environmentEntries;
-  private Map<String, String> defaultConfig;
-  private Map<String, String> preferredChart;
-  private Map<String, Object> valuesEntries;
-  private Map<String, Object> initContainer;
-  private Map<String, Object> secretEntries;
+	private List<Map<String, Object>> environmentEntries;
 
+	private Map<String, String> defaultConfig;
+
+	private Map<String, String> preferredChart;
+
+	private Map<String, Object> valuesEntries;
+
+	private Map<String, Object> initContainer;
+
+	private Map<String, Object> secretEntries;
 
 }

@@ -9,8 +9,10 @@ import java.util.Date;
 @Setter
 public class BuildInfo {
 
-    String version;
-    String id;
-    Date date;
+	String version;
+
+	String id;
+
+	Date date;
 
 }

@@ -13,19 +13,20 @@ import java.util.Optional;
 @Component
 public class SpringBootStarterWebResolver implements DependencyResolver {
 
-  @Override
-  public String dependencyName() {
-    return "web";
-  }
+	@Override
+	public String dependencyName() {
+		return "web";
+	}
 
-  @Override
-  public List<String> matchOn() {
-    return List.of("spring-boot-starter-web", "spring-boot-starter-webflux", "spring-boot-starter-graphql");
-  }
+	@Override
+	public List<String> matchOn() {
+		return List.of("spring-boot-starter-web", "spring-boot-starter-webflux", "spring-boot-starter-graphql");
+	}
 
-  @Override
-  public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
-    context.setCreateIngress(true);
-    return Optional.empty();
-  }
+	@Override
+	public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
+		context.setCreateIngress(true);
+		return Optional.empty();
+	}
+
 }

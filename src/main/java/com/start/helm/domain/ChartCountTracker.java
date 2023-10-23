@@ -16,58 +16,58 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class ChartCountTracker {
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    @Value("${helm-start.data-directory:helm-start-data}")
-    private String dataDirectory;
+	@Value("${helm-start.data-directory:helm-start-data}")
+	private String dataDirectory;
 
-    @SneakyThrows
-    private File getStore() {
-        Path dataDirectory = Paths.get(this.dataDirectory);
-        if (!Files.exists(dataDirectory)) {
-            Files.createDirectory(dataDirectory);
-        }
+	@SneakyThrows
+	private File getStore() {
+		Path dataDirectory = Paths.get(this.dataDirectory);
+		if (!Files.exists(dataDirectory)) {
+			Files.createDirectory(dataDirectory);
+		}
 
-        Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count.json");
-        if (!Files.exists(filePath)) {
-            Files.createFile(filePath);
-            String json = this.objectMapper.writeValueAsString(new ChartCount(0));
-            Files.write(filePath, json.getBytes());
-        }
+		Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count.json");
+		if (!Files.exists(filePath)) {
+			Files.createFile(filePath);
+			String json = this.objectMapper.writeValueAsString(new ChartCount(0));
+			Files.write(filePath, json.getBytes());
+		}
 
-        return filePath.toFile();
-    }
+		return filePath.toFile();
+	}
 
-    @SneakyThrows
-    public int getChartCount() {
-        File store = this.getStore();
-        return this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated();
-    }
+	@SneakyThrows
+	public int getChartCount() {
+		File store = this.getStore();
+		return this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated();
+	}
 
-    @SneakyThrows
-    private void setChartCount(int count) {
-        objectMapper.writeValue(this.getStore(), new ChartCount(count));
-    }
+	@SneakyThrows
+	private void setChartCount(int count) {
+		objectMapper.writeValue(this.getStore(), new ChartCount(count));
+	}
 
-    @SneakyThrows
-    private void increment() {
-        int incremented = this.getChartCount() + 1;
-        this.setChartCount(incremented);
-    }
+	@SneakyThrows
+	private void increment() {
+		int incremented = this.getChartCount() + 1;
+		this.setChartCount(incremented);
+	}
 
-    @EventListener
-    public void onIncrementEvent(ChartDownloadedEvent evt) {
-        this.increment();
-    }
+	@EventListener
+	public void onIncrementEvent(ChartDownloadedEvent evt) {
+		this.increment();
+	}
 
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class ChartCount {
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ChartCount {
-        private int chartsGenerated;
-    }
+		private int chartsGenerated;
 
+	}
 
 }
