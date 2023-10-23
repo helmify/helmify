@@ -57,13 +57,16 @@
 </div>
 <div class="row" hx-boost="true">
     <div class="col-8">
-        Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart
+        Upload a (Spring) pom.xml / build.gradle and enter some data, so we can generate a suitable Helm Chart
         for
         you :) <a
             href="/about">Tell me more ..</a>
     </div>
     <div class="col-4" style="text-align: right">
         Helm Charts generated: <span th:text="${chartsGenerated}"></span>
+    </div>
+    <div class="col-12">
+        We support: Maven, Gradle, <span th:text="${supportedDependencies}"></span>
     </div>
     <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
 </div>
