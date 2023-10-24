@@ -36,8 +36,11 @@ public class StartupCheck {
 	}
 
 	private void write() throws Exception {
-		Files.createDirectory(Paths.get(dataDirectory, "startup-check"));
-		Files.write(Paths.get(dataDirectory, "startup-check", System.currentTimeMillis() + ".txt"), "OK".getBytes());
+		Path checkDir = Paths.get(dataDirectory, "startup-check");
+		if(!Files.exists(checkDir)) {
+			Files.createDirectory(checkDir);
+		}
+		Files.write(Paths.get(checkDir.toFile().getAbsolutePath(), System.currentTimeMillis() + ".txt"), "OK".getBytes());
 	}
 
 	private void read() throws Exception {
