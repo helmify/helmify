@@ -70,7 +70,7 @@ public class SpringInitializrRestController {
 		viewModel.addAttribute("helmContext", helmContext);
 		viewModel.addAttribute("springInitializrLink", springInitializrLink);
 
-		return "fragments :: pom-upload-form";
+		return "fragments :: second-form";
 	}
 
 	private static void validateResponseCode(ResponseEntity<byte[]> response) {

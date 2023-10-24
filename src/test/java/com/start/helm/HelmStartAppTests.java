@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.start.helm.domain.ChartCountTracker;
+import com.start.helm.domain.resolvers.DependencyResolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,14 +57,26 @@ public class HelmStartAppTests {
 
 	@Test
 	public void testIndex() throws Exception {
-		int i = new Random().nextInt();
+		int i = 1337;
 		var model = new ChartCountTracker.ChartCount(i);
 		Files.write(Paths.get(dataDirectory, "chart-count.json"), om.writeValueAsBytes(model));
 
 		HtmlPage page = webClient.getPage("http://localhost:" + port + "/");
-		Assertions.assertTrue(page.getWebResponse().getContentAsString().contains("hello world"));
+
+		List<String> names = ctx.getBeansOfType(DependencyResolver.class)
+			.values()
+			.stream()
+			.map(DependencyResolver::dependencyName)
+			.filter(n -> !n.equals("web"))
+			.filter(n -> !n.equals("actuator"))
+			.toList();
+
+		String indexContent = page.getWebResponse().getContentAsString();
+
+		names.forEach(n -> Assertions.assertTrue(indexContent.toLowerCase().contains(n)));
+
 		Assertions.assertTrue(
-				page.getWebResponse().getContentAsString().contains("Helm Charts generated: <span>" + i + "</span>"));
+				page.getWebResponse().getContentAsString().contains("Charts generated: <span>" + i + "</span>"));
 
 	}
 
