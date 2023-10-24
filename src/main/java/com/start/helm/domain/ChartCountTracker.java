@@ -41,7 +41,7 @@ public class ChartCountTracker {
 	@SneakyThrows
 	public int getChartCount() {
 		File store = this.getStore();
-		return this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated();
+		return Math.max(0, this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated());
 	}
 
 	@SneakyThrows
