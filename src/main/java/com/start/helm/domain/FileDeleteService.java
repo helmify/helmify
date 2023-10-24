@@ -20,7 +20,6 @@ public class FileDeleteService {
 
 	@Scheduled(fixedDelay = 1000 * 60 * 60)
 	public void deleteFiles() {
-		log.info("Deleting files");
 		long now = System.currentTimeMillis();
 		long hourAgo = now - 1000 * 60 * 60;
 
