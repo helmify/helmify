@@ -53,7 +53,7 @@ public class FileUploadController {
 			viewModel.addAttribute("helmContext", helmContext);
 		}
 
-		return "fragments :: pom-upload-form";
+		return "fragments :: second-form";
 	}
 
 	private static void validateFilename(String fileName) {

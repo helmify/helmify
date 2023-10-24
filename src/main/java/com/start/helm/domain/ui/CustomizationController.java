@@ -48,7 +48,7 @@ public class CustomizationController {
 
 		viewModel.addAttribute("customized", true);
 
-		return "fragments :: pom-upload-form";
+		return "fragments :: third-form";
 	}
 
 }

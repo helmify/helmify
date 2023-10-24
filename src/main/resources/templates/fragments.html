@@ -2,85 +2,93 @@
       xmlns:th="http://www.thymeleaf.org"
       lang="en">
 
-<div th:fragment="header-row" id="header-row">
+<div th:fragment="first-form">
     <div class="row">
-        <label class="button outline col card-label"
-               th:classappend="${helmContext == null ? 'primary':'default'}" for="upload-input">
-            1. Upload Maven / Gradle file
-        </label>
-        <label class="button  outline col card-label"
-               th:classappend="${helmContext != null && !helmContext.customized ? 'primary':'default'}">
-            2. Provide Metadata
-        </label>
-        <label class="button outline col card-label"
-               th:classappend="${helmContext != null && helmContext.customized ? 'primary':'default'}">
-            3. Profit
-        </label>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div th:if="${helmContext == null}"
-                 style="width: 100%; opacity: 80%; font-size: 1.1em; text-align: center; padding: 0.5em"
-                 class="default">
-                Or
-            </div>
-            <div th:if="${helmContext == null}" style="width: 100%">
-                <label>
-                    <input
-                            hx-trigger="keyup changed delay:500ms"
-                            hx-post="/spring-initializr-link"
-                            hx-ext="json-enc"
-                            hx-target="#pom-form"
-                            id="springInitializrLink"
-                            name="springInitializrLink"
-                            type="text"
-                            placeholder="1.1 Paste Spring Initializr Link"/>
-                    <span style="font-size: 0.8em;">
-                        Maven / Gradle (Groovy) / Gradle (Kotlin) are supported
-                    </span>
-                </label>
+        <div class="col-12 text-center" id="main">
+            <div style="font-size: 1.2em;margin-bottom: 1em;">First upload a Spring Build File</div>
+            <div id="upload-btn" class="button" onclick="document.getElementById('upload-input').click()" th:if="${helmContext == null}" >
+                <div>
+                    <img src="/icons/gradle.svg" height="200" width="200" style="padding: 1em 2.5em 1em 0.5em; border-right: 1px inset">
+                    <img src="/icons/maven-svgrepo-com.svg" height="200" width="200" style="padding: 1em"/>
+                </div>
+                <div style="padding: 1em;">
+                    Or just paste a shared Spring Initializr Link anywhere on here
+                </div>
             </div>
         </div>
-        <div class="col"></div>
-        <div class="col"></div>
     </div>
 </div>
+<div th:fragment="second-form">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div style="font-size: 1.2em;">App Summary</div>
+        </div>
+        <div class="col-12" th:if="${helmContext != null}">
+            <div>
+                <span>This is a <span class="bold">Maven</span> based Application called
+                    <span class="bold" th:text="${helmContext.appName}"></span>
+                    in Version
+                    <span class="bold" th:text="${helmContext.appVersion}"></span>
+                    built with
+                    <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
+                    <span th:if="${helmContext.createIngress}">
+                        and should be exposed through an <span class="bold">Ingress</span>
+                    </span>.
+                    <span th:if="${helmContext.helmDependencies.size() > 0}">
+                        It depends on
+                        <span th:each="d,iter : ${helmContext.helmDependencies}">
+                            <span class="bold" th:text="${d.name}"></span>
+                            <span th:if="${iter.last == false}">, </span>
+                        </span>
+                    </span>
+                </span>
+            </div>
+            <div style="margin-top: 1em;" th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
+        </div>
+    </div>
+</div>
+
 <div th:fragment="customization-input-form">
     <form id="dockerImageForm"
           hx-post="/customize"
           hx-ext="json-enc"
-          hx-target="#pom-form"
-
+          hx-target="#outlet"
     >
-        <h4 th:if="${helmContext.customized == false}">Inputs required:</h4>
-        <h4 th:if="${helmContext.customized == true}" style="color: #14854F">Inputs provided:</h4>
-        <h5>Docker Image Coordinates</h5>
-        <div>
-            <label for="imageUrl">Docker Image Repository URL</label>
-            <input type="text"
-                   th:value="'registry.your-org.com/docker-registry/'+${helmContext.appName}"
-                   th:disabled="${helmContext.customized == true}"
-                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                   name="dockerImageRepositoryUrl"
-                   id="imageUrl">
+        <div th:if="${helmContext.customized == false}" class="text-error" style="font-size: 1.2em;">Inputs required:</div>
+        <div th:if="${helmContext.customized == true}" class="text-success" style="font-size: 1.2em;">Inputs provided:</div>
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <h5>Docker Image Coordinates</h5>
+            <div style="width: 300px;">
+                <label for="imageUrl">Docker Image Repository URL</label>
+                <input type="text"
+                       th:value="${helmContext.appName}"
+                       th:disabled="${helmContext.customized == true}"
+                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                       name="dockerImageRepositoryUrl"
+                       size="30"
+                       id="imageUrl">
+            </div>
+            <div style="margin-top: 1em; width: 300px;">
+                <label for="imageTag">Docker Image Tag</label>
+                <input id="imageTag" th:value="${helmContext.appVersion}" name="dockerImageTag"
+                       th:disabled="${helmContext.customized == true}"
+                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                       size="30"
+                       type="text">
+            </div>
+            <div style="margin-top: 1em; width: 300px;">
+                <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
+                <input id="imagePullSecret" th:value="''" name="dockerImagePullSecret"
+                       th:disabled="${helmContext.customized == true}"
+                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                       size="30"
+                       type="text">
+                <input style="display: none;" id="helmContext" name="helmContext" th:value="${helmContext}"
+                       th:if="${helmContext.customized == false}"
+                >
+            </div>
         </div>
-        <div style="margin-top: 1em">
-            <label for="imageTag">Docker Image Tag</label>
-            <input id="imageTag" th:value="'latest'" name="dockerImageTag"
-                   th:disabled="${helmContext.customized == true}"
-                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                   type="text">
-        </div>
-        <div style="margin-top: 1em">
-            <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
-            <input id="imagePullSecret" th:value="''" name="dockerImagePullSecret"
-                   th:disabled="${helmContext.customized == true}"
-                   th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                   type="text">
-            <input style="display: none;" id="helmContext" name="helmContext" th:value="${helmContext}"
-                   th:if="${helmContext.customized == false}"
-            >
-        </div>
+
         <div style="padding: 2em; text-align: center; font-size: 1.5em">
             <button style="font-size: 2em;"
                     th:disabled="${helmContext.customized == true}"
@@ -94,83 +102,36 @@
     </form>
 </div>
 
-<div th:fragment="pom-upload-form">
-    <div id="pom-form">
-        <div th:insert="~{fragments :: header-row}"></div>
-        <div class="row">
-            <div class="col">
-
-                <form id="form"
-                      hx-encoding="multipart/form-data"
-                      hx-post="/upload-file"
-                      hx-target="#pom-form"
-                      method="post">
-                    <input id="upload-input"
-                           type="file"
-                           name="file"
-                           class="form-control-file"
-                           style="display: none;"
-                           onchange="this.form.requestSubmit()"
-                    >
-                </form>
-                <div th:if="${springInitializrLink != null}">
-                    <a th:href="${springInitializrLink}" target="_blank">
-                        Spring Initalizr Link
-                    </a>
-                </div>
-                <div th:if="${helmContext != null}">
-                        <pre style="
-                        max-height: 51em;
-                        max-width: 47em;
-                        overflow-y: scroll;
-                        font-size: 0.8em;"
-                             th:text="${helmContext.dependencyDescriptor}"></pre>
-                </div>
-            </div>
-            <div class="col">
-                <div th:if="${helmContext != null}">
-                    <h4>App Summary</h4>
-                    <div>
-                            <span>This is a <span class="bold">Maven</span> based Application called
-                                <span class="bold" th:text="${helmContext.appName}"></span>
-                                in Version
-                                <span class="bold" th:text="${helmContext.appVersion}"></span>
-                                built with
-                                <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
-                                <span th:if="${helmContext.createIngress}">
-                                    and should be exposed through an <span class="bold">Ingress</span>
-                                </span>.
-                                <span th:if="${helmContext.helmDependencies.size() > 0}">
-                                    It depends on
-                                    <span th:each="d,iter : ${helmContext.helmDependencies}">
-                                        <span class="bold" th:text="${d.name}"></span>
-                                        <span th:if="${iter.last == false}">, </span>
-                                    </span>
-                                </span>
-                            </span>
-                    </div>
-                    <div th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
-                </div>
-            </div>
-            <div class="col">
-                <div th:if="${helmContext != null}" style="text-align: center">
-                    <div
-                            th:if="${helmContext.zipLink != null}"
-                            class="outline primary button"
-                            style="cursor: pointer; font-size: 1.6em; font-weight: bold; text-align: center; padding: 1.4em;margin-top: 3em;"
-                            th:text="'Download '+${helmContext.zipLink}"
-                            hx-trigger="click"
-                            hx-ext="json-enc"
-                            th:attrappend="hx-vars='helmContext: '+${helmContext}"
-                            th:attr="hx-post='/download/'+ ${helmContext.zipLink}"
-                    >
-                    </div>
-                </div>
-            </div>
+<div th:fragment="third-form">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div style="font-size: 1.2em;" class="text-primary">Your Helm Chart is ready to download</div>
         </div>
-        <div id="pom-upload-message" hx-swap-oob="true">
-            <p th:if="${message != null}" th:text="'Server says: ' + ${message} "/>
-            <p th:if="${error != null}" th:text="'Server says Error: ' + ${error} "/>
+    </div>
+    <div class="col-12">
+        <div th:if="${helmContext != null}" style="text-align: center">
+            <script lang="text/javascript">
+                 function handleDlClick () {
+                     let el = document.getElementById('notification-text');
+                     el.textContent = 'Returning to start screen in 30 seconds';
+                     el.setAttribute("class", "text-dark");
+                     setTimeout(function(){window.location.href = '/'}, 30000)
+                }
+            </script>
+            <div
+                    onclick="handleDlClick()"
+                    th:if="${helmContext.zipLink != null}"
+                    class="primary button helm-dl-btn"
+                    th:text="'Download '+${helmContext.zipLink}"
+                    hx-trigger="click"
+                    hx-ext="json-enc"
+                    th:attrappend="hx-vars='helmContext: '+${helmContext}"
+                    th:attr="hx-post='/download/'+ ${helmContext.zipLink}"
+            >
+            </div>
+            <div style="margin-top: 2.5em; opacity: 0.5">
+                You may want to further customize your Helm Chart by editing values.yaml
+            </div>
         </div>
     </div>
 </div>
