@@ -43,11 +43,15 @@ class HelmChartServiceTest {
 		context.setAppVersion("1.0.0");
 
 		assertNotNull(context);
-		assertEquals(7, context.getHelmChartSlices().size());
-		assertEquals(6, context.getValuesGlobalBlocks().size());
-		assertEquals(6, context.getHelmDependencies().size());
+		assertEquals(8, context.getHelmChartSlices().size());
+		assertEquals(7, context.getValuesGlobalBlocks().size());
+		assertEquals(7, context.getHelmDependencies().size());
 		assertTrue(context.isHasActuator());
 		assertTrue(context.isCreateIngress());
+
+		boolean neo4j = context.getHelmChartSlices()
+			.stream()
+			.anyMatch(s -> s.getValuesEntries().keySet().contains("neo4j"));
 
 		boolean mariadb = context.getHelmChartSlices()
 			.stream()
@@ -74,6 +78,7 @@ class HelmChartServiceTest {
 		assertTrue(redis);
 		assertTrue(mongodb);
 		assertTrue(mariadb);
+		assertTrue(neo4j);
 
 		context.getHelmChartSlices()
 			.stream()
@@ -126,6 +131,7 @@ class HelmChartServiceTest {
 		String deploymentYaml = contents.get("templates/deployment.yaml");
 
 		// look for init containers
+		assertTrue(deploymentYaml.contains("-neo4jchecker"));
 		assertTrue(deploymentYaml.contains("-mariadbchecker"));
 		assertTrue(deploymentYaml.contains("-mongodbchecker"));
 		assertTrue(deploymentYaml.contains("-rabbitmqchecker"));
@@ -134,6 +140,11 @@ class HelmChartServiceTest {
 		assertTrue(deploymentYaml.contains("-mysqlchecker"));
 
 		// look for env vars
+		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
+		assertTrue(deploymentYaml.contains("key: neo4j-username"));
+		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_PASSWORD"));
+		assertTrue(deploymentYaml.contains("key: neo4j-password"));
+
 		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_USERNAME"));
 		assertTrue(deploymentYaml.contains("key: rabbitmq-username"));
 		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_PASSWORD"));
@@ -180,6 +191,7 @@ class HelmChartServiceTest {
 		assertTrue(configmapYaml.contains("    spring.data.redis.host="));
 		assertTrue(configmapYaml.contains("    spring.data.redis.port="));
 		assertTrue(configmapYaml.contains("    spring.data.mongodb.uri="));
+		assertTrue(configmapYaml.contains("    spring.neo4j.uri="));
 
 	}
 
@@ -211,6 +223,14 @@ class HelmChartServiceTest {
             version: 18.1.2
             repository: https://charts.bitnami.com/bitnami
             condition: redis.enabled
+            tags: []
+        """));
+		//@formatter:off
+		assertTrue(chartYaml.contains("""
+          - name: neo4j
+            version: 5.12.0
+            repository: https://helm.neo4j.com/neo4j
+            condition: neo4j.enabled
             tags: []
         """));
   }
