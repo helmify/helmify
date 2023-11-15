@@ -27,7 +27,6 @@ public class CliApi {
 
 	private final ApplicationEventPublisher publisher;
 
-
 	@PostMapping("/cli")
 	public ResponseEntity<byte[]> cli(@RequestParam("name") String name, @RequestParam("version") String version,
 			@RequestBody String buildFileContents) {
