@@ -1,4 +1,4 @@
-package com.start.helm.cli;
+package com.start.helm.cli.listeners;
 
 import com.start.helm.cli.events.HelmZipDownloadedEvent;
 import org.springframework.context.event.EventListener;
