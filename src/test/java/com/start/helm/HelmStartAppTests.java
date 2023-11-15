@@ -59,6 +59,9 @@ public class HelmStartAppTests {
 	public void testIndex() throws Exception {
 		int i = 1337;
 		var model = new ChartCountTracker.ChartCount(i);
+		if (!Files.exists(Paths.get(dataDirectory))) {
+			Files.createDirectory(Paths.get(dataDirectory));
+		}
 		Files.write(Paths.get(dataDirectory, "chart-count.json"), om.writeValueAsBytes(model));
 
 		HtmlPage page = webClient.getPage("http://localhost:" + port + "/");
