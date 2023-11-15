@@ -1,5 +1,6 @@
-package com.start.helm.cli.config;
+package com.start.helm.cli.listeners;
 
+import com.start.helm.cli.config.AppConfig;
 import com.start.helm.cli.events.HelmZipDownloadedEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -29,11 +30,9 @@ public class AppConfigListener {
 		try {
 			Path buildFilePath = Path.of(buildFile);
 			String buildFileContents = Files.readString(buildFilePath);
-			String url = String.format("http://localhost:8080/api/cli?name=%s&version=%s", config.getAppName(),
-					config.getAppVersion());
-			System.out.println("sending request to " + url);
+			final String url = String.format("https://dev.helm-start.com/api/cli?name=%s&version=%s",
+					config.getAppName(), config.getAppVersion());
 			ResponseEntity<byte[]> binary = restTemplate.postForEntity(url, buildFileContents, byte[].class);
-
 			if (!binary.getStatusCode().is2xxSuccessful()) {
 				System.err.println("error sending buildfile to server");
 				return;
