@@ -5,45 +5,49 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class AppVersionProvider {
-    public String getAppVersion(String buildFile) {
 
-        if(buildFile.contains("build.gradle")) {
-            return extractVersionFromGradle(buildFile);
-        }
+	public String getAppVersion(String buildFile) {
 
-        if(buildFile.contains("pom.xml")) {
-            return  extractVersionFromPom(buildFile);
-        }
+		if (buildFile.contains("build.gradle")) {
+			return extractVersionFromGradle(buildFile);
+		}
 
-        return"";
-    }
+		if (buildFile.contains("pom.xml")) {
+			return extractVersionFromPom(buildFile);
+		}
 
-    private String extractVersionFromPom(String buildFile) {
-        try {
-            List<String> strings = Files.readAllLines(Path.of(buildFile));
-            for (String string : strings) {
-                if(string.contains("<version>")) {
-                    return string.replace("<version>", "").replace("</version>", "").trim();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("error reading buildfile at " + buildFile);
-            e.printStackTrace();
-        }
-        return "1.0.0";
-    }
+		return "";
+	}
 
-    private String extractVersionFromGradle(String buildFile) {
-        try {
-            List<String> strings = Files.readAllLines(Path.of(buildFile));
-            for (String string : strings) {
-                if(string.startsWith("version")) {
-                    return string.replace("version", "").replace("=", "").replace("'", "").replace("\"", "").trim();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "1.0.0";
-    }
+	private String extractVersionFromPom(String buildFile) {
+		try {
+			List<String> strings = Files.readAllLines(Path.of(buildFile));
+			for (String string : strings) {
+				if (string.contains("<version>")) {
+					return string.replace("<version>", "").replace("</version>", "").trim();
+				}
+			}
+		}
+		catch (Exception e) {
+			System.err.println("error reading buildfile at " + buildFile);
+			e.printStackTrace();
+		}
+		return "1.0.0";
+	}
+
+	private String extractVersionFromGradle(String buildFile) {
+		try {
+			List<String> strings = Files.readAllLines(Path.of(buildFile));
+			for (String string : strings) {
+				if (string.startsWith("version")) {
+					return string.replace("version", "").replace("=", "").replace("'", "").replace("\"", "").trim();
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "1.0.0";
+	}
+
 }

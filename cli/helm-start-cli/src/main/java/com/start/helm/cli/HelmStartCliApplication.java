@@ -12,21 +12,21 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class HelmStartCliApplication {
 
-    public static void main(String[] args) {
-        if(ArgumentValidator.isValidArgs(args)) {
-            ConfigurableApplicationContext ctx = SpringApplication.run(HelmStartCliApplication.class, args);
-            String buildFile = ArgumentListParser.getBuildFile(args);
+	public static void main(String[] args) {
+		if (ArgumentValidator.isValidArgs(args)) {
+			ConfigurableApplicationContext ctx = SpringApplication.run(HelmStartCliApplication.class, args);
+			String buildFile = ArgumentListParser.getBuildFile(args);
 
-            if(buildFile != null) {
+			if (buildFile != null) {
 
-                final String appName = new AppNameProvider().getAppName(buildFile);
-                final String appVersion = new AppVersionProvider().getAppVersion(buildFile);
+				final String appName = new AppNameProvider().getAppName(buildFile);
+				final String appVersion = new AppVersionProvider().getAppVersion(buildFile);
 
-                AppConfig appConfig =  new AppConfig(buildFile, appName, appVersion);
-                ctx.publishEvent(appConfig);
-            }
+				AppConfig appConfig = new AppConfig(buildFile, appName, appVersion);
+				ctx.publishEvent(appConfig);
+			}
 
-        }
-    }
+		}
+	}
 
 }

@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 
 class ArgumentValidatorTest {
 
-    @Test
-    void isValidArgs() {
+	@Test
+	void isValidArgs() {
 
-        ArgumentValidator.isValidArgs(new String[]{"--build-file", "build.gradle"});
+		ArgumentValidator.isValidArgs(new String[] { "--build-file", "build.gradle" });
 
+	}
 
-    }
 }
