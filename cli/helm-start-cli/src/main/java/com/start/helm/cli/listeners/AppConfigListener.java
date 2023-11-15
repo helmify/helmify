@@ -30,8 +30,8 @@ public class AppConfigListener {
 		try {
 			Path buildFilePath = Path.of(buildFile);
 			String buildFileContents = Files.readString(buildFilePath);
-			final String url = String.format("https://dev.helm-start.com/api/cli?name=%s&version=%s",
-					config.getAppName(), config.getAppVersion());
+			final String url = String.format("https://helm-start.com/api/cli?name=%s&version=%s", config.getAppName(),
+					config.getAppVersion());
 			ResponseEntity<byte[]> binary = restTemplate.postForEntity(url, buildFileContents, byte[].class);
 			if (!binary.getStatusCode().is2xxSuccessful()) {
 				System.err.println("error sending buildfile to server");
