@@ -14,36 +14,41 @@ import java.nio.file.Paths;
 @Component
 public class AppConfigListener {
 
-    private final RestTemplate restTemplate;
-    private final ApplicationContext context;
+	private final RestTemplate restTemplate;
 
-    public AppConfigListener(RestTemplate restTemplate, ApplicationContext context) {
-        this.restTemplate = restTemplate;
-        this.context = context;
-    }
+	private final ApplicationContext context;
 
-    @EventListener
-    public void listen(AppConfig config) {
-        String buildFile = config.getBuildFile();
-        try {
-            Path buildFilePath = Path.of(buildFile);
-            String buildFileContents = Files.readString(buildFilePath);
-            String url = String.format("http://localhost:8080/api/cli?name=%s&version=%s", config.getAppName(), config.getAppVersion());
-            System.out.println("sending request to " + url);
-            ResponseEntity<byte[]> binary = restTemplate.postForEntity(url, buildFileContents, byte[].class);
+	public AppConfigListener(RestTemplate restTemplate, ApplicationContext context) {
+		this.restTemplate = restTemplate;
+		this.context = context;
+	}
 
-            if (!binary.getStatusCode().is2xxSuccessful()) {
-                System.err.println("error sending buildfile to server");
-                return;
-            }
-            String helmZipPath = Paths.get(buildFilePath.getParent().toFile().getAbsolutePath(), "helm.zip").toFile().getAbsolutePath();
-            context.publishEvent(new HelmZipDownloadedEvent(binary.getBody(), helmZipPath));
+	@EventListener
+	public void listen(AppConfig config) {
+		String buildFile = config.getBuildFile();
+		try {
+			Path buildFilePath = Path.of(buildFile);
+			String buildFileContents = Files.readString(buildFilePath);
+			String url = String.format("http://localhost:8080/api/cli?name=%s&version=%s", config.getAppName(),
+					config.getAppVersion());
+			System.out.println("sending request to " + url);
+			ResponseEntity<byte[]> binary = restTemplate.postForEntity(url, buildFileContents, byte[].class);
 
-        } catch (Exception e) {
-            System.err.println("error reading buildfile at " + config.getBuildFile());
-            e.printStackTrace();
-        }
+			if (!binary.getStatusCode().is2xxSuccessful()) {
+				System.err.println("error sending buildfile to server");
+				return;
+			}
+			String helmZipPath = Paths.get(buildFilePath.getParent().toFile().getAbsolutePath(), "helm.zip")
+				.toFile()
+				.getAbsolutePath();
+			context.publishEvent(new HelmZipDownloadedEvent(binary.getBody(), helmZipPath));
 
-    }
+		}
+		catch (Exception e) {
+			System.err.println("error reading buildfile at " + config.getBuildFile());
+			e.printStackTrace();
+		}
+
+	}
 
 }

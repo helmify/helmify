@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 
 class HelmStartCliApplicationTest {
 
-    @Test
-    void testMain() {
+	@Test
+	void testMain() {
 
-    }
+	}
 
 }

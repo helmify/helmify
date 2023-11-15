@@ -2,25 +2,28 @@ package com.start.helm.cli.config;
 
 public class AppConfig {
 
-    private final String buildFile;
-    private final String appName;
-    private final String appVersion;
+	private final String buildFile;
 
-    public AppConfig(String buildFile, String appName, String appVersion) {
-        this.buildFile = buildFile;
-        this.appName = appName;
-        this.appVersion = appVersion;
-    }
+	private final String appName;
 
-    public String getBuildFile() {
-        return buildFile;
-    }
+	private final String appVersion;
 
-    public String getAppName() {
-        return appName;
-    }
+	public AppConfig(String buildFile, String appName, String appVersion) {
+		this.buildFile = buildFile;
+		this.appName = appName;
+		this.appVersion = appVersion;
+	}
 
-    public String getAppVersion() {
-        return appVersion;
-    }
+	public String getBuildFile() {
+		return buildFile;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public String getAppVersion() {
+		return appVersion;
+	}
+
 }
