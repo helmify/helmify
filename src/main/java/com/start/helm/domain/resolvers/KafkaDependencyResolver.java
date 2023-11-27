@@ -11,6 +11,7 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
 
 /**
  * Resolver for spring kafka dependency.
+ * <a href="https://github.com/bitnami/charts/tree/main/bitnami/kafka">Also see Bitnami Chart</a>
  */
 @Slf4j
 @Component
@@ -35,17 +36,27 @@ public class KafkaDependencyResolver implements DependencyResolver {
 		);
 	}
 
+	private int getKafkaPort() {
+		return 9092;
+	}
+
 	public Map<String, Object> getValuesEntries(HelmContext context) {
 		return Map.of(
 				"kafka",
 				Map.of("enabled", true,
-						"port", 5672,
-						"vhost", "/",
+						"port", getKafkaPort() ,
 						"nameOverride", context.getAppName() + "-kafka",
 						"fullnameOverride", context.getAppName() + "-kafka",
+						"listeners", Map.of(
+								"client", Map.of(
+									"protocol", "PLAINTEXT", // Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+										"sslClientAuth", "none" // Allowed values are 'none', 'required' and 'requested'
+								)
+						),
+
 						"auth", Map.of("username", "guest", "password", "guest")
 				),
-				"global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", 9092))
+				"global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", getKafkaPort() ))
 		);
 	}
 
