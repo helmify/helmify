@@ -45,7 +45,7 @@ public class KafkaDependencyResolver implements DependencyResolver {
 						"fullnameOverride", context.getAppName() + "-kafka",
 						"auth", Map.of("username", "guest", "password", "guest")
 				),
-				"global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", 5672))
+				"global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", 9092))
 		);
 	}
 
