@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
-
 /**
  * Resolver for spring kafka dependency.
  * <a href="https://github.com/bitnami/charts/tree/main/bitnami/kafka">Also see Bitnami
@@ -32,8 +30,6 @@ public class KafkaDependencyResolver implements DependencyResolver {
 
 	public Map<String, Object> getSecretEntries() {
 		return Map.of(
-				"kafka-username", "{{ .Values.kafka.auth.username | b64enc | quote }}"
-				, "kafka-password", "{{ .Values.kafka.auth.password | b64enc | quote }}"
 		);
 	}
 
@@ -53,9 +49,7 @@ public class KafkaDependencyResolver implements DependencyResolver {
 									"protocol", "PLAINTEXT", // Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
 										"sslClientAuth", "none" // Allowed values are 'none', 'required' and 'requested'
 								)
-						),
-
-						"auth", Map.of("username", "guest", "password", "guest")
+						)
 				),
 				"global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", getKafkaPort() ))
 		);
@@ -77,8 +71,6 @@ public class KafkaDependencyResolver implements DependencyResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				makeSecretKeyRef("SPRING_KAFKA_USERNAME", "kafka-username", context.getAppName()),
-				makeSecretKeyRef("SPRING_KAFKA_PASSWORD", "kafka-password", context.getAppName())
 		);
 	}
 
