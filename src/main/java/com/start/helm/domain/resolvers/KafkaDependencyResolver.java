@@ -52,7 +52,7 @@ public class KafkaDependencyResolver implements DependencyResolver {
 	public Map<String, String> getPreferredChart() {
 		return Map.of(
 				"name", "kafka",
-				"version", "11.9.0",
+				"version", "26.4.2",
 				"repository", "https://charts.bitnami.com/bitnami"
 		);
 	}
