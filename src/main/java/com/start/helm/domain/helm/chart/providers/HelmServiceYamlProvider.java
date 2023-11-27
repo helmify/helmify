@@ -47,7 +47,7 @@ public class HelmServiceYamlProvider implements HelmFileProvider {
 	}
 
 	private String addHealthCheckPort(String content) {
-		return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 2);
+		return insertAfter(content, "###@helm-start:healthcheckport", healthCheckPortPatch, 4);
 	}
 
 	@Override
