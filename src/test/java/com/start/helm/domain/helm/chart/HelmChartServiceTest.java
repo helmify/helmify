@@ -43,11 +43,16 @@ class HelmChartServiceTest {
 		context.setAppVersion("1.0.0");
 
 		assertNotNull(context);
-		assertEquals(8, context.getHelmChartSlices().size());
-		assertEquals(7, context.getValuesGlobalBlocks().size());
-		assertEquals(7, context.getHelmDependencies().size());
+		int expectedSlices = 9;
+		assertEquals(expectedSlices, context.getHelmChartSlices().size());
+		assertEquals(expectedSlices - 1, context.getValuesGlobalBlocks().size());
+		assertEquals(expectedSlices - 1, context.getHelmDependencies().size());
 		assertTrue(context.isHasActuator());
 		assertTrue(context.isCreateIngress());
+
+		boolean kafka = context.getHelmChartSlices()
+			.stream()
+			.anyMatch(s -> s.getValuesEntries().keySet().contains("kafka"));
 
 		boolean neo4j = context.getHelmChartSlices()
 			.stream()
@@ -72,6 +77,8 @@ class HelmChartServiceTest {
 		boolean postgresql = context.getHelmChartSlices()
 			.stream()
 			.anyMatch(s -> s.getValuesEntries().keySet().contains("postgresql"));
+
+		assertTrue(kafka);
 		assertTrue(mysql);
 		assertTrue(rabbitmq);
 		assertTrue(postgresql);
@@ -138,6 +145,7 @@ class HelmChartServiceTest {
 		assertTrue(deploymentYaml.contains("-postgresqlchecker"));
 		assertTrue(deploymentYaml.contains("-redischecker"));
 		assertTrue(deploymentYaml.contains("-mysqlchecker"));
+		assertTrue(deploymentYaml.contains("-kafkachecker"));
 
 		// look for env vars
 		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
@@ -192,6 +200,7 @@ class HelmChartServiceTest {
 		assertTrue(configmapYaml.contains("    spring.data.redis.port="));
 		assertTrue(configmapYaml.contains("    spring.data.mongodb.uri="));
 		assertTrue(configmapYaml.contains("    spring.neo4j.uri="));
+		assertTrue(configmapYaml.contains("    spring.kafka.bootstrap-servers="));
 
 	}
 
@@ -231,6 +240,14 @@ class HelmChartServiceTest {
             version: 5.12.0
             repository: https://helm.neo4j.com/neo4j
             condition: neo4j.enabled
+            tags: []
+        """));
+		//@formatter:off
+		assertTrue(chartYaml.contains("""
+          - name: kafka
+            version: 26.4.2
+            repository: https://charts.bitnami.com/bitnami
+            condition: kafka.enabled
             tags: []
         """));
   }
