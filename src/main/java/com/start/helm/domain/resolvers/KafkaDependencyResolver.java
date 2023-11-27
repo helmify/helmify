@@ -59,9 +59,7 @@ public class KafkaDependencyResolver implements DependencyResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"spring.kafka.host", "{{ .Values.global.hosts.kafka }}",
-				"spring.kafka.port", "{{ .Values.global.ports.kafka }}",
-				"spring.kafka.virtual-host", "{{ .Values.kafka.vhost }}"
+				"spring.kafka.bootstrap-servers", "{{ .Values.global.hosts.kafka }}:{{ .Values.global.ports.kafka }}"
 		);
 	}
 
