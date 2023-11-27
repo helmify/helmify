@@ -32,7 +32,7 @@ public class HelmReadmeProvider implements HelmFileProvider {
 				The image tag should be updated correspondingly in values.yaml:
 				```yaml
 				image:
-				  pullPolicy: Always
+				  pullPolicy: IfNotPresent
 				  repository: &s
 				  secrets: []
 				  tag: some-specific-version
