@@ -12,11 +12,36 @@
 
 </head>
 <style>
+    .helm-dl-btn {
+        cursor: pointer;
+        font-size: 1.6em;
+        font-weight: bold;
+        text-align: center;
+        padding: 1.4em;
+        margin-top: 3em;
+        box-shadow: 0 3px 3px 2px white;
+    }
+
+    .helm-dl-btn:active {
+        box-shadow: unset;
+    }
+
+    .step-header {
+        font-size: 1.3em;
+    }
+
+    .step-header.text-primary {
+        text-decoration: underline;
+    }
+
+    .step-header.default {
+        opacity: 0.5;
+    }
+
     #footer {
         position: absolute;
         bottom: 0;
         text-align: center;
-        border-top: 0.1rem solid #d1d1d1;
         width: 99%;
     }
 
@@ -56,31 +81,90 @@
     </header>
 </div>
 <div class="row" hx-boost="true">
-    <div class="col-8">
-        Upload a (Spring) Maven / Gradle file and enter some data, so we can generate a suitable Helm Chart
-        for
-        you :) <a
-            href="/about">Tell me more ..</a>
+    <div class="col-12 text-center">
+        <div>
+            Upload a (Spring) pom.xml / build.gradle, Get a Helm Chart :) <a href="/about">Tell me more ..</a>
+        </div>
     </div>
-    <div class="col-4" style="text-align: right">
-        Helm Charts generated: <span th:text="${chartsGenerated}"></span>
+    <div class="col-12">
+        <div id="outlet" style="margin-top: 1em" class="col-12" th:insert="~{fragments :: first-form}"></div>
+        <form id="form"
+              hx-encoding="multipart/form-data"
+              hx-post="/upload-file"
+              hx-target="#main"
+              method="post">
+            <input id="upload-input"
+                   type="file"
+                   name="file"
+                   class="form-control-file"
+                   style="display: none;"
+                   onchange="this.form.requestSubmit()"
+            >
+        </form>
+        <form id="springInitializrForm">
+            <label>
+                <input id="springInitializrLink"
+                       hx-trigger="keyup changed"
+                       hx-post="/spring-initializr-link"
+                       hx-ext="json-enc"
+                       hx-target="#main"
+                       name="springInitializrLink"
+                       style="display: none;"
+                       type="text"
+                />
+            </label>
+        </form>
     </div>
-    <div style="margin-top: 1em" class="col-12" th:insert="~{fragments :: pom-upload-form}"></div>
+
 </div>
-<div class="row" id="footer">
-    <div class="col-4" style="padding-top: 0.5em; text-align: left">
+<div class="row" id="footer" style="padding-top: 0.5em; ">
+    <div class="col-2 text-left" style="padding-top: 0.5em; padding-bottom: 0.5em">
+        <span id="notification-text"></span>
+    </div>
+    <div class="col-8 text-center" style="padding: 0.5em;">
+        Supported Technologies: Maven, Gradle, <span th:text="${supportedDependencies}"></span>
+    </div>
+    <div class="col-2"></div>
+    <div class="col-12" style="border-bottom: 0.1rem solid #d1d1d1;"></div>
+    <div class="col-4 text-left" style="padding-top: 0.9em;">
+        Charts generated: <span th:text="${chartsGenerated}"></span>
+    </div>
+    <div class="col-4" style="padding-top: 0.9em;">
+        <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
+        Spring Initializr URL in your IDE.
+    </div>
+    <div class="col-4 text-right">
         <div>
             Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
         </div>
         <div>
             Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
         </div>
-
-    </div>
-    <div class="col-4" style="padding-top: 1.4em;">
-        <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
-        Spring Initializr URL in your IDE.
     </div>
 </div>
+<script lang="text/javascript">
+    document.onpaste = function (event) {
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        for (index in items) {
+            var item = items[index];
+            if (item.kind === 'string') {
+                item.getAsString(function (string) {
+                    if (string.startsWith('https://start.spring.io/')) {
+                        let notificationText = document.getElementById('notification-text');
+                        notificationText.textContent = '✓ Spring Initializr Link received';
+                        notificationText.setAttribute("class", "text-success");
+                        setTimeout(function () {
+                            notificationText.textContent = '';
+                        }, 2000);
+                        setTimeout(function () {
+                            document.getElementById('springInitializrLink').value = string;
+                            document.getElementById('springInitializrLink').dispatchEvent(new Event('keyup'));
+                        }, 200);
+                    }
+                })
+            }
+        }
+    }
+</script>
 </body>
 </html>

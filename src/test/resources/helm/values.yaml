@@ -1,0 +1,127 @@
+global:
+  hosts:
+    mariadb: demo18-mariadb
+    mysql: demo18-mysql
+    postgresql: demo18-postgresql
+    rabbitmq: demo18-rabbitmq
+    redis: demo18-redis-master
+  ports:
+    mariadb: 3306
+    mysql: 3306
+    postgresql: 5432
+    rabbitmq: 5672
+    redis: 6379
+
+affinity: { }
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+fullnameOverride: demo18
+image:
+  pullPolicy: IfNotPresent
+  repository: demo18
+  secrets: [ ]
+  tag: 0.0.1-SNAPSHOT
+imagePullSecrets: [ ]
+ingress:
+  annotations: { }
+  className: ''
+  enabled: false
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: [ ]
+nameOverride: ''
+nodeSelector: { }
+podAnnotations: { }
+podSecurityContext: { }
+replicaCount: 1
+resources: { }
+securityContext: { }
+service:
+  port: 8080
+  type: ClusterIP
+serviceAccount:
+  annotations: { }
+  create: false
+  name: ''
+tolerations: [ ]
+
+mariadb:
+  fullnameOverride: demo18-mariadb
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: ''
+  architecture: standalone
+  database: my_database
+  auth:
+    username: mariadb
+    password: mariadb
+    rootPassword: mariadb
+  enabled: true
+  nameOverride: demo18-mariadb
+
+postgresql:
+  fullnameOverride: demo18-postgresql
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: ''
+  architecture: standalone
+  database: postgres
+  auth:
+    username: postgres
+    password: postgres
+  enabled: true
+  nameOverride: demo18-postgresql
+
+redis:
+  enabled: true
+  port: 6379
+  nameOverride: demo18-redis
+  fullnameOverride: demo18-redis
+  architecture: standalone
+
+mysql:
+  fullnameOverride: demo18-mysql
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: ''
+  architecture: standalone
+  database: my_database
+  auth:
+    username: mysql
+    password: mysql
+    rootPassword: mysql
+  enabled: true
+  nameOverride: demo18-mysql
+
+rabbitmq:
+  nameOverride: demo18-rabbitmq
+  fullnameOverride: demo18-rabbitmq
+  vhost: /
+  auth:
+    username: guest
+    password: guest
+  enabled: true
+  port: 5672
+
+healthcheck:
+  port: 8090
+  name: healthcheck
+

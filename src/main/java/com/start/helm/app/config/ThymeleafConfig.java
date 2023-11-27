@@ -10,12 +10,12 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 @Configuration
 public class ThymeleafConfig {
 
-    @Bean
-    public ISpringTemplateEngine templateEngine(ITemplateResolver templateResolver) {
-        SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.addDialect(new Java8TimeDialect());
-        engine.setTemplateResolver(templateResolver);
-        return engine;
-    }
+	@Bean
+	public ISpringTemplateEngine templateEngine(ITemplateResolver templateResolver) {
+		SpringTemplateEngine engine = new SpringTemplateEngine();
+		engine.addDialect(new Java8TimeDialect());
+		engine.setTemplateResolver(templateResolver);
+		return engine;
+	}
 
 }

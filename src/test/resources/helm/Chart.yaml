@@ -1,0 +1,38 @@
+apiVersion: v2
+name: demo18
+version: 0.1.0
+appVersion: 0.0.1-SNAPSHOT
+description: A Helm chart for Kubernetes
+type: application
+dependencies:
+  - name: postgresql
+    version: 11.9.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+    tags: [ ]
+  - name: mariadb
+    version: 14.0.3
+    repository: https://charts.bitnami.com/bitnami
+    condition: mariadb.enabled
+    tags: [ ]
+  - name: mysql
+    version: 9.12.5
+    repository: https://charts.bitnami.com/bitnami
+    condition: mysql.enabled
+    tags: [ ]
+  - name: redis
+    version: 18.1.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+    tags: [ ]
+  - name: rabbitmq
+    version: 11.9.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled
+    tags: [ ]
+  - name: common
+    version: 2.x.x
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: 'true'
+    tags:
+      - bitnami-common

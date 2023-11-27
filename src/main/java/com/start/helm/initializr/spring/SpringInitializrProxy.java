@@ -5,6 +5,7 @@ import com.start.helm.domain.gradle.GradleFileUploadService;
 import com.start.helm.domain.helm.chart.HelmChartService;
 import com.start.helm.domain.maven.MavenFileUploadService;
 import com.start.helm.util.DownloadUtil;
+import com.start.helm.util.GradleUtil;
 import com.start.helm.util.ZipUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,115 +28,141 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class SpringInitializrProxy {
 
-    private final MavenFileUploadService mavenFileUploadService;
-    private final GradleFileUploadService gradleFileUploadService;
-    private final HelmChartService helmChartService;
-    private final ApplicationEventPublisher publisher;
+	private final MavenFileUploadService mavenFileUploadService;
 
-    @GetMapping(value = "/spring")
-    public Object getCapabilities() {
-        RestTemplate restTemplate = new RestTemplate();
+	private final GradleFileUploadService gradleFileUploadService;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.valueOf("application/vnd.initializr.v2.2+json")));
-        HttpEntity<Object> entity = new HttpEntity<>(headers);
+	private final HelmChartService helmChartService;
 
-        return restTemplate.exchange("https://start.spring.io/", HttpMethod.GET, entity, Object.class);
-    }
+	private final ApplicationEventPublisher publisher;
 
-    @GetMapping(value = "/spring/starter.zip")
-    public ResponseEntity<?> getStarter(HttpServletRequest request) throws IOException {
+	@GetMapping(value = "/spring")
+	public Object getCapabilities() {
+		RestTemplate restTemplate = new RestTemplate();
 
-        RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(List.of(MediaType.valueOf("application/vnd.initializr.v2.2+json")));
+		HttpEntity<Object> entity = new HttpEntity<>(headers);
 
-        Map<String, List<String>> collected = request.getParameterMap()
-                .keySet()
-                .stream()
-                .collect(Collectors.toMap(k -> k, k -> Arrays.asList(request.getParameterMap().get(k))));
+		return restTemplate.exchange("https://start.spring.io/", HttpMethod.GET, entity, Object.class);
+	}
 
-        URI uri = UriComponentsBuilder.fromHttpUrl("https://start.spring.io/starter.zip")
-                .queryParams(new MultiValueMapAdapter<>(collected))
-                .build()
-                .toUri();
+	@GetMapping(value = "/spring/starter.zip")
+	public ResponseEntity<?> getStarter(HttpServletRequest request) throws IOException {
 
-        ResponseEntity<byte[]> forEntity = restTemplate.getForEntity(uri, byte[].class);
+		RestTemplate restTemplate = new RestTemplate();
 
-        if (forEntity.getStatusCode().is2xxSuccessful() && forEntity.getBody() != null) {
+		Map<String, List<String>> collected = request.getParameterMap()
+			.keySet()
+			.stream()
+			.collect(Collectors.toMap(k -> k, k -> Arrays.asList(request.getParameterMap().get(k))));
 
-            byte[] body = forEntity.getBody();
-            String uuid = UUID.randomUUID().toString();
-            Path dataDirectory = Paths.get("helm-start-data");
-            File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp", uuid).toFile();
-            parentDir.mkdirs();
-            File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
-            helmDir.mkdirs();
+		URI uri = UriComponentsBuilder.fromHttpUrl("https://start.spring.io/starter.zip")
+			.queryParams(new MultiValueMapAdapter<>(collected))
+			.build()
+			.toUri();
 
-            org.zeroturnaround.zip.ZipUtil.unpack(new ByteArrayInputStream(body), parentDir);
+		ResponseEntity<byte[]> forEntity = restTemplate.getForEntity(uri, byte[].class);
 
-            ByteArrayResource helmChart = this.generateHelmChart(new ByteArrayResource(body));
+		if (forEntity.getStatusCode().is2xxSuccessful() && forEntity.getBody() != null) {
 
-            org.zeroturnaround.zip.ZipUtil.unpack(helmChart.getInputStream(), helmDir);
+			byte[] body = forEntity.getBody();
+			String uuid = UUID.randomUUID().toString();
+			Path dataDirectory = Paths.get("helm-start-data");
+			File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp", uuid).toFile();
+			parentDir.mkdirs();
+			File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
+			helmDir.mkdirs();
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(body.length);
+			org.zeroturnaround.zip.ZipUtil.unpack(new ByteArrayInputStream(body), parentDir);
 
-            org.zeroturnaround.zip.ZipUtil.pack(parentDir, outputStream);
+			ByteArrayResource helmChart = this.generateHelmChart(new ByteArrayResource(body));
 
-            ByteArrayResource merged = new ByteArrayResource(outputStream.toByteArray());
+			org.zeroturnaround.zip.ZipUtil.unpack(helmChart.getInputStream(), helmDir);
 
-            publisher.publishEvent(new ChartDownloadedEvent());
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream(body.length);
 
-            return ResponseEntity.ok().headers(DownloadUtil.headers("starter.zip"))
-                    .contentLength(merged.contentLength())
-                    .contentType(MediaType.parseMediaType("application/octet-stream")).body(merged);
-        }
+			org.zeroturnaround.zip.ZipUtil.pack(parentDir, outputStream);
 
-        return ResponseEntity.internalServerError().build();
-    }
+			ByteArrayResource merged = new ByteArrayResource(outputStream.toByteArray());
 
-    @SneakyThrows
-    private ByteArrayResource generateHelmChart(ByteArrayResource body) {
-        byte[] content = body.getContentAsByteArray();
+			publisher.publishEvent(new ChartDownloadedEvent());
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(content.length);
+			return ResponseEntity.ok()
+				.headers(DownloadUtil.headers("starter.zip"))
+				.contentLength(merged.contentLength())
+				.contentType(MediaType.parseMediaType("application/octet-stream"))
+				.body(merged);
+		}
 
-        Optional<String> buildFile = tryReadBuildFile(body.getInputStream());
-        buildFile.map(f -> f.trim().startsWith("<?xml") ? mavenFileUploadService.processBuildFile(f) : gradleFileUploadService.processBuildFile(f))
-                .map(helmContext -> this.helmChartService.process(helmContext, outputStream, true))
-                .orElseThrow();
+		return ResponseEntity.internalServerError().build();
+	}
 
-        return new ByteArrayResource(outputStream.toByteArray());
-    }
+	@SneakyThrows
+	private ByteArrayResource generateHelmChart(ByteArrayResource body) {
+		byte[] content = body.getContentAsByteArray();
 
-    @SneakyThrows
-    private void resetStream(InputStream zipInputStream) {
-        try {
-            zipInputStream.reset();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(content.length);
 
-    private Optional<String> tryReadBuildFile(InputStream zipInputStream) {
-        return Optional.ofNullable(ZipUtil.getZipContent("build.gradle.kts", new ZipInputStream(zipInputStream))
-                .orElseGet(() -> {
-                            resetStream(zipInputStream);
-                            return ZipUtil.getZipContent("build.gradle", new ZipInputStream(zipInputStream))
-                                    .orElseGet(
-                                            () -> {
-                                                resetStream(zipInputStream);
-                                                return ZipUtil.getZipContent("pom.xml", new ZipInputStream(zipInputStream))
-                                                        .orElse(null);
-                                            }
-                                    );
-                        }
-                )
-        );
-    }
+		Optional<String> buildFile = tryReadBuildFile(body.getInputStream());
+		buildFile.map(f -> {
+			if (f.trim().startsWith("<?xml")) {
+				return mavenFileUploadService.processBuildFile(f);
+			}
+			else {
+				try {
+					String appName = getGradleAppName(body.getInputStream());
+					return gradleFileUploadService.processBuildFile(f, appName, GradleUtil.extractVersion(f));
+				}
+				catch (Exception e) {
+					log.error("Error processing build file", e);
+				}
+				return null;
+			}
+		}).map(helmContext -> this.helmChartService.process(helmContext, outputStream, true)).orElseThrow();
+
+		return new ByteArrayResource(outputStream.toByteArray());
+	}
+
+	private String getGradleAppName(InputStream inputStream) {
+		resetStream(inputStream);
+		Optional<String> zipContent = ZipUtil.getZipContent("settings.gradle", new ZipInputStream(inputStream));
+		return zipContent.map(s -> s.replace("rootProject.name = ", ""))
+			.map(SpringInitializrProxy::cleanupAppName)
+			.orElse("my-project");
+	}
+
+	private static String cleanupAppName(String name) {
+		return name.replace("'", "")
+			.replaceAll("[^\\x00-\\x7F]", "")
+			.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "")
+			.replaceAll("\\p{C}", "");
+	}
+
+	@SneakyThrows
+	private void resetStream(InputStream zipInputStream) {
+		try {
+			zipInputStream.reset();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Optional<String> tryReadBuildFile(InputStream zipInputStream) {
+		return Optional
+			.ofNullable(ZipUtil.getZipContent("build.gradle.kts", new ZipInputStream(zipInputStream)).orElseGet(() -> {
+				resetStream(zipInputStream);
+				return ZipUtil.getZipContent("build.gradle", new ZipInputStream(zipInputStream)).orElseGet(() -> {
+					resetStream(zipInputStream);
+					return ZipUtil.getZipContent("pom.xml", new ZipInputStream(zipInputStream)).orElse(null);
+				});
+			}));
+	}
 
 }
