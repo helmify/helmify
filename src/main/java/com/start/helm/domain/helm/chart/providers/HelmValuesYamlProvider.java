@@ -32,7 +32,8 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 			}
 
 			defaultHelmValues.setImage(new HelmValues.HelmValuesImage(customizations.getDockerImageRepositoryUrl(),
-					customizations.getDockerImageTag(), HelmValues.HelmValuesImage.ImagePullPolicy.IfNotPresent, secrets));
+					customizations.getDockerImageTag(), HelmValues.HelmValuesImage.ImagePullPolicy.IfNotPresent,
+					secrets));
 		}
 
 		buffer.append(yaml.dumpAsMap(defaultHelmValues));

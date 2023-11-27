@@ -11,7 +11,8 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
 
 /**
  * Resolver for spring kafka dependency.
- * <a href="https://github.com/bitnami/charts/tree/main/bitnami/kafka">Also see Bitnami Chart</a>
+ * <a href="https://github.com/bitnami/charts/tree/main/bitnami/kafka">Also see Bitnami
+ * Chart</a>
  */
 @Slf4j
 @Component
