@@ -47,28 +47,26 @@ public class HelmChartTests {
 
 	@Test
 	@SneakyThrows
-	public void testHelmLint() {
-		GenericContainer<?> c = new GenericContainer<>("alpine/helm:3.11.1")
-			.withCopyToContainer(MountableFile.forClasspathResource("helm", 0777), "/apps")
-			.withLogConsumer(new Slf4jLogConsumer(LOGGER))
-			.withCommand("lint");
-		c.start();
+	public void lintAndUnittestPostgres() {
 
-		waitForCondition(() -> !c.isRunning(), 10);
-		Assertions.assertTrue(c.getLogs().contains("0 chart(s) failed"));
-
-	}
-
-	@Test
-	@SneakyThrows
-	public void helmUnittestPostgres() {
 		// generate helm chart
 		File chartDirectory = downloadStarter(this.mvc, "test-postgres-chart", "1.0.0", List.of("postgresql"));
+
+		// lint chart
+		GenericContainer<?> lintContainer = new GenericContainer<>("alpine/helm:3.11.1")
+			.withCopyToContainer(MountableFile.forHostPath(chartDirectory.toPath(), 0777), "/apps")
+			.withLogConsumer(new Slf4jLogConsumer(LOGGER))
+			.withCommand("lint");
+		lintContainer.start();
+		waitForCondition(() -> !lintContainer.isRunning(), 10);
+		Assertions.assertTrue(lintContainer.getLogs().contains("0 chart(s) failed"));
+
 		// copy helm unittest files to helmchart/tests directory
 		addHelmUnittestFiles(chartDirectory, "postgres", List.of("deployment_postgres_test.yaml",
 				"service_postgres_test.yaml", "configmap_postgres_test.yaml", "secrets_postgres_test.yaml"));
 		addHelmUnittestValues(chartDirectory);
 
+		// helm-unittest chart
 		GenericContainer<?> c = new GenericContainer<>("helmunittest/helm-unittest:3.11.1-0.3.0")
 			.withCopyToContainer(MountableFile.forHostPath(chartDirectory.toPath(), 0777), "/apps")
 			.withLogConsumer(new Slf4jLogConsumer(LOGGER))

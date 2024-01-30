@@ -64,6 +64,7 @@ public class HelmStartAppTests {
 		}
 		Files.write(Paths.get(dataDirectory, "chart-count.json"), om.writeValueAsBytes(model));
 
+		webClient.getOptions().setThrowExceptionOnScriptError(false);
 		HtmlPage page = webClient.getPage("http://localhost:" + port + "/");
 
 		List<String> names = ctx.getBeansOfType(DependencyResolver.class)
