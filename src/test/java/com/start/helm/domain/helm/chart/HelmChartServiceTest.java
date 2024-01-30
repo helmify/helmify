@@ -1,9 +1,9 @@
 package com.start.helm.domain.helm.chart;
 
-import com.start.helm.TestUtil;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.maven.MavenModelParser;
 import com.start.helm.domain.maven.MavenModelProcessor;
+import com.start.helm.util.TestUtil;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

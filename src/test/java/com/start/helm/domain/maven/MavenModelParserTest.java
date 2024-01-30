@@ -1,6 +1,6 @@
 package com.start.helm.domain.maven;
 
-import com.start.helm.TestUtil;
+import com.start.helm.util.TestUtil;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
