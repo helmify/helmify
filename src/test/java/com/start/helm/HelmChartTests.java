@@ -1,7 +1,5 @@
 package com.start.helm;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -27,8 +24,6 @@ import static com.start.helm.util.TestUtil.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HelmChartTests {
 
-	WebClient webClient;
-
 	MockMvc mvc;
 
 	@LocalServerPort
@@ -39,18 +34,18 @@ public class HelmChartTests {
 
 	@BeforeEach
 	void before() {
-		this.webClient = MockMvcWebClientBuilder.webAppContextSetup(ctx).build();
 		this.mvc = MockMvcBuilders.webAppContextSetup(ctx).alwaysDo(MockMvcResultHandlers.print()).build();
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HelmChartTests.class);
 
-	@Test
-	@SneakyThrows
-	public void lintAndUnittestPostgres() {
+	record HelmUnittestContext(String chartName, String chartVersion, List<String> dependencies,
+			String unittestSourceDirectory, List<String> unittestFiles) {
+	}
 
-		// generate helm chart
-		File chartDirectory = downloadStarter(this.mvc, "test-postgres-chart", "1.0.0", List.of("postgresql"));
+	void lintAndTestChart(HelmUnittestContext context) {
+		// generate chart
+		File chartDirectory = downloadStarter(this.mvc, context.chartName, context.chartVersion, context.dependencies);
 
 		// lint chart
 		GenericContainer<?> lintContainer = new GenericContainer<>("alpine/helm:3.11.1")
@@ -62,18 +57,39 @@ public class HelmChartTests {
 		Assertions.assertTrue(lintContainer.getLogs().contains("0 chart(s) failed"));
 
 		// copy helm unittest files to helmchart/tests directory
-		addHelmUnittestFiles(chartDirectory, "postgres", List.of("deployment_postgres_test.yaml",
-				"service_postgres_test.yaml", "configmap_postgres_test.yaml", "secrets_postgres_test.yaml"));
+		addHelmUnittestFiles(chartDirectory, context.unittestSourceDirectory, context.unittestFiles);
 		addHelmUnittestValues(chartDirectory);
 
 		// helm-unittest chart
-		GenericContainer<?> c = new GenericContainer<>("helmunittest/helm-unittest:3.11.1-0.3.0")
+		GenericContainer<?> unittestContainer = new GenericContainer<>("helmunittest/helm-unittest:latest")
 			.withCopyToContainer(MountableFile.forHostPath(chartDirectory.toPath(), 0777), "/apps")
 			.withLogConsumer(new Slf4jLogConsumer(LOGGER))
 			.withCommand("-o /apps/test-output.xml -t junit .".split(" "));
-		c.start();
-		waitForCondition(() -> !c.isRunning(), 10);
-		Assertions.assertFalse(c.getLogs().contains("exited with error"));
+		unittestContainer.start();
+		waitForCondition(() -> !unittestContainer.isRunning(), 10);
+		Assertions.assertFalse(unittestContainer.getLogs().contains("exited with error"));
 	}
+
+	@Test
+	public void testChartWithPostgres() {
+
+		List<String> starterDependencies = List.of("postgresql");
+		//@formatter:off
+        List<String> unittestFiles = List.of(
+                "deployment_postgres_test.yaml",
+                "service_postgres_test.yaml",
+                "configmap_postgres_test.yaml",
+                "secrets_postgres_test.yaml"
+        );
+
+        lintAndTestChart(
+            new HelmUnittestContext(
+                "test-postgres-chart",
+                "1.0.0",
+                starterDependencies,
+                "postgres",
+                unittestFiles)
+        );
+    }
 
 }
