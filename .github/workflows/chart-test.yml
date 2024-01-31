@@ -41,7 +41,7 @@ jobs:
       - name: check output
         run: curl -v http://localhost:9090/actuator/health
       - name: generate chart
-        run: curl -v http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0 --data "@/src/test/resources/pom-with-postgres.xml" -o helm.zip
+        run: curl -X POST -v http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0 --data "@/src/test/resources/pom-with-postgres.xml" -o helm.zip
       - name: list all
         run: ls -lah
       - name: Stop helm-start
