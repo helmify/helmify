@@ -45,6 +45,8 @@ jobs:
           until printf "." && curl --silent http://localhost:9090/actuator/health; do \
             sleep 2; \
           done;
+      - name: list all
+        run: ls -lah
       - name: generate chart
         run: curl -X POST --data @src/test/resources/pom-with-postgres.xml -o helm.zip "http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0"
       - name: container log
