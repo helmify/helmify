@@ -42,6 +42,8 @@ public class KindClusterTest {
 		List<String> expectedDeployments = getProperty("expected-deployments");
 		List<String> expectedServices = getProperty("expected-services");
 		List<String> expectedPods = getProperty("expected-pods");
+		List<String> expectedConfigs = getProperty("expected-configs");
+		List<String> expectedSecrets = getProperty("expected-secrets");
 
 		try (KubernetesClient client = new DefaultKubernetesClient()) {
 
@@ -89,7 +91,8 @@ public class KindClusterTest {
 				.map(secret -> secret.getMetadata().getName())
 				.toList();
 			System.out.println("Secrets: " + actualSecrets);
-
+			boolean allExpectedSecretsPresent = checkIfAllPresent(actualSecrets, expectedSecrets);
+			Assertions.assertTrue(allExpectedSecretsPresent, "Not all expected secrets found: " + expectedSecrets);
 			System.out.println("-----------------------------------");
 
 			List<String> actualConfigMaps = client.configMaps()
@@ -99,6 +102,8 @@ public class KindClusterTest {
 				.map(configMap -> configMap.getMetadata().getName())
 				.toList();
 			System.out.println("ConfigMaps: " + actualConfigMaps);
+			boolean allExpectedConfigsPresent = checkIfAllPresent(actualConfigMaps, expectedConfigs);
+			Assertions.assertTrue(allExpectedConfigsPresent, "Not all expected configMaps found: " + expectedConfigs);
 			System.out.println("-----------------------------------");
 
 			List<String> actualVolumes = client.persistentVolumes()
@@ -108,6 +113,9 @@ public class KindClusterTest {
 				.map(volume -> volume.getMetadata().getName())
 				.toList();
 			System.out.println("Volumes: " + actualVolumes);
+			boolean allExpectedVolumesPresent = checkIfAllPresent(actualVolumes, expectedConfigs);
+			Assertions.assertTrue(allExpectedVolumesPresent, "Not all expected volumes found: " + expectedConfigs);
+
 		}
 		catch (Exception e) {
 			log.error("Error getting cluster info", e);
