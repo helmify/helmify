@@ -62,3 +62,5 @@ jobs:
         run: kubectl config use-context kind-chart-testing
       - name: helm install
         run: cd helm && helm install demo .
+      - name: run cluster test
+        run: mvn test -Dtest=KindClusterTest
