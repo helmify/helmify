@@ -53,7 +53,7 @@ jobs:
       - name: container log
         run: docker logs $(docker ps -q --filter ancestor=helmstart/helm-start-testing:latest)
       - name: unzip helm chart
-        run: unzip helm.zip
+        run: unzip helm.zip -d helm
       - name: helm dependency update
         run: cd helm && helm dependency update
       - name: create cluster
