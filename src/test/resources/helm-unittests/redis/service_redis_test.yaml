@@ -1,0 +1,16 @@
+suite: service tests
+templates:
+  - service.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-redis-chart
+      - equal:
+          path: spec.ports[0].port
+          value: 8080
