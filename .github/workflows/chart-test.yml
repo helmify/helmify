@@ -47,6 +47,8 @@ jobs:
           done;
       - name: generate chart
         run: curl -X POST --data "@src/test/resources/pom-with-postgres.xml" -o helm.zip "http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0"
+      - name: container log
+        run: docker logs $(docker ps -q --filter ancestor=helmstart/helm-start-testing:latest)
       - name: unzip helm chart
         run: unzip helm.zip
       - name: helm dependency update
