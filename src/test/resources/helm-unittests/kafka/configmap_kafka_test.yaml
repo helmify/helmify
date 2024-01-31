@@ -1,0 +1,19 @@
+suite: configmap tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-kafka-chart-config
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.application.name=test-kafka-chart
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.kafka.bootstrap-servers=test-kafka-chart-kafka:9092
