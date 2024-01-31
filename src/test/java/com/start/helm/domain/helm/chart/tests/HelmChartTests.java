@@ -1,8 +1,7 @@
-package com.start.helm;
+package com.start.helm.domain.helm.chart.tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +21,15 @@ import java.util.List;
 import static com.start.helm.util.TestUtil.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class HelmChartTests {
+public abstract class HelmChartTests {
 
-	MockMvc mvc;
+	protected MockMvc mvc;
 
 	@LocalServerPort
-	int port;
+	protected int port;
 
 	@Autowired
-	WebApplicationContext ctx;
+	protected WebApplicationContext ctx;
 
 	@BeforeEach
 	void before() {
@@ -39,11 +38,11 @@ public class HelmChartTests {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HelmChartTests.class);
 
-	record HelmUnittestContext(String chartName, String chartVersion, List<String> dependencies,
+	protected record HelmUnittestContext(String chartName, String chartVersion, List<String> dependencies,
 			String unittestSourceDirectory, List<String> unittestFiles) {
 	}
 
-	void lintAndTestChart(HelmUnittestContext context) {
+	protected void lintAndTestChart(HelmUnittestContext context) {
 		// generate chart
 		File chartDirectory = downloadStarter(this.mvc, context.chartName, context.chartVersion, context.dependencies);
 
@@ -69,27 +68,5 @@ public class HelmChartTests {
 		waitForCondition(() -> !unittestContainer.isRunning(), 10);
 		Assertions.assertFalse(unittestContainer.getLogs().contains("exited with error"));
 	}
-
-	@Test
-	public void testChartWithPostgres() {
-
-		List<String> starterDependencies = List.of("postgresql");
-		//@formatter:off
-        List<String> unittestFiles = List.of(
-                "deployment_postgres_test.yaml",
-                "service_postgres_test.yaml",
-                "configmap_postgres_test.yaml",
-                "secrets_postgres_test.yaml"
-        );
-
-        lintAndTestChart(
-            new HelmUnittestContext(
-                "test-postgres-chart",
-                "1.0.0",
-                starterDependencies,
-                "postgres",
-                unittestFiles)
-        );
-    }
 
 }
