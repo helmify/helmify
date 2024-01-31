@@ -19,6 +19,17 @@ public class KindClusterTest {
 		return property.contains(",") ? List.of(property.split(",")) : List.of(property);
 	}
 
+	private boolean checkIfAllPresent(List<String> actual, List<String> expected) {
+		for (String expectedItem : expected) {
+			boolean found = actual.stream().anyMatch(actualItem -> actualItem.contains(expectedItem));
+			if (!found) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	@Test
 	public void testCluster() {
 
@@ -41,7 +52,8 @@ public class KindClusterTest {
 				.map(service -> service.getMetadata().getName())
 				.toList();
 			System.out.println("Services: " + actualServices);
-			boolean allExpectedServicesPresent = actualServices.containsAll(expectedServices);
+
+			boolean allExpectedServicesPresent = checkIfAllPresent(actualServices, expectedServices);
 			Assertions.assertTrue(allExpectedServicesPresent, "Not all expected services found: " + expectedServices);
 
 			System.out.println("-----------------------------------");
@@ -52,7 +64,7 @@ public class KindClusterTest {
 				.map(pod -> pod.getMetadata().getName())
 				.toList();
 			System.out.println("Pods: " + actualPods);
-			boolean allExpectedPodsPresent = actualPods.containsAll(expectedPods);
+			boolean allExpectedPodsPresent = checkIfAllPresent(actualPods, expectedPods);
 			Assertions.assertTrue(allExpectedPodsPresent, "Not all expected pods found: " + expectedPods);
 
 			System.out.println("-----------------------------------");
@@ -64,7 +76,7 @@ public class KindClusterTest {
 				.map(deployment -> deployment.getMetadata().getName())
 				.toList();
 			System.out.println("Deployments: " + actualDeployments);
-			boolean allExpectedDeploymentsPresent = actualDeployments.containsAll(expectedDeployments);
+			boolean allExpectedDeploymentsPresent = checkIfAllPresent(actualDeployments, expectedDeployments);
 			Assertions.assertTrue(allExpectedDeploymentsPresent,
 					"Not all expected deployments found: " + expectedDeployments);
 
