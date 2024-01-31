@@ -38,7 +38,8 @@ public class ChartCountTracker {
 			}
 
 			return filePath.toFile();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Error getting store", e);
 		}
 		return null;
@@ -47,7 +48,7 @@ public class ChartCountTracker {
 	@SneakyThrows
 	public int getChartCount() {
 		File store = this.getStore();
-		if(store == null)
+		if (store == null)
 			return -1;
 		return Math.max(0, this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated());
 	}
@@ -55,7 +56,7 @@ public class ChartCountTracker {
 	@SneakyThrows
 	private void setChartCount(int count) {
 		File store = this.getStore();
-		if(store != null) {
+		if (store != null) {
 			objectMapper.writeValue(store, new ChartCount(count));
 		}
 	}
