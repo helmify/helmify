@@ -41,7 +41,7 @@ jobs:
       - name: Start helm-start
         run: docker run -d -p 8080:8080 -p 9090:9090 helmstart/helm-start-testing:latest
       - name: wait for start
-        run: until printf "." && nc -z -w 2 http://localhost:9090/actuator/health; do sleep 2; done;
+        run: until printf "." && nc -z -w 2 localhost 9090; do sleep 2; done;
       - name: generate chart
         run: curl -X POST --data "@src/test/resources/pom-with-postgres.xml" -o helm.zip "http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0"
       - name: unzip helm chart
