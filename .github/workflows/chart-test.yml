@@ -1,0 +1,11 @@
+name: Helm Chart Test Pipeline
+
+on:
+  push:
+    branches: [ "chart-test"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
