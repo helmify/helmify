@@ -1,0 +1,16 @@
+name: curl
+
+on:
+  push:
+    branches: [ "chart-test"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: fetch pom
+       run: curl https://raw.githubusercontent.com/helm-start/helm-start/main/src/test/resources/pom-with-postgres.xml -o pom-with-postgres.xml
+     - name: test curl
+       run: curl -X POST https://helm-start.com/api/cli?name=helm-start-testing&version=1.0.0 --data "@/pom-with-postgres.xml" -o helm.zip
+     - name: list
+       run: ls -lah
