@@ -1,0 +1,22 @@
+suite: configmap tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-redis-chart-config
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.application.name=test-redis-chart
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.data.redis.host=test-redis-chart-redis-master
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.data.redis.port=6379
