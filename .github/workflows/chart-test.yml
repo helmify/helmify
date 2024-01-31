@@ -58,3 +58,5 @@ jobs:
         run: cd helm && helm dependency update
       - name: create cluster
         uses: helm/kind-action@v1.8.0
+      - name: helm install
+        run: cd helm && helm install helm-start-testing .
