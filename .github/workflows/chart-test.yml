@@ -36,5 +36,9 @@ jobs:
         run: mvn -B clean -DskipTests=true spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmstart/helm-start-testing
       - name: Start helm-start
         run: docker run -d -p 8080:8080 helmstart/helm-start-testing:latest
+      - name: wait for start
+        run: sleep 30
+      - name: check output
+        run: curl -v http://localhost:8080/actuator/health
       - name: Stop helm-start
         run: docker stop $(docker ps -q --filter ancestor=helmstart/helm-start-testing:latest )
