@@ -49,11 +49,7 @@ jobs:
         run: ls -lah
       - name: generate chart
         run: |
-          curl -X POST \
-          --data @src/test/resources/pom-with-postgres.xml \
-          -o helm.zip \
-          -H "Content-Type: application/json" \ 
-          "http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0"
+          curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=helm-start-testing&version=1.0.0"
       - name: container log
         run: docker logs $(docker ps -q --filter ancestor=helmstart/helm-start-testing:latest)
       - name: unzip helm chart
