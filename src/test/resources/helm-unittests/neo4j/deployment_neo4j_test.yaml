@@ -1,0 +1,49 @@
+suite: deployment tests
+templates:
+  - deployment.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: test-neo4j-chart
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: test-neo4j-chart-neo4jchecker
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test-neo4j-chart:1.0.0
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 8080
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command
+          value: [ "sh", "-c", "sleep 10" ]
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: test-neo4j-chart-config-vol
+            mountPath: /workspace/BOOT-INF/classes/application.properties
+            subPath: application.properties
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: test-neo4j-chart-config-vol
+      - equal:
+          path: spec.template.spec.volumes[0].projected.sources[0].configMap.name
+          value: test-neo4j-chart-config
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SPRING_NEO4J_AUTHENTICATION_USERNAME
+          count: 1
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SPRING_NEO4J_AUTHENTICATION_PASSWORD
+          count: 1
+          any: true
