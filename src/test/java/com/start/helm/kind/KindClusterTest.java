@@ -33,31 +33,29 @@ public class KindClusterTest {
 		List<String> expectedPods = getProperty("expected-pods");
 
 		try (KubernetesClient client = new DefaultKubernetesClient()) {
-			System.out.println("Services:");
+
 			List<String> actualServices = client.services()
 				.list()
 				.getItems()
 				.stream()
 				.map(service -> service.getMetadata().getName())
 				.toList();
-
+			System.out.println("Services: " + actualServices);
 			boolean allExpectedServicesPresent = actualServices.containsAll(expectedServices);
 			Assertions.assertTrue(allExpectedServicesPresent, "Not all expected services found: " + expectedServices);
 
 			System.out.println("-----------------------------------");
-			System.out.println("Pods:");
 			List<String> actualPods = client.pods()
 				.list()
 				.getItems()
 				.stream()
 				.map(pod -> pod.getMetadata().getName())
 				.toList();
-
+			System.out.println("Pods: " + actualPods);
 			boolean allExpectedPodsPresent = actualPods.containsAll(expectedPods);
 			Assertions.assertTrue(allExpectedPodsPresent, "Not all expected pods found: " + expectedPods);
 
 			System.out.println("-----------------------------------");
-			System.out.println("Deployments:");
 			List<String> actualDeployments = client.apps()
 				.deployments()
 				.list()
@@ -65,36 +63,39 @@ public class KindClusterTest {
 				.stream()
 				.map(deployment -> deployment.getMetadata().getName())
 				.toList();
-
+			System.out.println("Deployments: " + actualDeployments);
 			boolean allExpectedDeploymentsPresent = actualDeployments.containsAll(expectedDeployments);
 			Assertions.assertTrue(allExpectedDeploymentsPresent,
 					"Not all expected deployments found: " + expectedDeployments);
 
 			System.out.println("-----------------------------------");
-			System.out.println("Secrets:");
-			client.secrets()
+
+			List<String> actualSecrets = client.secrets()
 				.list()
 				.getItems()
 				.stream()
 				.map(secret -> secret.getMetadata().getName())
-				.forEach(System.out::println);
+				.toList();
+			System.out.println("Secrets: " + actualSecrets);
+
 			System.out.println("-----------------------------------");
-			System.out.println("ConfigMaps:");
-			client.configMaps()
+
+			List<String> actualConfigMaps = client.configMaps()
 				.list()
 				.getItems()
 				.stream()
 				.map(configMap -> configMap.getMetadata().getName())
-				.forEach(System.out::println);
+				.toList();
+			System.out.println("ConfigMaps: " + actualConfigMaps);
 			System.out.println("-----------------------------------");
-			System.out.println("Volumes:");
-			client.persistentVolumes()
+
+			List<String> actualVolumes = client.persistentVolumes()
 				.list()
 				.getItems()
 				.stream()
 				.map(volume -> volume.getMetadata().getName())
-				.forEach(System.out::println);
-
+				.toList();
+			System.out.println("Volumes: " + actualVolumes);
 		}
 		catch (Exception e) {
 			log.error("Error getting cluster info", e);
