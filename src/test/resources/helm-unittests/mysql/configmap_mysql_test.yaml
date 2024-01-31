@@ -1,0 +1,19 @@
+suite: configmap tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-mysql-chart-config
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.application.name=test-mysql-chart
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.datasource.url=jdbc:mysql://test-mysql-chart-mysql:3306/my_database
