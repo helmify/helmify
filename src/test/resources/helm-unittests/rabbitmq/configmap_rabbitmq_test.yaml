@@ -1,0 +1,25 @@
+suite: configmap tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should work
+    values:
+      - values.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-rabbitmq-chart-config
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.application.name=test-rabbitmq-chart
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.rabbitmq.virtual-host=/
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.rabbitmq.host=test-rabbitmq-chart-rabbitmq
+      - matchRegex:
+          path: data["application.properties"]
+          pattern: spring.rabbitmq.port=5672
