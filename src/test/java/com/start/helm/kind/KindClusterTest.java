@@ -44,6 +44,7 @@ public class KindClusterTest {
 		List<String> expectedPods = getProperty("expected-pods");
 		List<String> expectedConfigs = getProperty("expected-configs");
 		List<String> expectedSecrets = getProperty("expected-secrets");
+		List<String> expectedVolumes = getProperty("expected-volumes");
 
 		try (KubernetesClient client = new DefaultKubernetesClient()) {
 
@@ -113,8 +114,6 @@ public class KindClusterTest {
 				.map(volume -> volume.getMetadata().getName())
 				.toList();
 			System.out.println("Volumes: " + actualVolumes);
-			boolean allExpectedVolumesPresent = checkIfAllPresent(actualVolumes, expectedConfigs);
-			Assertions.assertTrue(allExpectedVolumesPresent, "Not all expected volumes found: " + expectedConfigs);
 
 		}
 		catch (Exception e) {

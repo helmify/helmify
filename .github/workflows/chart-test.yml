@@ -63,4 +63,10 @@ jobs:
       - name: helm install
         run: cd helm && helm install demo .
       - name: run cluster test
-        run: mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
+        run: mvn test \
+          -Dtest=KindClusterTest \
+          -Dexpected-deployments=demo \
+          -Dexpected-services=demo,demo-postgresql \
+          -Dexpected-pods=demo,demo-postgresql \
+          -Dexpected-configs=demo-config \
+          -Dexpected-secrets=demo,demo-postgresql
