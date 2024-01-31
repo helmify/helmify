@@ -12,3 +12,6 @@ logging:
   level:
     web: DEBUG
 
+management:
+  server:
+    port: 9090
