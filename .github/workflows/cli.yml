@@ -18,12 +18,12 @@ jobs:
       - name: Install dependencies
         run: cd cli && go get .
       - name: Build CLI - Windows 64bit
-        run: cd cli && env GOOS=windows GOARCH=amd64 go build . -o helm-start-win64.exe
+        run: cd cli && env GOOS=windows GOARCH=amd64 go build -o helm-start-win64.exe .
       - name: Build CLI - Windows 32bit
-        run: cd cli && env GOOS=windows GOARCH=386 go build . -o helm-start-win32.exe
+        run: cd cli && env GOOS=windows GOARCH=386 go build -o helm-start-win32.exe .
       - name: Build CLI - Linux 64bit
-        run: cd cli && env GOOS=linux GOARCH=amd64 go build . -o helm-start-linux64
+        run: cd cli && env GOOS=linux GOARCH=amd64 go build -o helm-start-linux64 .
       - name: Build CLI - Linux 32bit
-        run: cd cli && env GOOS=linux GOARCH=386 go build . -o helm-start-linux32
+        run: cd cli && env GOOS=linux GOARCH=386 go build -o helm-start-linux32 .
       - name: List
         run: cd cli && ls -lah
