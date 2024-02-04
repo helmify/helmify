@@ -120,14 +120,11 @@ func extractFromPom(content string, tagName string) string {
 }
 
 func getAppVersion(content string, path string) string {
-
 	if s.Contains(path, "pom.xml") {
 		return s.TrimSpace(getAppVersionMaven(content))
 	} else {
 		return s.TrimSpace(getAppVersionGradle(content))
 	}
-
-	return "1.0.0"
 }
 
 func getAppVersionMaven(content string) string {
