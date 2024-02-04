@@ -3,20 +3,63 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"path/filepath"
 	s "strings"
 )
 
+/*
+* - Read build file (pom.xml / build.gradle)
+* - Extract app name
+* - Extract app version
+* - Send request to API
+* - Store Helm Chart
+ */
 func main() {
 
+	// content, path to build file (pom.xml / build.gradle)
 	content, p := readBuildFile()
+	// extract app name
 	appName := getAppName(content, p)
+	// extract app version
 	appVersion := getAppVersion(content, p)
 
 	fmt.Println("App Name: ", appName)
 	fmt.Println("App Version: ", appVersion)
+
+	// send request
+	invokeApi(appName, appVersion, content, p)
+
+}
+
+func invokeApi(appName string, appVersion string, buildFileContent string, path string) {
+	url := fmt.Sprintf("https://helm-start.com/api/cli?name=%s&version=%s", appName, appVersion)
+
+	resp, err := http.Post(url, "application/json", s.NewReader(buildFileContent))
+	if err != nil {
+		log.Fatal(err)
+	}
+	// store file from response
+	defer resp.Body.Close()
+
+	// create new file in path
+	newFilePath := filepath.Join(filepath.Dir(path), "helm.zip")
+	file, err := os.Create(newFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// write response to file
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	fmt.Println("Find your Helm Chart at: ", newFilePath)
 
 }
 
@@ -31,7 +74,7 @@ func getAppName(content string, path string) string {
 		appName = getAppNameGradle(path)
 	}
 
-	return appName
+	return s.TrimSpace(appName)
 }
 
 func getAppNameGradle(path string) string {
@@ -79,9 +122,9 @@ func extractFromPom(content string, tagName string) string {
 func getAppVersion(content string, path string) string {
 
 	if s.Contains(path, "pom.xml") {
-		return getAppVersionMaven(content)
+		return s.TrimSpace(getAppVersionMaven(content))
 	} else {
-		return getAppVersionGradle(content)
+		return s.TrimSpace(getAppVersionGradle(content))
 	}
 
 	return "1.0.0"
@@ -111,11 +154,9 @@ func readBuildFile() (string, string) {
 
 	flag.Parse()
 
-	fmt.Println("tail:", flag.Args())
-
 	var buildFile = *buildFilePtr
 
-	fmt.Println("Build File: ", buildFile)
+	fmt.Println("Reading ", buildFile)
 
 	content, error := ioutil.ReadFile(buildFile)
 	if error != nil {
