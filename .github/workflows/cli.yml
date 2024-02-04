@@ -27,3 +27,23 @@ jobs:
         run: cd cli && env GOOS=linux GOARCH=386 go build -o helm-start-linux32 .
       - name: List
         run: cd cli && ls -lah
+      - name: Upload Win32 DEV binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-helm-start-win32.exe
+          path: dev-helm-start-win32.exe
+      - name: Upload Win64 DEV binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-helm-start-win64.exe
+          path: dev-helm-start-win64.exe
+      - name: Upload Linux32 DEV binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-helm-start-linux32
+          path: dev-helm-start-linux32
+      - name: Upload Linux64 DEV binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-helm-start-linux64
+          path: dev-helm-start-linux64
