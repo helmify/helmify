@@ -8,6 +8,7 @@
 
     <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script src="/components/navbar.js"></script>
     <link rel="stylesheet" href="/main.css"/>
 
 </head>
@@ -65,20 +66,7 @@
 </style>
 <body>
 <div class="row">
-    <header id="header" class="col-12">
-        <nav class="nav">
-            <div class="nav-left">
-                <a class="brand" href="/">helm-start</a>
-            </div>
-            <div class="nav-right">
-                <div class="tabs">
-                    <a class="active" href="https://github.com/helm-start/helm-start">Github</a>
-                    <a href="https://jenil.github.io/chota/#docs">Chota</a>
-                    <a href="https://htmx.org/docs/">htmx</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <navbar-component  class="col-12"></navbar-component>
 </div>
 <div class="row" hx-boost="true">
     <div class="col-12 text-center">

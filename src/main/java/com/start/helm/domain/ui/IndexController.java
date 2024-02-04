@@ -48,4 +48,9 @@ public class IndexController {
 		return "about";
 	}
 
+	@GetMapping("/privacy")
+	public String privacy() {
+		return "privacy";
+	}
+
 }
