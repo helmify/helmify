@@ -2,7 +2,7 @@ name: CLI dev Build
 
 on:
   push:
-    branches: [ "develop", "feature/**", "fix/**" ]
+    branches: [ "cli-pipeline", "develop", "feature/**", "fix/**" ]
   pull_request:
     branches: [ "develop" ]
 
