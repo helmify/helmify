@@ -1,0 +1,21 @@
+name: CLI dev Build
+
+on:
+  push:
+    branches: [ "develop", "feature/**", "fix/**" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.x'
+      - name: Install dependencies
+        run: cd cli && go get .
+      - name: Build
+        run: cd cli && go build .
