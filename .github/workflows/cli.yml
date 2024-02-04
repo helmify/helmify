@@ -18,6 +18,6 @@ jobs:
       - name: Install dependencies
         run: cd cli && go get .
       - name: Build
-        run: env GOOS=windows GOARCH=amd64 && cd cli && go build .
+        run: cd cli && env GOOS=windows GOARCH=amd64 go build .
       - name: List
         run: cd cli && ls -lah
