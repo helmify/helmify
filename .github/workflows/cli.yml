@@ -19,3 +19,5 @@ jobs:
         run: cd cli && go get .
       - name: Build
         run: cd cli && go build .
+      - name: List
+        run: cd cli && ls -lah
