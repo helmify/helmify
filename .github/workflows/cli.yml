@@ -2,22 +2,29 @@ name: CLI dev Build
 
 on:
   push:
-    branches: [ "develop", "feature/**", "fix/**" ]
-  pull_request:
-    branches: [ "develop" ]
+    tags:
+      - "*"
 
 jobs:
   build:
+    name: GoReleaser build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go 1.21
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21.x'
-      - name: Install dependencies
-        run: cd cli && go get .
-      - name: Build
-        run: cd cli && go build .
-      - name: List
-        run: cd cli && ls -lah
+          go-version: 1.21
+        id: go
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@master
+        with:
+          version: latest
+          args: release --rm-dist
+          workdir: ./cli
+        env:
+          GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
