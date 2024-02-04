@@ -2,7 +2,8 @@ name: CLI dev Build
 
 on:
   push:
-    branches: [ "cli-pipeline", "develop", "feature/**", "fix/**" ]
+    tags:
+      - "*"
 
 jobs:
   build:
