@@ -3,47 +3,29 @@ name: CLI dev Build
 on:
   push:
     branches: [ "cli-pipeline", "develop", "feature/**", "fix/**" ]
-  pull_request:
-    branches: [ "develop" ]
 
 jobs:
   build:
+    name: GoReleaser build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # See: https://goreleaser.com/ci/actions/
+
+      - name: Set up Go 1.21
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21.x'
-      - name: Install dependencies
-        run: cd cli && go get .
-      - name: Build CLI - Windows 64bit
-        run: cd cli && env GOOS=windows GOARCH=amd64 go build -o dev-helm-start-win64.exe .
-      - name: Build CLI - Windows 32bit
-        run: cd cli && env GOOS=windows GOARCH=386 go build -o dev-helm-start-win32.exe .
-      - name: Build CLI - Linux 64bit
-        run: cd cli && env GOOS=linux GOARCH=amd64 go build -o dev-helm-start-linux64 .
-      - name: Build CLI - Linux 32bit
-        run: cd cli && env GOOS=linux GOARCH=386 go build -o dev-helm-start-linux32 .
-      - name: List
-        run: cd cli && ls -lah
-      - name: Upload Win32 DEV binary
-        uses: actions/upload-artifact@v4
+          go-version: 1.21
+        id: go
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@master
         with:
-          name: dev-helm-start-win32.exe
-          path: cli/dev-helm-start-win32.exe
-      - name: Upload Win64 DEV binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: dev-helm-start-win64.exe
-          path: cli/dev-helm-start-win64.exe
-      - name: Upload Linux32 DEV binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: dev-helm-start-linux32
-          path: cli/dev-helm-start-linux32
-      - name: Upload Linux64 DEV binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: dev-helm-start-linux64
-          path: cli/dev-helm-start-linux64
+          version: latest
+          args: release --rm-dist
+          workdir: ./cli
+        env:
+          GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
