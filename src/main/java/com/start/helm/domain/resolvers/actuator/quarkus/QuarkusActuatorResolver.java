@@ -1,7 +1,8 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.actuator.quarkus;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.DependencyResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Optional;
  * Resolver for spring actuator dependency.
  */
 @Component
-public class SpringBootStarterActuatorResolver implements DependencyResolver {
+public class QuarkusActuatorResolver implements DependencyResolver {
 
 	@Override
 	public String dependencyName() {
@@ -21,7 +22,7 @@ public class SpringBootStarterActuatorResolver implements DependencyResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("actuator");
+		return List.of("quarkus-smallrye-health");
 	}
 
 	@Override
