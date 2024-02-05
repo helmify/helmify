@@ -1,5 +1,6 @@
 package com.start.helm.domain.resolvers;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmChartSliceBuilder;
 import com.start.helm.domain.helm.HelmContext;
@@ -53,6 +54,7 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		String endpoint = initContainerCheckEndpoint(context).replace("%s", dependencyName());
 		Map<String, Object> initContainer = initContainer(context.getAppName(), dependencyName(), endpoint);
 		slice.setInitContainer(initContainer);
+		context.setFrameworkVendor(getVendor());
 
 		return Optional.of(slice);
 	}
@@ -61,5 +63,9 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 	 * Name of the dependency.
 	 */
 	String dependencyName();
+
+	default FrameworkVendor getVendor() {
+		return FrameworkVendor.Spring;
+	}
 
 }

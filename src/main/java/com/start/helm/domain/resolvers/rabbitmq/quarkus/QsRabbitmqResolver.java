@@ -1,5 +1,6 @@
 package com.start.helm.domain.resolvers.rabbitmq.quarkus;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.rabbitmq.RabbitmqResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,10 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 				makeSecretKeyRef("RABBITMQ_USERNAME", "rabbitmq-username", context.getAppName()),
 				makeSecretKeyRef("RABBITMQ_PASSWORD", "rabbitmq-password", context.getAppName())
 		);
+	}
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.start.helm.domain.helm;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.util.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -98,15 +99,6 @@ public class HelmContext {
 
 	private void addHelmDependency(HelmDependency helmDependency) {
 		this.helmDependencies.add(helmDependency);
-	}
-
-	public enum FrameworkVendor {
-
-		Spring
-		// Quarkus
-		// Micronaut
-		// ...
-
 	}
 
 	@Getter

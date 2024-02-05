@@ -1,5 +1,6 @@
 package com.start.helm.domain.resolvers.postgres.quarkus;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.postgres.PostgresResolver;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,11 @@ public class QsRxPostgresResolver implements PostgresResolver {
 	public Map<String, String> getDefaultConfig() {
 		return Map.of("quarkus.datasource.reactive.url",
 				"vertx-reactive:postgresql://{{ .Values.global.hosts.postgresql }}:{{ .Values.global.ports.postgresql }}/{{ .Values.postgresql.database }}");
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

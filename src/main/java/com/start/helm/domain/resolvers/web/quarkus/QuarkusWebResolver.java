@@ -1,5 +1,6 @@
 package com.start.helm.domain.resolvers.web.quarkus;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.DependencyResolver;
@@ -28,6 +29,11 @@ public class QuarkusWebResolver implements DependencyResolver {
 	public Optional<HelmChartSlice> resolveDependency(HelmContext context) {
 		context.setCreateIngress(true);
 		return Optional.empty();
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }
