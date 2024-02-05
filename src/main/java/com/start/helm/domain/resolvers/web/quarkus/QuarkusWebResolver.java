@@ -1,17 +1,18 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.web.quarkus;
 
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.DependencyResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Resolver for spring web dependencies.
+ * Resolver for quarkus web dependencies.
  */
 @Component
-public class SpringBootStarterWebResolver implements DependencyResolver {
+public class QuarkusWebResolver implements DependencyResolver {
 
 	@Override
 	public String dependencyName() {
@@ -20,7 +21,7 @@ public class SpringBootStarterWebResolver implements DependencyResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("spring-boot-starter-web", "spring-boot-starter-webflux", "spring-boot-starter-graphql");
+		return List.of("quarkus-vertx-graphql", "quarkus-smallrye-graphql", "quarkus-resteasy-reactive-jackson");
 	}
 
 	@Override

@@ -1,6 +1,7 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.rabbitmq.spring;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.rabbitmq.RabbitmqResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,9 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
  */
 @Slf4j
 @Component
-public class RabbitmqDependencyResolver implements DependencyResolver {
+public class SgRabbitmqResolver implements RabbitmqResolver {
 
 	//@formatter:off
-
-	@Override
-	public String dependencyName() {
-		return "rabbitmq";
-	}
 
 	@Override
 	public List<String> matchOn() {
@@ -32,28 +28,6 @@ public class RabbitmqDependencyResolver implements DependencyResolver {
 		return Map.of(
 				"rabbitmq-username", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
 				, "rabbitmq-password", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
-		);
-	}
-
-	public Map<String, Object> getValuesEntries(HelmContext context) {
-		return Map.of(
-				"rabbitmq",
-				Map.of("enabled", true,
-						"port", 5672,
-						"vhost", "/",
-						"nameOverride", context.getAppName() + "-rabbitmq",
-						"fullnameOverride", context.getAppName() + "-rabbitmq",
-						"auth", Map.of("username", "guest", "password", "guest")
-				),
-				"global", Map.of("hosts", Map.of("rabbitmq", context.getAppName() + "-rabbitmq"), "ports", Map.of("rabbitmq", 5672))
-		);
-	}
-
-	public Map<String, String> getPreferredChart() {
-		return Map.of(
-				"name", "rabbitmq",
-				"version", "11.9.0",
-				"repository", "https://charts.bitnami.com/bitnami"
 		);
 	}
 
