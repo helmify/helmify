@@ -1,5 +1,6 @@
 package com.start.helm.domain.maven;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.HelmDependency;
 import com.start.helm.domain.resolvers.DependencyResolver;
@@ -49,6 +50,11 @@ public class MavenModelProcessor {
 				.map(Optional::get))
 			.collect(Collectors.toSet())
 			.forEach(context::addHelmChartFragment);
+
+		boolean hasQuarkus = dependencies.stream().anyMatch(d -> d.getGroupId().contains("io.quarkus"));
+		boolean hasSpring = dependencies.stream().anyMatch(d -> d.getGroupId().contains("org.springframework"));
+		context.setFrameworkVendor(
+				hasQuarkus ? FrameworkVendor.Quarkus : hasSpring ? FrameworkVendor.Spring : FrameworkVendor.Framework);
 
 		return context;
 	}

@@ -2,7 +2,7 @@ package com.start.helm.domain;
 
 public enum FrameworkVendor {
 
-	Spring, Quarkus
+	Spring, Quarkus, Framework
 	// Quarkus
 	// Micronaut
 	// ...

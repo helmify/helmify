@@ -34,7 +34,7 @@ public class HelmContext {
 
 	@Getter
 	@Setter
-	private FrameworkVendor frameworkVendor = FrameworkVendor.Spring;
+	private FrameworkVendor frameworkVendor;
 
 	@Getter
 	@Setter

@@ -54,7 +54,6 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		String endpoint = initContainerCheckEndpoint(context).replace("%s", dependencyName());
 		Map<String, Object> initContainer = initContainer(context.getAppName(), dependencyName(), endpoint);
 		slice.setInitContainer(initContainer);
-		context.setFrameworkVendor(getVendor());
 
 		return Optional.of(slice);
 	}
