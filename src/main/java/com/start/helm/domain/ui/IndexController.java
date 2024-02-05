@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,12 +33,13 @@ public class IndexController {
 		model.addAttribute("chartsGenerated", chartCountTracker.getChartCount());
 		model.addAttribute("buildInfo", buildInfoProvider.getBuildInfo());
 
-		String supportedDependencies = resolvers.stream()
+		Set<String> supportedDependenciesList = resolvers.stream()
 			.map(DependencyResolver::dependencyName)
 			.filter(s -> !s.equals("actuator"))
 			.filter(s -> !s.equals("web"))
 			.map(StringUtils::capitalize)
-			.collect(Collectors.joining(", "));
+			.collect(Collectors.toSet());
+		String supportedDependencies = String.join(", ", supportedDependenciesList);
 
 		model.addAttribute("supportedDependencies", supportedDependencies);
 		return "index";
