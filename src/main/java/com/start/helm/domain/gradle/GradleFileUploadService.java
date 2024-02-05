@@ -4,6 +4,7 @@ import com.start.helm.domain.FileUploadService;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.DependencyResolver;
 import com.start.helm.util.GradleUtil;
+import com.start.helm.util.HelmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class GradleFileUploadService implements FileUploadService {
 		context.setAppVersion(appVersion);
 		context.setDependencyDescriptor(buildFile);
 
-		buildFile.lines()
+		List<String> dependencies = buildFile.lines()
 			.filter(line -> line.contains("implementation") || line.contains("runtimeOnly"))
 			.map(String::trim)
 			.map(line -> line.replace("runtimeOnly", ""))
@@ -48,6 +49,10 @@ public class GradleFileUploadService implements FileUploadService {
 			.map(line -> line.replace("'", ""))
 			.map(line -> line.replace("\"", ""))
 			.map(line -> line.replace("(", "").replace(")", ""))
+			.toList();
+		List<String> groupIds = dependencies.stream().map(line -> line.split(":")[0]).toList();
+
+		dependencies.stream()
 			.map(line -> line.split(":")[1])
 			.flatMap(artifactId -> resolvers.stream()
 				.filter(matcher -> matcher.matches(artifactId))
@@ -57,6 +62,7 @@ public class GradleFileUploadService implements FileUploadService {
 			.collect(Collectors.toSet())
 			.forEach(context::addHelmChartFragment);
 
+		context.setFrameworkVendor(HelmUtil.getFrameworkVendor(groupIds));
 		return context;
 	}
 

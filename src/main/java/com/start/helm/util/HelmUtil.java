@@ -1,5 +1,7 @@
 package com.start.helm.util;
 
+import com.start.helm.domain.FrameworkVendor;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,12 @@ import java.util.stream.Collectors;
 public final class HelmUtil {
 
 	private HelmUtil() {
+	}
+
+	public static FrameworkVendor getFrameworkVendor(List<String> dependencies) {
+		boolean hasQuarkus = dependencies.stream().anyMatch(d -> d.contains("io.quarkus"));
+		boolean hasSpring = dependencies.stream().anyMatch(d -> d.contains("org.springframework"));
+		return hasQuarkus ? FrameworkVendor.Quarkus : hasSpring ? FrameworkVendor.Spring : FrameworkVendor.Framework;
 	}
 
 	public static String removeMarkers(String content) {
