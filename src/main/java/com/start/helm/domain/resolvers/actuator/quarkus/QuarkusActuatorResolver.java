@@ -1,5 +1,6 @@
 package com.start.helm.domain.resolvers.actuator.quarkus;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.DependencyResolver;
@@ -31,6 +32,11 @@ public class QuarkusActuatorResolver implements DependencyResolver {
 		HelmChartSlice slice = new HelmChartSlice();
 		slice.setValuesEntries(Map.of("healthcheck", Map.of("port", 8090, "name", "healthcheck")));
 		return Optional.of(slice);
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

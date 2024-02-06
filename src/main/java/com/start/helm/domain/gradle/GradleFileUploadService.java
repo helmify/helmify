@@ -1,6 +1,7 @@
 package com.start.helm.domain.gradle;
 
 import com.start.helm.domain.FileUploadService;
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.DependencyResolver;
 import com.start.helm.util.GradleUtil;
@@ -51,10 +52,13 @@ public class GradleFileUploadService implements FileUploadService {
 			.map(line -> line.replace("(", "").replace(")", ""))
 			.toList();
 		List<String> groupIds = dependencies.stream().map(line -> line.split(":")[0]).toList();
+		FrameworkVendor frameworkVendor = HelmUtil.getFrameworkVendor(groupIds);
+		context.setFrameworkVendor(frameworkVendor);
 
 		dependencies.stream()
 			.map(line -> line.split(":")[1])
 			.flatMap(artifactId -> resolvers.stream()
+				.filter(matcher -> frameworkVendor.equals(matcher.getVendor()))
 				.filter(matcher -> matcher.matches(artifactId))
 				.map(matcher -> matcher.resolveDependency(context))
 				.filter(Optional::isPresent)
@@ -62,7 +66,6 @@ public class GradleFileUploadService implements FileUploadService {
 			.collect(Collectors.toSet())
 			.forEach(context::addHelmChartFragment);
 
-		context.setFrameworkVendor(HelmUtil.getFrameworkVendor(groupIds));
 		return context;
 	}
 
