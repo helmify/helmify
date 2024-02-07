@@ -77,7 +77,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 			                command: ["sh", "-c", "sleep 10"]
 			          volumeMounts:
 			            - name: {{ include "REPLACEME.fullname" . }}-config-vol
-			              mountPath: /workspace/BOOT-INF/classes/application.properties
+			              mountPath: ###@helm-start:configpath/application.properties
 			              subPath: application.properties
 			          resources:
 			            {{- toYaml .Values.resources | nindent 12 }}
@@ -103,7 +103,13 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
 	@Override
 	public String getFileContent(HelmContext context) {
-		String filledTemplate = template.replace("REPLACEME", context.getAppName());
+		boolean isSpring = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
+		boolean isQuarkus = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
+
+		String configPath = isSpring ? "/workspace/BOOT-INF/classes" : isQuarkus ? "/deployments/config" : "";
+
+		String filledTemplate = template.replace("REPLACEME", context.getAppName())
+			.replace("###@helm-start:configpath", configPath);
 		return HelmUtil.removeMarkers(customize(filledTemplate, context));
 	}
 
