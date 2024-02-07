@@ -45,6 +45,9 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 		if (vendor.equals(FrameworkVendor.Quarkus)) {
 			patch.append("quarkus.application.name={{ .Values.fullnameOverride }}\n");
+			patch.append("quarkus.kubernetes-config.secrets.enabled=true\n");
+			patch.append("quarkus.kubernetes-config.secrets={{ .Values.fullnameOverride }}\n");
+
 		}
 
 		// set separate port for actuator, we don't want to expose actuator through an
