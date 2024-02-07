@@ -104,7 +104,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 	@Override
 	public String getFileContent(HelmContext context) {
 		boolean isSpring = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
-		boolean isQuarkus = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
+		boolean isQuarkus = context.getFrameworkVendor().equals(FrameworkVendor.Quarkus);
 
 		String configPath = isSpring ? "/workspace/BOOT-INF/classes" : isQuarkus ? "/deployments/config" : "";
 
