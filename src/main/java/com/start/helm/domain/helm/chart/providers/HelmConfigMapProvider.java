@@ -40,11 +40,11 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 		FrameworkVendor vendor = context.getFrameworkVendor();
 		if (vendor.equals(FrameworkVendor.Spring)) {
-			patch.append("spring.application.name={{ .Values.appName }}\n");
+			patch.append("spring.application.name={{ .Values.fullnameOverride }}\n");
 		}
 
 		if (vendor.equals(FrameworkVendor.Quarkus)) {
-			patch.append("quarkus.application.name={{ .Values.appName }}\n");
+			patch.append("quarkus.application.name={{ .Values.fullnameOverride }}\n");
 		}
 
 		// set separate port for actuator, we don't want to expose actuator through an
