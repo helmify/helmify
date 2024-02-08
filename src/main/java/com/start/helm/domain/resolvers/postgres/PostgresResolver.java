@@ -36,7 +36,8 @@ public interface PostgresResolver extends DependencyResolver {
 						),
 					"auth", Map.of(
 							"username", "postgres",
-							"password", "postgres"
+							"password", "postgres",
+							"postgresPassword", "postgres"
 						)
 				), "global", Map.of(
 						"hosts", Map.of("postgresql", name),
