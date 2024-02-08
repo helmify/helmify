@@ -72,6 +72,13 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 			}
 		}
 
+		if (vendor.equals(FrameworkVendor.Quarkus)) {
+			patch.append("\nquarkus.log.level=DEBUG\n")
+				.append("quarkus.log.min-level=DEBUG\n")
+				.append("quarkus.log.console.enable=true\n")
+				.append("quarkus.log.console.format=%d{HH:mm:ss} %-5p [%c] %s%e%n\n");
+		}
+
 		return HelmUtil
 			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helm-start:configmap", patch.toString(), 4));
 	}
