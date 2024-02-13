@@ -38,6 +38,20 @@ services:
     networks:
       - web
 
+  initializr:
+    image: helmstart/spring-initializr:latest
+    container_name: spring-initializr
+    restart: always
+    expose:
+      - 8080
+    networks:
+      - web
+    labels:
+      - traefik.http.routers.start-spring-helm-start.rule=Host(`start-spring.helm-start.com`)
+      - traefik.http.routers.start-spring-helm-start.entrypoints=https
+      - traefik.http.routers.start-spring-helm-start.tls.certresolver=myresolver
+      - traefik.enable=true
+
   helm-start-dev:
     image: helmstart/helm-start:latest
     container_name: helm-start-dev
