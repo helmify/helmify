@@ -1,8 +1,10 @@
 package com.start.helm.domain.maven;
 
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.helm.HelmDependency;
 import com.start.helm.domain.resolvers.DependencyResolver;
+import com.start.helm.util.HelmUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
@@ -40,9 +42,14 @@ public class MavenModelProcessor {
 		context.setAppName(m.getArtifactId());
 		context.setAppVersion(m.getVersion());
 
+		List<String> groupIds = dependencies.stream().map(Dependency::getGroupId).toList();
+		FrameworkVendor frameworkVendor = HelmUtil.getFrameworkVendor(groupIds);
+		context.setFrameworkVendor(frameworkVendor);
+
 		dependencies.stream()
 			.filter(d -> !"test".equals(d.getScope()))
 			.flatMap(d -> resolvers.stream()
+				.filter(matcher -> frameworkVendor.equals(matcher.getVendor()))
 				.filter(matcher -> matcher.matches(d.getArtifactId()))
 				.map(matcher -> matcher.resolveDependency(context))
 				.filter(Optional::isPresent)

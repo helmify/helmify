@@ -1,9 +1,11 @@
 package com.start.helm.domain.gradle;
 
 import com.start.helm.domain.FileUploadService;
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.domain.resolvers.DependencyResolver;
 import com.start.helm.util.GradleUtil;
+import com.start.helm.util.HelmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class GradleFileUploadService implements FileUploadService {
 		context.setAppVersion(appVersion);
 		context.setDependencyDescriptor(buildFile);
 
-		buildFile.lines()
+		List<String> dependencies = buildFile.lines()
 			.filter(line -> line.contains("implementation") || line.contains("runtimeOnly"))
 			.map(String::trim)
 			.map(line -> line.replace("runtimeOnly", ""))
@@ -48,8 +50,15 @@ public class GradleFileUploadService implements FileUploadService {
 			.map(line -> line.replace("'", ""))
 			.map(line -> line.replace("\"", ""))
 			.map(line -> line.replace("(", "").replace(")", ""))
+			.toList();
+		List<String> groupIds = dependencies.stream().map(line -> line.split(":")[0]).toList();
+		FrameworkVendor frameworkVendor = HelmUtil.getFrameworkVendor(groupIds);
+		context.setFrameworkVendor(frameworkVendor);
+
+		dependencies.stream()
 			.map(line -> line.split(":")[1])
 			.flatMap(artifactId -> resolvers.stream()
+				.filter(matcher -> frameworkVendor.equals(matcher.getVendor()))
 				.filter(matcher -> matcher.matches(artifactId))
 				.map(matcher -> matcher.resolveDependency(context))
 				.filter(Optional::isPresent)

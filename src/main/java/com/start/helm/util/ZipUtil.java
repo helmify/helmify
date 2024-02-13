@@ -14,9 +14,16 @@ public class ZipUtil {
 	public static Optional<String> getZipContent(String ofFile, ZipInputStream zipInputStream) {
 		ZipEntry entry;
 
+		String dir = "";
+
 		while ((entry = zipInputStream.getNextEntry()) != null) {
 			String filename = entry.getName();
-			if (ofFile.equals(filename)) {
+			if (entry.isDirectory() && "".equals(dir)) {
+				dir = entry.getName();
+				continue;
+			}
+
+			if (filename.endsWith(ofFile)) {
 				byte[] buffer = new byte[10240];
 				int len;
 
