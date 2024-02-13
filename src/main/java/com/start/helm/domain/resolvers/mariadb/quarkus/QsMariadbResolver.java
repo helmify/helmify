@@ -1,8 +1,8 @@
-package com.start.helm.domain.resolvers.postgres.quarkus;
+package com.start.helm.domain.resolvers.mariadb.quarkus;
 
 import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmContext;
-import com.start.helm.domain.resolvers.postgres.PostgresResolver;
+import com.start.helm.domain.resolvers.mariadb.MariaDbResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
 
 @Component
-public class QsPostgresResolver implements PostgresResolver {
+public class QsMariadbResolver implements MariaDbResolver {
 
 	@Override
 	public List<String> matchOn() {

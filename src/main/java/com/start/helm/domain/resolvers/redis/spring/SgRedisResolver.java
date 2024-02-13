@@ -1,6 +1,7 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.redis.spring;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.redis.RedisResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,44 +13,16 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class RedisDependencyResolver implements DependencyResolver {
+public class SgRedisResolver implements RedisResolver {
 
 	//@formatter:off
-
-    @Override
-    public String dependencyName() {
-        return "redis";
-    }
 
     @Override
     public List<String> matchOn() {
         return List.of("spring-boot-starter-data-redis", "spring-data-redis");
     }
 
-    public Map<String, Object> getValuesEntries(HelmContext context) {
-        return Map.of("redis", Map.of(
-                "enabled", true,
-                "port", 6379,
-                "nameOverride", context.getAppName() + "-redis",
-                "fullnameOverride", context.getAppName() + "-redis",
-                "architecture", "standalone"),
-                "global", Map.of(
-                        "hosts", Map.of(
-                            "redis", getRedisHost(context)),
-                            "ports", Map.of("redis", getRedisPort())));
-    }
 
-    private int getRedisPort() {
-        return 6379;
-    }
-
-    private String getRedisHost(HelmContext context) {
-        return context.getAppName() + "-redis-master";
-    }
-
-    public Map<String, String> getPreferredChart() {
-        return Map.of("name", "redis", "version", "18.1.2", "repository", "https://charts.bitnami.com/bitnami");
-    }
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
