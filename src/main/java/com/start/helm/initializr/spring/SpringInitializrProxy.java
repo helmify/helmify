@@ -5,7 +5,7 @@ import com.start.helm.util.DownloadUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.util.MultiValueMapAdapter;
@@ -28,7 +28,12 @@ public class SpringInitializrProxy {
 
 	private final InitializrSupport initializrSupport;
 
-	private final ApplicationEventPublisher publisher;
+	@Value("${spring.initializr.host}")
+	private String initializrHost;
+
+	private String getInitializrHost() {
+		return String.format("https://%s/", this.initializrHost);
+	}
 
 	@GetMapping(value = "/spring")
 	public Object getCapabilities() {
@@ -38,7 +43,7 @@ public class SpringInitializrProxy {
 		headers.setAccept(List.of(MediaType.valueOf("application/vnd.initializr.v2.2+json")));
 		HttpEntity<Object> entity = new HttpEntity<>(headers);
 
-		return restTemplate.exchange("https://start.spring.io/", HttpMethod.GET, entity, Object.class);
+		return restTemplate.exchange(getInitializrHost(), HttpMethod.GET, entity, Object.class);
 	}
 
 	@GetMapping(value = "/spring/starter.zip")
@@ -51,7 +56,7 @@ public class SpringInitializrProxy {
 			.stream()
 			.collect(Collectors.toMap(k -> k, k -> Arrays.asList(request.getParameterMap().get(k))));
 
-		URI uri = UriComponentsBuilder.fromHttpUrl("https://start.spring.io/starter.zip")
+		URI uri = UriComponentsBuilder.fromHttpUrl(getInitializrHost() + "starter.zip")
 			.queryParams(new MultiValueMapAdapter<>(collected))
 			.build()
 			.toUri();
