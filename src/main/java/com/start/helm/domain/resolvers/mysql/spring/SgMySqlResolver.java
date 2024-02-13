@@ -1,6 +1,7 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.mysql.spring;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.mysql.MySqlResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
  * Resolver for spring postgres dependency.
  */
 @Component
-public class MySQLDependencyResolver implements DependencyResolver {
+public class SgMySqlResolver implements MySqlResolver {
 
 	//@formatter:off
 
@@ -45,38 +46,5 @@ public class MySQLDependencyResolver implements DependencyResolver {
 		);
 	}
 
-	public Map<String, Object> getValuesEntries(HelmContext context) {
-		return Map.of("mysql", Map.of(
-						"enabled", true,
-						"database", "my_database",
-						"fullnameOverride", context.getAppName() + "-mysql",
-						"nameOverride", context.getAppName() + "-mysql",
-						"architecture", "standalone",
-						"primary", Map.of(
-								"persistence", Map.of(
-										"enabled", true,
-										"storageClass", "",
-										"accessModes", List.of("ReadWriteOnce"),
-										"size", "1Gi"
-								)
-						),
-						"auth",
-						Map.of("username", "mysql", "password", "mysql", "rootPassword", "mysql")),
-				"global",
-				Map.of("hosts", Map.of("mysql", context.getAppName() + "-mysql"), "ports", Map.of("mysql", 3306))
-		);
-	}
 
-	public Map<String, String> getPreferredChart() {
-		return Map.of(
-				"name", "mysql",
-				"version", "9.12.5",
-				"repository", "https://charts.bitnami.com/bitnami"
-		);
-	}
-
-	@Override
-	public String dependencyName() {
-		return "mysql";
-	}
 }

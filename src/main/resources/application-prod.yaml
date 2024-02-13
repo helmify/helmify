@@ -1,3 +1,7 @@
+spring:
+  initializr:
+    host: start.spring.io
+
 server:
   port: 7070
 

@@ -7,6 +7,7 @@ import com.start.helm.util.GradleUtil;
 import com.start.helm.util.ZipUtil;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,13 @@ public class SpringInitializrRestController {
 
 	private final GradleFileUploadService gradleFileUploadService;
 
+	@Value("${spring.initializr.host}")
+	private String initializrHost;
+
+	private String getInitializrHost() {
+		return String.format("https://%s/", this.initializrHost);
+	}
+
 	@Getter
 	@Setter
 	@ToString
@@ -48,8 +56,8 @@ public class SpringInitializrRestController {
 		final String springInitializrLink = request.getSpringInitializrLink();
 		validateLink(springInitializrLink);
 
-		final String zipLink = springInitializrLink.replace("https://start.spring.io/#!",
-				"https://start.spring.io/starter.zip?");
+		final String zipLink = springInitializrLink.replace(getInitializrHost() + "#!",
+				getInitializrHost() + "starter.zip?");
 
 		ResponseEntity<byte[]> response = restTemplate.getForEntity(zipLink, byte[].class);
 		log.info("Received Response, Code {}", response.getStatusCode());
@@ -156,8 +164,8 @@ public class SpringInitializrRestController {
 		return ZipUtil.getZipContent("pom.xml", zipInputStream);
 	}
 
-	private static void validateLink(String springInitializrLink) {
-		if (!springInitializrLink.startsWith("https://start.spring.io/")) {
+	private void validateLink(String springInitializrLink) {
+		if (!springInitializrLink.startsWith(getInitializrHost())) {
 			throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
 					"Not a spring initializr link");
 		}

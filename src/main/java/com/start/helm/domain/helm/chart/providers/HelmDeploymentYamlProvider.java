@@ -1,6 +1,7 @@
 package com.start.helm.domain.helm.chart.providers;
 
 import com.start.helm.app.config.YamlConfig;
+import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmContext;
 import com.start.helm.util.HelmUtil;
@@ -76,7 +77,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 			                command: ["sh", "-c", "sleep 10"]
 			          volumeMounts:
 			            - name: {{ include "REPLACEME.fullname" . }}-config-vol
-			              mountPath: /workspace/BOOT-INF/classes/application.properties
+			              mountPath: ###@helm-start:configpath/application.properties
 			              subPath: application.properties
 			          resources:
 			            {{- toYaml .Values.resources | nindent 12 }}
@@ -102,7 +103,13 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
 	@Override
 	public String getFileContent(HelmContext context) {
-		String filledTemplate = template.replace("REPLACEME", context.getAppName());
+		boolean isSpring = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
+		boolean isQuarkus = context.getFrameworkVendor().equals(FrameworkVendor.Quarkus);
+
+		String configPath = isSpring ? "/workspace/BOOT-INF/classes" : isQuarkus ? "/deployments/config" : "";
+
+		String filledTemplate = template.replace("REPLACEME", context.getAppName())
+			.replace("###@helm-start:configpath", configPath);
 		return HelmUtil.removeMarkers(customize(filledTemplate, context));
 	}
 
@@ -123,7 +130,14 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 		if (context.isCreateIngress() && context.isHasActuator()) {
 			// remove default probe
 			withInitContainers = removeBetween("###@helm-start:probes", "###@helm-start:lifecycle", withInitContainers);
-			withInitContainers = insertAfter(withInitContainers, "###@helm-start:probes", """
+
+			FrameworkVendor vendor = context.getFrameworkVendor();
+			String liveness = vendor.equals(FrameworkVendor.Spring) ? "/actuator/health/liveness"
+					: vendor.equals(FrameworkVendor.Quarkus) ? "/q/health/live" : "";
+			String readiness = vendor.equals(FrameworkVendor.Spring) ? "/actuator/health/readiness"
+					: vendor.equals(FrameworkVendor.Quarkus) ? "/q/health/ready" : "";
+
+			withInitContainers = insertAfter(withInitContainers, "###@helm-start:probes", String.format("""
 					  - name: healthcheck
 					    containerPort: {{ .Values.healthcheck.port }}
 					    protocol: TCP
@@ -134,7 +148,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 					  timeoutSeconds: 5
 					  failureThreshold: 3
 					  httpGet:
-					    path: /actuator/health/liveness
+					    path: %s
 					    port: healthcheck
 					readinessProbe:
 					  initialDelaySeconds: 10
@@ -143,9 +157,9 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 					  timeoutSeconds: 5
 					  failureThreshold: 3
 					  httpGet:
-					    path: /actuator/health/readiness
+					    path: %s
 					    port: healthcheck
-					""", 10);
+					""", liveness, readiness), 10);
 		}
 
 		return injectEnvVars(withInitContainers, context);

@@ -1,6 +1,8 @@
 spring:
   application:
     name: helm-start
+  initializr:
+    host: start.spring.io
   devtools:
     restart:
       additional-paths: src/main/resources/static
@@ -15,3 +17,4 @@ logging:
 management:
   server:
     port: 9090
+

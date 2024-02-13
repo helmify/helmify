@@ -1,6 +1,7 @@
-package com.start.helm.domain.resolvers;
+package com.start.helm.domain.resolvers.postgres.spring;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.resolvers.postgres.PostgresResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
  * Resolver for spring postgres dependency.
  */
 @Component
-public class PostgresDependencyResolver implements DependencyResolver {
+public class SgPostgresResolver implements PostgresResolver {
 
 	//@formatter:off
 
@@ -45,38 +46,4 @@ public class PostgresDependencyResolver implements DependencyResolver {
 		);
 	}
 
-	public Map<String, Object> getValuesEntries(HelmContext context) {
-		return Map.of("postgresql", Map.of(
-						"enabled", true,
-						"database", "postgres",
-						"fullnameOverride", context.getAppName() + "-postgresql",
-						"nameOverride", context.getAppName() + "-postgresql",
-						"architecture", "standalone",
-						"primary", Map.of(
-								"persistence", Map.of(
-										"enabled", true,
-										"storageClass", "",
-										"accessModes", List.of("ReadWriteOnce"),
-										"size", "1Gi"
-								)
-						),
-						"auth",
-						Map.of("username", "postgres", "password", "postgres")),
-				"global",
-				Map.of("hosts", Map.of("postgresql", context.getAppName() + "-postgresql"), "ports", Map.of("postgresql", 5432))
-		);
-	}
-
-	public Map<String, String> getPreferredChart() {
-		return Map.of(
-				"name", "postgresql",
-				"version", "11.9.2",
-				"repository", "https://charts.bitnami.com/bitnami"
-		);
-	}
-
-	@Override
-	public String dependencyName() {
-		return "postgresql";
-	}
 }
