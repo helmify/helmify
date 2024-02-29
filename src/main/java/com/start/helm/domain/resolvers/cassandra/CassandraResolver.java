@@ -36,7 +36,7 @@ public interface CassandraResolver extends DependencyResolver {
 	default Map<String, String> getPreferredChart() {
 		return Map.of(
 				"name", "cassandra",
-				"version", "4.1.4",
+				"version", "10.11.2",
 				"repository", "https://charts.bitnami.com/bitnami"
 		);
 	}
