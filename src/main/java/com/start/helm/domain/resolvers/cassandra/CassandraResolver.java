@@ -11,26 +11,26 @@ public interface CassandraResolver extends DependencyResolver {
 
 	default Map<String, Object> getValuesEntries(HelmContext context) {
 		return Map.of("cassandra",
-				Map.of("enabled", true,
+				Map.of(	"enabled", true,
 						"keyspaceName", context.getAppName(),
 						"service", Map.of(
 								"ports", Map.of(
 										"cql", getPort()
 								)
-							)
 						),
 						"port", getPort(),
 						"nameOverride", context.getAppName() + "-cassandra",
 						"fullnameOverride", context.getAppName() + "-cassandra",
 						"dbUser", Map.of(
 								"user", "cassandra",
-							"password", "cassandra"
-						),
-						"global", Map.of(
-								"hosts", Map.of(
-										"cassandra", context.getAppName() + "-cassandra"),
-							"ports", Map.of(
-									"cassandra", getPort())));
+								"password", "cassandra"
+						)
+				),
+				"global", Map.of(
+						"hosts", Map.of(
+								"cassandra", context.getAppName() + "-cassandra"),
+						"ports", Map.of(
+								"cassandra", getPort())));
 	}
 
 	default Map<String, String> getPreferredChart() {

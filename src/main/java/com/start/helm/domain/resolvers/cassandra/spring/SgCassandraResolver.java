@@ -29,8 +29,8 @@ public class SgCassandraResolver implements CassandraResolver {
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "cassandra-username", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}"
-                , "cassandra-password", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
+                "cassandra-username", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
+                "cassandra-password", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
         );
     }
 
