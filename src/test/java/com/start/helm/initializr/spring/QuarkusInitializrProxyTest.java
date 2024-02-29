@@ -58,7 +58,7 @@ public class QuarkusInitializrProxyTest {
 				    "noCode": "true",
 				    "noExamples": "true",
 				    "javaVersion": 17,
-					"streamKey":"io.quarkus.platform:3.7",
+					"streamKey":"io.quarkus.platform:3.8",
 					"extensions":[
 						"io.quarkus:quarkus-resteasy-reactive-jackson",\s
 						"io.quarkus:quarkus-jdbc-postgresql",\s
