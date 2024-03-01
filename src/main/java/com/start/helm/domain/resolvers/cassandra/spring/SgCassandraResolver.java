@@ -37,8 +37,9 @@ public class SgCassandraResolver implements CassandraResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}:{{ .Values.global.ports.cassandra }}",
-                "spring.cassandra.keyspace-name", "{{ .Values.cassandra.keyspaceName }}"
+                "spring.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local",
+                "spring.cassandra.keyspace-name", "{{ .Values.cassandra.keyspaceName }}",
+                "spring.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
         );
     }
 

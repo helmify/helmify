@@ -1,8 +1,10 @@
 package com.start.helm.domain.resolvers.cassandra;
 
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.helm.chart.model.HelmSecret;
 import com.start.helm.domain.resolvers.DependencyResolver;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CassandraResolver extends DependencyResolver {
@@ -13,6 +15,7 @@ public interface CassandraResolver extends DependencyResolver {
 		return Map.of("cassandra",
 				Map.of(	"enabled", true,
 						"keyspaceName", context.getAppName(),
+						"dataCenter", "datacenter1",
 						"service", Map.of(
 								"ports", Map.of(
 										"cql", getPort()
@@ -24,7 +27,8 @@ public interface CassandraResolver extends DependencyResolver {
 						"dbUser", Map.of(
 								"user", "cassandra",
 								"password", "cassandra"
-						)
+						),
+						"initDBSecret", "cassandra-init"
 				),
 				"global", Map.of(
 						"hosts", Map.of(
@@ -50,4 +54,16 @@ public interface CassandraResolver extends DependencyResolver {
 		return "cassandra";
 	}
 
-}
+	//@formatter:off
+	@Override
+	default List<HelmSecret> getExtraSecrets(HelmContext context) {
+		return List.of(
+				new HelmSecret(
+						"cassandra-init-secret.yaml",
+						"cassandra-init",
+						"""
+init-keyspace.cql: >-
+  {{ "CREATE KEYSPACE IF NOT EXISTS {{ .Values.cassandra.keyspaceName }} WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1};" | b64enc}}
+        """)
+		);
+	}}
