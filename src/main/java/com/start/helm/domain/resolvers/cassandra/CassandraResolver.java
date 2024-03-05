@@ -11,10 +11,14 @@ public interface CassandraResolver extends DependencyResolver {
 
 	//@formatter:off
 
+	default String getKeySpaceName(HelmContext context) {
+		return context.getAppName().replace("-", "");
+	}
+
 	default Map<String, Object> getValuesEntries(HelmContext context) {
 		return Map.of("cassandra",
 				Map.of(	"enabled", true,
-						"keyspaceName", context.getAppName(),
+						"keyspaceName", getKeySpaceName(context),
 						"dataCenter", "datacenter1",
 						"service", Map.of(
 								"ports", Map.of(
@@ -57,13 +61,15 @@ public interface CassandraResolver extends DependencyResolver {
 	//@formatter:off
 	@Override
 	default List<HelmSecret> getExtraSecrets(HelmContext context) {
+
 		return List.of(
 				new HelmSecret(
 						"cassandra-init-secret.yaml",
 						"cassandra-init",
 						"""
 init-keyspace.cql: >-
-  {{ "CREATE KEYSPACE IF NOT EXISTS {{ .Values.cassandra.keyspaceName }} WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1};" | b64enc}}
-        """)
+  {{ "CREATE KEYSPACE IF NOT EXISTS @@keyspace WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1};" | b64enc}}
+        """.replace("@@keyspace", getKeySpaceName(context))
+				)
 		);
 	}}

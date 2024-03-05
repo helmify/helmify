@@ -1,5 +1,6 @@
 package com.start.helm.domain.helm.chart.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
 import com.start.helm.util.HelmUtil;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class HelmSecret {
 			###@helm-start:data
 			""";
 
+	@JsonIgnore
 	public String getYaml() {
 		String patched = TemplateStringPatcher.insertAfter(yaml, "###@helm-start:data", stringData, 2)
 			.replace("SECRET_NAME", secretName);
