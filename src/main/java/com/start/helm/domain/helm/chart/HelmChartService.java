@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -43,6 +44,18 @@ public class HelmChartService {
 			String fileName = p.getFileName();
 			addZipEntry(fileName, fileContent, zipOutputStream);
 		});
+
+		context.getHelmChartSlices()
+			.stream()
+			.filter(s -> Objects.nonNull(s.getExtraSecrets()))
+			.filter(s -> !s.getExtraSecrets().isEmpty())
+			.flatMap(s -> s.getExtraSecrets().stream())
+			.forEach(extraSecret -> {
+				String fileContent = extraSecret.getYaml();
+				String fileName = "templates/" + extraSecret.getFileName();
+				log.info("Adding extra secret {}", fileName);
+				addZipEntry(fileName, fileContent, zipOutputStream);
+			});
 
 		zipOutputStream.close();
 		outputStream.close();

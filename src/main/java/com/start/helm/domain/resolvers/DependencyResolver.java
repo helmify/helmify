@@ -4,7 +4,9 @@ import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.domain.helm.HelmChartSlice;
 import com.start.helm.domain.helm.HelmChartSliceBuilder;
 import com.start.helm.domain.helm.HelmContext;
+import com.start.helm.domain.helm.chart.model.HelmSecret;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +56,7 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		String endpoint = initContainerCheckEndpoint(context).replace("%s", dependencyName());
 		Map<String, Object> initContainer = initContainer(context.getAppName(), dependencyName(), endpoint);
 		slice.setInitContainer(initContainer);
+		slice.setExtraSecrets(getExtraSecrets(context));
 
 		return Optional.of(slice);
 	}
@@ -65,6 +68,10 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 
 	default FrameworkVendor getVendor() {
 		return FrameworkVendor.Spring;
+	}
+
+	default List<HelmSecret> getExtraSecrets(HelmContext context) {
+		return new ArrayList<>();
 	}
 
 }
