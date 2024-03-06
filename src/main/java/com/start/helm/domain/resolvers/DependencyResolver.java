@@ -59,6 +59,7 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		slice.setInitContainer(initContainer);
 		slice.setExtraSecrets(getExtraSecrets(context));
 		slice.setExtraFiles(getExtraFiles(context));
+		slice.setDependencyName(dependencyName());
 
 		return Optional.of(slice);
 	}

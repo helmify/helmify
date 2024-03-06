@@ -2,10 +2,7 @@ package com.start.helm.domain.helm;
 
 import com.start.helm.domain.FrameworkVendor;
 import com.start.helm.util.JsonUtil;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.*;
 
@@ -48,6 +45,9 @@ public class HelmContext {
 	private final Set<HelmDependency> helmDependencies = new HashSet<>();
 
 	@Getter
+	private final Set<HelmDependencyName> dependencyNames = new HashSet<>();
+
+	@Getter
 	private final Set<HelmChartSlice> helmChartSlices = new HashSet<>();
 
 	/**
@@ -80,6 +80,7 @@ public class HelmContext {
 	public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
 		this.helmChartSlices.add(helmChartSlice);
 		Map<String, String> preferredChart = helmChartSlice.getPreferredChart();
+		this.addDependencyName(helmChartSlice.getDependencyName());
 
 		if (preferredChart != null && !preferredChart.isEmpty()) {
 			this.addHelmDependency(new HelmDependency(preferredChart.get("name"), preferredChart.get("version"),
@@ -91,6 +92,10 @@ public class HelmContext {
 			}
 		}
 
+	}
+
+	private void addDependencyName(String dependencyName) {
+		this.dependencyNames.add(new HelmDependencyName(dependencyName));
 	}
 
 	private void addValuesGlobalBlock(Map<String, Object> valuesGlobalBlock) {
@@ -120,6 +125,15 @@ public class HelmContext {
 	@Override
 	public String toString() {
 		return JsonUtil.toJson(this);
+	}
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class HelmDependencyName {
+
+		private String name;
+
 	}
 
 }

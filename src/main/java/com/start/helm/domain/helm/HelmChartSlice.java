@@ -35,4 +35,6 @@ public class HelmChartSlice {
 
 	private List<HelmFile> extraFiles;
 
+	private String dependencyName;
+
 }
