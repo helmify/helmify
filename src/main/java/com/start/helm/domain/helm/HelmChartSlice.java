@@ -1,5 +1,6 @@
 package com.start.helm.domain.helm;
 
+import com.start.helm.domain.helm.chart.model.HelmFile;
 import com.start.helm.domain.helm.chart.model.HelmSecret;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,5 +32,7 @@ public class HelmChartSlice {
 	private Map<String, Object> secretEntries;
 
 	private List<HelmSecret> extraSecrets;
+
+	private List<HelmFile> extraFiles;
 
 }

@@ -3,18 +3,18 @@ package com.start.helm.domain.helm.chart.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.start.helm.domain.helm.chart.customizers.TemplateStringPatcher;
 import com.start.helm.util.HelmUtil;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
-public class HelmSecret {
+public class HelmSecret extends HelmFile {
 
-	@Getter
-	@Setter
-	private String fileName;
+	public HelmSecret(String filename, String secretName, String stringData) {
+		this.fileName = filename;
+		this.secretName = secretName;
+		this.stringData = stringData;
+	}
 
 	@Getter
 	@Setter

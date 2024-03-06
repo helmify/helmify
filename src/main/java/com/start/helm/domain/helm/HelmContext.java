@@ -81,7 +81,7 @@ public class HelmContext {
 		this.helmChartSlices.add(helmChartSlice);
 		Map<String, String> preferredChart = helmChartSlice.getPreferredChart();
 
-		if (preferredChart != null) {
+		if (preferredChart != null && !preferredChart.isEmpty()) {
 			this.addHelmDependency(new HelmDependency(preferredChart.get("name"), preferredChart.get("version"),
 					preferredChart.get("repository"), List.of()));
 
