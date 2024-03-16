@@ -57,6 +57,18 @@ public class HelmChartService {
 				addZipEntry(fileName, fileContent, zipOutputStream);
 			});
 
+		context.getHelmChartSlices()
+			.stream()
+			.filter(s -> Objects.nonNull(s.getExtraFiles()))
+			.filter(s -> !s.getExtraFiles().isEmpty())
+			.flatMap(s -> s.getExtraFiles().stream())
+			.forEach(extraFile -> {
+				String fileContent = extraFile.getContent();
+				String fileName = "templates/" + extraFile.getFileName();
+				log.info("Adding extra file {}", fileName);
+				addZipEntry(fileName, fileContent, zipOutputStream);
+			});
+
 		zipOutputStream.close();
 		outputStream.close();
 

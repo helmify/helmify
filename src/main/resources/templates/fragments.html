@@ -25,23 +25,32 @@
         </div>
         <div class="col-12" th:if="${helmContext != null}">
             <div>
-                <span>This is a <span class="bold">Maven</span> based Application called
+                <div>
+                    This is a <span class="bold">Maven</span> based Application called
                     <span class="bold" th:text="${helmContext.appName}"></span>
+                </div>
+                <div>
                     in Version
                     <span class="bold" th:text="${helmContext.appVersion}"></span>
+                </div>
+                <div>
                     built with
                     <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
-                    <span th:if="${helmContext.createIngress}">
+                </div>
+                <div th:if="${helmContext.createIngress}">
+                    <span >
                         and should be exposed through an <span class="bold">Ingress</span>
                     </span>.
-                    <span th:if="${helmContext.helmDependencies.size() > 0}">
+                </div>
+                <div th:if="${helmContext.dependencyNames.size() > 0}">
+                    <span>
                         It depends on
-                        <span th:each="d,iter : ${helmContext.helmDependencies}">
+                        <span th:each="d,iter : ${helmContext.dependencyNames}">
                             <span class="bold" th:text="${d.name}"></span>
                             <span th:if="${iter.last == false}">, </span>
                         </span>
                     </span>
-                </span>
+                </div>
             </div>
             <div style="margin-top: 1em;" th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
         </div>
