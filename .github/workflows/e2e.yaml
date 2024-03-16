@@ -1,8 +1,6 @@
 name: Helmify E2E Testing
 
 on:
-  push:
-    branches: [ "feature/82-add-e2e-testing-pipeline-using-test-apps" ]
   pull_request:
     branches: [ "main" ]
 
