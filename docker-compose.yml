@@ -96,6 +96,9 @@ services:
       - type: bind
         source: /mnt/volume_fra1_01/helmify-data/
         target: /workspace/helmify-data
+      - type: bind
+        source: /mnt/volume_fra1_01/helm-start-data/
+        target: /workspace/helm-start-data
 
 networks:
   web:
