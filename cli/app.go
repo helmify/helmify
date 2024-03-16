@@ -37,7 +37,7 @@ func main() {
 }
 
 func invokeApi(appName string, appVersion string, buildFileContent string, path string) {
-	url := fmt.Sprintf("https://helm-start.com/api/cli?name=%s&version=%s", appName, appVersion)
+	url := fmt.Sprintf("https://helmify.me/api/cli?name=%s&version=%s", appName, appVersion)
 
 	resp, err := http.Post(url, "application/json", s.NewReader(buildFileContent))
 	if err != nil {

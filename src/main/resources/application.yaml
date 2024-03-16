@@ -1,6 +1,6 @@
 spring:
   application:
-    name: helm-start
+    name: helmify
   initializr:
     host: start.spring.io
   devtools:
