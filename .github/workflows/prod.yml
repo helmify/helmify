@@ -33,12 +33,12 @@ jobs:
         run: |
           echo "resolved-version=$(mvn --quiet --non-recursive exec:exec -Dexec.executable=echo -Dexec.args='${project.version}')" >> "${GITHUB_OUTPUT}"
       - name: Build with Maven
-        run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmstart/helm-start
+        run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify
       - name: Tag Image
-        run: docker tag helmstart/helm-start:latest helmstart/helm-start:${{ steps.version.outputs.resolved-version }}
+        run: docker tag helmify/helmify:latest helmify/helmify:${{ steps.version.outputs.resolved-version }}
 ### Integration-Testing for generated Helm Charts
-      - name: Start helm-start
-        run: docker run -d -p 8080:8080 -p 9090:9090 helmstart/helm-start:latest
+      - name: Start helmify
+        run: docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest
       - name: wait for start
         run: |
           until printf "." && curl --silent http://localhost:9090/actuator/health; do \
@@ -50,7 +50,7 @@ jobs:
         run: |
           curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT"
       - name: container log
-        run: docker logs $(docker ps -q --filter ancestor=helmstart/helm-start:latest)
+        run: docker logs $(docker ps -q --filter ancestor=helmify/helmify:latest)
       - name: unzip helm chart
         run: unzip helm.zip -d helm
       - name: Set up Helm
@@ -74,7 +74,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push Docker Image
-        run: docker push helmstart/helm-start:${{ steps.version.outputs.resolved-version }}
+        run: docker push helmify/helmify:${{ steps.version.outputs.resolved-version }}
       - name: deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -83,10 +83,10 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
-            docker pull helmstart/helm-start:${{ steps.version.outputs.resolved-version }} &&
-            docker tag helmstart/helm-start:${{ steps.version.outputs.resolved-version }} helmstart/helm-start:prod &&
-            wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/develop/docker-compose.yml &&
-            docker compose up -d --force-recreate --no-deps helm-start
+            docker pull helmify/helmify:${{ steps.version.outputs.resolved-version }} &&
+            docker tag helmify/helmify:${{ steps.version.outputs.resolved-version }} helmify/helmify:prod &&
+            wget -O docker-compose.yml https://raw.githubusercontent.com/helmify/helmify/develop/docker-compose.yml &&
+            docker compose up -d --force-recreate --no-deps helmify
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph

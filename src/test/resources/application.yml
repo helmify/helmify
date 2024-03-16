@@ -1,5 +1,5 @@
-helm-start.data-directory: ${java.io.tmpdir}/helm-start-data
+helmify.data-directory: ${java.io.tmpdir}/helmify-data
 
 spring:
   initializr:
-    host: start-spring.helm-start.com
+    host: spring.helmify.com
