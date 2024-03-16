@@ -19,4 +19,4 @@ jobs:
       - name: pull
         run: docker pull busybox:latest
       - name: Deploy Spring Postgres Tester
-        run: kind load docker-image busybox:latest
+        run: kind load docker-image busybox:latest --name chart-testing
