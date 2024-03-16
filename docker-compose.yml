@@ -99,7 +99,7 @@ services:
       - type: bind
         source: /mnt/volume_fra1_01/helm-start-data/
         target: /workspace/helm-start-data
-
+        
 networks:
   web:
     external: true
