@@ -2,4 +2,4 @@ helmify.data-directory: ${java.io.tmpdir}/helmify-data
 
 spring:
   initializr:
-    host: spring.helmify.com
+    host: spring.helmify.me
