@@ -13,39 +13,32 @@ import static com.start.helm.util.HelmUtil.makeSecretKeyRef;
 @Component
 public class QsCouchbaseResolver implements CouchbaseResolver {
 
-	/**
-	 * quarkus.cassandra.contact-points={cassandra_ip}:9042
-	 * quarkus.cassandra.local-datacenter={dc_name} quarkus.cassandra.keyspace={keyspace}
-	 * quarkus.cassandra.auth.username=john quarkus.cassandra.auth.password=s3cr3t
-	 */
 	//@formatter:off
     @Override
     public List<String> matchOn() {
-        return List.of("cassandra-quarkus-client");
+        return List.of("quarkus-couchbase");
     }
 
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_USERNAME", "cassandra-username", context.getAppName()),
-                makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_PASSWORD", "cassandra-password", context.getAppName())
+                makeSecretKeyRef("QUARKUS_COUCHBASE_USERNAME", "couchbase-username", context.getAppName()),
+                makeSecretKeyRef("QUARKUS_COUCHBASE_PASSWORD", "couchbase-password", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "cassandra-username", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
-                "cassandra-password", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
+                "couchbase-username", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
+                "couchbase-password", "{{ .Values.couchbase.dbUser.password | b64enc | quote }}"
         );
     }
 
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "quarkus.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.cassandra }}",
-                "quarkus.cassandra.keyspace", "{{ .Values.cassandra.keyspaceName }}",
-                "quarkus.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
+                "quarkus.couchbase.connection-string","{{ .Values.global.hosts.couchbase }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.couchbase }}"
         );
     }
 
