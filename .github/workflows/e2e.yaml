@@ -27,6 +27,8 @@ jobs:
         uses: helm/kind-action@v1.8.0
       - name: set context
         run: kubectl config use-context kind-chart-testing
+      - name: set context
+        run: kubectl config set-cluster chart-testing
       - name: Set up JDK 21
         uses: oracle-actions/setup-java@v1
         with:
@@ -53,4 +55,4 @@ jobs:
       - name: Build Spring Postgres Tester
         run: mvn spring-boot:build-image -Dspring-boot.build-image.imageName=spring-postgres-tester:0.1.0 --file testing/spring-postgres-tester/pom.xml
       - name: Deploy Spring Postgres Tester
-        run: kind load docker-image spring-postgres-tester:0.1.0
+        run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing
