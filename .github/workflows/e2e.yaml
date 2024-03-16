@@ -14,6 +14,8 @@ jobs:
         uses: helm/kind-action@v1.8.0
       - name: set context
         run: kubectl config use-context kind-chart-testing
+      - name: set cluster
+        run: kubectl config set-cluster chart-testing
       - name: pull
         run: docker pull busybox:latest
       - name: Deploy Spring Postgres Tester
