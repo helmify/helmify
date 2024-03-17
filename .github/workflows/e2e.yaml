@@ -52,7 +52,20 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
+      - name: Build Helmify
+        run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify
+      ### Integration-Testing for generated Helm Charts
+      - name: Start helmify
+        run: docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest
+      - name: Wait for Helmify Start
+        run: |
+          until printf "." && curl --silent http://localhost:9090/actuator/health; do \
+          sleep 2; \
+          done;
       - name: Build Spring Postgres Tester
         run: mvn spring-boot:build-image -Dspring-boot.build-image.imageName=spring-postgres-tester:0.1.0 --file testing/spring-postgres-tester/pom.xml
+      - name: Generate Spring Postgres Tester Helm Chart
+        run: |
+          curl -X POST --data @testing/spring-postgres-tester/pom.xml  -o spring-postgres-tester.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=spring-postgres-tester&version=0.1.0"
       - name: Deploy Spring Postgres Tester
         run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing
