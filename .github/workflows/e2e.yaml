@@ -73,3 +73,9 @@ jobs:
         run: cd spring-postgres-tester-chart && helm dependency update
       - name: Deploy Spring Postgres Tester
         run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing && helm install spring-postgres-tester spring-postgres-tester-chart
+      - name: Test Spring Postgres Tester Deployment
+        run: mvn test -Dtest=KindClusterTest -Dexpected-deployments=spring-postgres-tester -Dexpected-services=spring-postgres-tester,spring-postgres-tester-postgresql -Dexpected-pods=spring-postgres-tester,spring-postgres-tester-postgresql -Dexpected-configs=spring-postgres-tester-config -Dexpected-secrets=spring-postgres-tester,spring-postgres-tester-postgresql
+      - name: Port-Forward Spring Postgres Tester
+        run: kubectl port-forward svc/spring-postgres-tester 8080:8080 &
+      - name: Ping Spring Postgres Tester
+        run: mvn test -Dtest=KindPingTest -Durl=http://localhost:8080/ping -Dexpected=postgres
