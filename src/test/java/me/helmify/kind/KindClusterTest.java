@@ -35,7 +35,7 @@ public class KindClusterTest {
 
 		// only execute when explicitly called
 		String property = System.getProperty("test");
-		if (property == null || property.isEmpty()) {
+		if (property == null || property.isEmpty() || !"KindClusterTest".equals(property)) {
 			return;
 		}
 

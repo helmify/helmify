@@ -1,0 +1,52 @@
+name: Helmify E2E Testing
+
+on:
+  push:
+    branches: [ "feature/82-add-e2e-testing-pipeline-using-test-apps" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Helmify
+        uses: actions/checkout@v4
+      - name: Checkout Helmify E2E Tests
+        uses: actions/checkout@v4
+        with:
+          repository: helmify/testing.git
+          ref: main
+          path: testing
+      - name: Set Build Environment
+        uses: ./.github/actions/setup-build
+      - name: Set Up Cluster
+        uses: ./.github/actions/setup-cluster
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Start Helmify Docker Container
+        uses: ./.github/actions/run-helmify
+      - name: Build Spring Postgres Tester
+        run: mvn spring-boot:build-image -Dspring-boot.build-image.imageName=spring-postgres-tester:0.1.0 --file testing/spring-postgres-tester/pom.xml
+      - name: Generate Spring Postgres Tester Helm Chart
+        run: |
+          curl -X POST --data @testing/spring-postgres-tester/pom.xml  -o spring-postgres-tester.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=spring-postgres-tester&version=0.1.0"
+      - name: Unzip Spring Postgres Tester Helm Chart
+        run: unzip spring-postgres-tester.zip -d spring-postgres-tester-chart
+      - name: Helm Dependency Update
+        run: cd spring-postgres-tester-chart && helm dependency update
+      - name: Deploy Spring Postgres Tester
+        run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing && helm install spring-postgres-tester spring-postgres-tester-chart
+      - name: Wait for All Pods Running
+        run: kubectl wait pod --all --for=condition=Ready --timeout=300s
+      - name: Test Spring Postgres Tester Deployment
+        run: mvn test -Dtest=KindClusterTest -Dexpected-deployments=spring-postgres-tester -Dexpected-services=spring-postgres-tester,spring-postgres-tester-postgresql -Dexpected-pods=spring-postgres-tester,spring-postgres-tester-postgresql -Dexpected-configs=spring-postgres-tester-config -Dexpected-secrets=spring-postgres-tester,spring-postgres-tester-postgresql
+      - name: Port-Forward Spring Postgres Tester
+        run: kubectl port-forward svc/spring-postgres-tester 18080:8080 &
+      - name: Ping Spring Postgres Tester
+        run: mvn test -Dtest=KindPingTest -Durl=http://localhost:18080/ping -Dexpected=postgres
