@@ -23,10 +23,7 @@ jobs:
     - name: Set Build Environment
       uses: ./.github/actions/setup-build
     - name: Start Helmify Docker Container
-      run: |
-        mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify && \
-        docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest && \
-        until printf "." && curl --silent http://localhost:9090/actuator/health; do sleep 2; done;
+      uses: ./.github/actions/run-helmify
     - name: Set up Cluster
       uses: ./.github/actions/setup-cluster
     - name: Install Test App with generated Helm Chart and Verify

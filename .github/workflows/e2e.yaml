@@ -23,28 +23,8 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           version: v3.12.1
-      - name: create cluster
-        uses: helm/kind-action@v1.8.0
-      - name: set context
-        run: kubectl config use-context kind-chart-testing
-      - name: set context
-        run: kubectl config set-cluster chart-testing
-      - name: Set up JDK 21
-        uses: oracle-actions/setup-java@v1
-        with:
-          website: jdk.java.net
-          release: 21
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      # This is a separate action that sets up buildx runner
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      # So now you can use Actions' own caching!
+      - name: Set Build Environment
+        uses: ./.github/actions/setup-build
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -52,16 +32,8 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Build Helmify
-        run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify
-      ### Integration-Testing for generated Helm Charts
-      - name: Start helmify
-        run: docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest
-      - name: Wait for Helmify Start
-        run: |
-          until printf "." && curl --silent http://localhost:9090/actuator/health; do \
-          sleep 2; \
-          done;
+      - name: Start Helmify Docker Container
+        uses: ./.github/actions/run-helmify
       - name: Build Spring Postgres Tester
         run: mvn spring-boot:build-image -Dspring-boot.build-image.imageName=spring-postgres-tester:0.1.0 --file testing/spring-postgres-tester/pom.xml
       - name: Generate Spring Postgres Tester Helm Chart
