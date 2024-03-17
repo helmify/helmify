@@ -1,0 +1,55 @@
+name: Run Spring Tester
+
+inputs:
+  username:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Helmify
+      uses: actions/checkout@v4
+    - name: Checkout Helmify E2E Tests
+      uses: actions/checkout@v4
+      with:
+        repository: helmify/testing.git
+        ref: main
+        path: testing
+    - name: Set up JDK 21
+      uses: oracle-actions/setup-java@v1
+      with:
+        website: jdk.java.net
+        release: 21
+    - name: Cache local Maven repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+    - name: Build with Maven
+      run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify
+    - name: Start helmify
+      run: docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest
+    - name: wait for start
+      run: |
+        until printf "." && curl --silent http://localhost:9090/actuator/health; do \
+          sleep 2; \
+        done;
+    - name: list all
+      run: ls -lah
+    - name: generate chart
+      run: |
+        curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT"
+    - name: container log
+      run: docker logs $(docker ps -q --filter ancestor=helmify/helmify:latest)
