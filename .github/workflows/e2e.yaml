@@ -18,13 +18,10 @@ jobs:
           repository: helmify/testing.git
           ref: main
           path: testing
-      ### Build
-      - name: Set up Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.12.1
       - name: Set Build Environment
         uses: ./.github/actions/setup-build
+      - name: Set Up Cluster
+        uses: ./.github/actions/setup-cluster
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
