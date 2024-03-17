@@ -1,0 +1,49 @@
+name: Deploy a new Helmify image to runtime environment
+
+inputs:
+  instance:
+    required: true
+    type: string
+    description: 'The instance to deploy'
+  dockerhubUsername:
+    required: true
+    type: string
+  dockerhubToken:
+    required: true
+    type: string
+  deployHost:
+    required: true
+    type: string
+  deployUsername:
+    required: true
+    type: string
+  deployKey:
+    required: true
+    type: string
+  deployPort:
+    required: true
+    type: string
+
+outputs:
+
+runs:
+  using: "composite"
+  steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.dockerhubUsername }}
+        password: ${{ secrets.dockerhubToken }}
+    - name: Push Docker Image
+      run: docker push helmify/helmify:latest
+    - name: deploy
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.deployHost }}
+        username: ${{ secrets.deployUsername }}
+        key: ${{ secrets.deployKey }}
+        port: ${{ secrets.deployPort }}
+        script: |
+          docker pull helmify/helmify:latest && 
+          wget -O docker-compose.yml https://raw.githubusercontent.com/helmify/helmify/develop/docker-compose.yml &&
+          docker compose up -d --force-recreate --no-deps ${{ inputs.instance }}
