@@ -46,5 +46,6 @@ jobs:
         deployUsername: ${{ secrets.DEPLOY_USERNAME }}
         deployKey: ${{ secrets.DEPLOY_KEY }}
         deployPort: ${{ secrets.DEPLOY_PORT }}
+        instance: helmify-dev
 
 
