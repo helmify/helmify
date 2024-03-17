@@ -1,9 +1,5 @@
 name: Run Spring Tester
-
-inputs:
-  username:
-    required: true
-    type: string
+description: Run a Spring Boot Test application to test helm charts provided by Helmify
 
 runs:
   using: "composite"
@@ -39,17 +35,20 @@ runs:
           ${{ runner.os }}-buildx-
     - name: Build with Maven
       run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify
+      shell: bash
     - name: Start helmify
       run: docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest
+      shell: bash
     - name: wait for start
       run: |
         until printf "." && curl --silent http://localhost:9090/actuator/health; do \
           sleep 2; \
         done;
-    - name: list all
-      run: ls -lah
-    - name: generate chart
+      shell: bash
+    - name: Generate Helm Chart
       run: |
         curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT"
+      shell: bash
     - name: container log
       run: docker logs $(docker ps -q --filter ancestor=helmify/helmify:latest)
+      shell: bash

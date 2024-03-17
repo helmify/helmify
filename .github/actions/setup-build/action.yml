@@ -1,7 +1,5 @@
 name: Set Up Helmify Build Environment
-
-inputs:
-outputs:
+description: Set up the environment for building Helmify
 
 runs:
   using: "composite"

@@ -1,7 +1,6 @@
 name: Set Up KinD Cluster
 
-inputs:
-outputs:
+description: Set up a KinD cluster for testing Helm charts
 
 runs:
   using: "composite"
@@ -14,6 +13,8 @@ runs:
       uses: helm/kind-action@v1.8.0
     - name: set context
       run: kubectl config use-context kind-chart-testing
+      shell: bash
     - name: set context
       run: kubectl config set-cluster chart-testing
+      shell: bash
 
