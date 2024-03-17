@@ -70,6 +70,6 @@ jobs:
       - name: Unzip Spring Postgres Tester Helm Chart
         run: unzip spring-postgres-tester.zip -d spring-postgres-tester-chart
       - name: Helm Dependency Update
-        run: cd spring-postgres-tester && helm dependency update
+        run: cd spring-postgres-tester-chart && helm dependency update
       - name: Deploy Spring Postgres Tester
         run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing && helm install spring-postgres-tester spring-postgres-tester-chart
