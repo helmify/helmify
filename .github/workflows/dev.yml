@@ -21,7 +21,7 @@ jobs:
     - name: Checkout Helmify
       uses: actions/checkout@v3
     - name: Set Build Environment
-      uses: actions/setup-build@v1
+      uses: ./.github/actions/setup-build
     - name: Start Helmify Docker Container
       run: |
         mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify && \
@@ -32,14 +32,14 @@ jobs:
         curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT" && \
         unzip helm.zip -d helm
     - name: Set up Cluster
-      uses: actions/setup-cluster@v1
+      uses: ./.github/actions/setup-cluster
     - name: Install Test App and Verify
       run: |
         cd helm && helm dependency update && \
         helm install demo . && \
         mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
     - name: Deploy Helmify
-      uses: actions/deploy-helmify@v1
+      uses: ./.github/actions/deploy-helmify
       with:
         dockerhubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhubToken: ${{ secrets.DOCKERHUB_TOKEN }}
