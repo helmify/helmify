@@ -67,5 +67,9 @@ jobs:
       - name: Generate Spring Postgres Tester Helm Chart
         run: |
           curl -X POST --data @testing/spring-postgres-tester/pom.xml  -o spring-postgres-tester.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=spring-postgres-tester&version=0.1.0"
+      - name: Unzip Spring Postgres Tester Helm Chart
+        run: unzip spring-postgres-tester.zip -d spring-postgres-tester-chart
+      - name: Helm Dependency Update
+        run: cd spring-postgres-tester && helm dependency update
       - name: Deploy Spring Postgres Tester
-        run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing
+        run: kind load docker-image spring-postgres-tester:0.1.0 --name chart-testing && helm install spring-postgres-tester spring-postgres-tester-chart
