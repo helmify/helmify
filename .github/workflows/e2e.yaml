@@ -19,24 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set Up Helmify Build Environment
-        uses: ./.github/actions/setup-build
-      - name: Start Helmify Docker Container
-        uses: ./.github/actions/run-helmify
-
-  springE2ePostgres:
-    runs-on: ubuntu-latest
-    needs: [setupCluster,  startHelmify]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Checkout Helmify E2E Tests
+      - name: Checkout E2E Tests
         uses: actions/checkout@v4
         with:
           repository: helmify/testing.git
           ref: main
           path: testing
-      - name: Set Up Build Environment
+      - name: Set Up Helmify Build Environment
         uses: ./.github/actions/setup-build
+      - name: Start Helmify Docker Container
+        uses: ./.github/actions/run-helmify
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
@@ -44,20 +36,6 @@ jobs:
           type: spring
           port: 18000
           expect: postgres
-
-  quarkusE2ePostgres:
-    runs-on: ubuntu-latest
-    needs: [setupCluster,  startHelmify]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Checkout Helmify E2E Tests
-        uses: actions/checkout@v4
-        with:
-          repository: helmify/testing.git
-          ref: main
-          path: testing
-      - name: Set Up Build Environment
-        uses: ./.github/actions/setup-build
       - name: Run Quarkus Postgres Tester
         uses: ./.github/actions/run-tester
         with:
