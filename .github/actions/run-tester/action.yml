@@ -1,0 +1,33 @@
+name: Run Tester
+description: Run a Test application to test helm charts provided by Helmify
+
+inputs:
+  name:
+    description: 'The directory & image name & helm release name'
+    required: true
+  expect:
+    description: 'The expected output of the test'
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Deploy ${{ inputs.name }} Tester
+      shell: bash
+      run: |
+        mvn quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml \
+        && curl -X POST --data @testing/${{ inputs.name }}/pom.xml  -o ${{ inputs.name }}.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=${{ inputs.name }}&version=0.1.0" \
+        && unzip ${{ inputs.name }}.zip -d ${{ inputs.name }}-chart \
+        && cd ${{ inputs.name }}-chart && helm dependency update \
+        && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing && helm install ${{ inputs.name }} ${{ inputs.name }}-chart \
+        && kubectl wait pod --all --for=condition=Ready --timeout=300s
+    - name: Ping ${{ inputs.name }} Tester
+      shell: bash
+      uses: ./.github/actions/ping-tester
+      with:
+        name: ${{ inputs.name }}
+        expected: ${{ inputs.expect }}
+    - name: Uninstall ${{ inputs.name }} Tester
+      shell: bash
+      run: helm uninstall ${{ inputs.name }}
