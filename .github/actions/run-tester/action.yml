@@ -25,7 +25,8 @@ runs:
       if: ${{ inputs.type  == 'quarkus' }}
       shell: bash
       run: |
-        mvn clean compile quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml
+        mvn clean compile quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml \
+        && docker tag runner/${{ inputs.name }}:0.1.0 ${{ inputs.name }}:0.1.0
     - name: Deploy ${{ inputs.name }} Tester
       shell: bash
       run: |
