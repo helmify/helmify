@@ -7,37 +7,29 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+
+  e2e-spring-postgres:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Helmify
-        uses: actions/checkout@v4
-      - name: Checkout Helmify E2E Tests
-        uses: actions/checkout@v4
-        with:
-          repository: helmify/testing.git
-          ref: main
-          path: testing
-      - name: Set Build Environment
-        uses: ./.github/actions/setup-build
-      - name: Set Up Cluster
-        uses: ./.github/actions/setup-cluster
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: Start Helmify Docker Container
-        uses: ./.github/actions/run-helmify
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
           name: spring-postgres-tester
+          type: spring
+          port: 18000
           expect: postgres
+
+  e2e-quarkus-postgres:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
       - name: Run Quarkus Postgres Tester
         uses: ./.github/actions/run-tester
         with:
           name: quarkus-postgres-tester
+          type: quarkus
+          port: 18001
           expect: postgres
