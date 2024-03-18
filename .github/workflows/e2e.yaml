@@ -35,9 +35,11 @@ jobs:
         uses: ./.github/actions/run-tester
         with:
           name: spring-postgres-tester
+          type: spring
           expect: postgres
       - name: Run Quarkus Postgres Tester
         uses: ./.github/actions/run-tester
         with:
           name: quarkus-postgres-tester
+          type: quarkus
           expect: postgres
