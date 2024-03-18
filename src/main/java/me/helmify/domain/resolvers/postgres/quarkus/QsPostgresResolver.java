@@ -14,24 +14,24 @@ public class QsPostgresResolver implements PostgresResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("quarkus-jdbc-mariadb");
+		return List.of("quarkus-jdbc-postgresql");
 	}
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "mariadb-username", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "mariadb-password", context.getAppName()));
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "postgresql-username", context.getAppName()),
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "postgresql-password", context.getAppName()));
 	}
 
 	public Map<String, Object> getSecretEntries() {
-		return Map.of("mariadb-username", "{{ .Values.mariadb.auth.username | b64enc | quote }}", "mariadb-password",
-				"{{ .Values.mariadb.auth.password | b64enc | quote }}");
+		return Map.of("postgresql-username", "{{ .Values.postgresql.auth.username | b64enc | quote }}",
+				"postgresql-password", "{{ .Values.postgresql.auth.password | b64enc | quote }}");
 	}
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of("quarkus.datasource.jdbc.url",
-				"jdbc:mariadb://{{ .Values.global.hosts.mariadb }}:{{ .Values.global.ports.mariadb }}/{{ .Values.mariadb.database }}",
-				"quarkus.datasource.db-kind", "mariadb");
+				"jdbc:postgresql://{{ .Values.global.hosts.postgresql }}:{{ .Values.global.ports.postgresql }}/{{ .Values.postgresql.database }}",
+				"quarkus.datasource.db-kind", "postgresql");
 	}
 
 	@Override
