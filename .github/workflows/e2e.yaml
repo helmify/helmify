@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Helmify
@@ -24,15 +24,21 @@ jobs:
         uses: ./.github/actions/setup-cluster
       - name: Start Helmify Docker Container
         uses: ./.github/actions/run-helmify
+  e2eTest:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
           name: spring-postgres-tester
           type: spring
+          port: 18000
           expect: postgres
       - name: Run Quarkus Postgres Tester
         uses: ./.github/actions/run-tester
         with:
           name: quarkus-postgres-tester
           type: quarkus
+          port: 18001
           expect: postgres
