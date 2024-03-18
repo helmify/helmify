@@ -1,0 +1,12 @@
+name: run helmify
+description: 'Run Helmify'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Start Helmify Docker Container
+      shell: bash
+      run: |
+        mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmify/helmify && \
+        docker run -d -p 8080:8080 -p 9090:9090 helmify/helmify:latest && \
+        until printf "." && curl --silent http://localhost:9090/actuator/health; do sleep 2; done;

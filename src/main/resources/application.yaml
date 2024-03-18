@@ -1,6 +1,8 @@
 spring:
   application:
-    name: helm-start
+    name: helmify
+  initializr:
+    host: start.spring.io
   devtools:
     restart:
       additional-paths: src/main/resources/static
@@ -11,4 +13,8 @@ spring:
 logging:
   level:
     web: DEBUG
+
+management:
+  server:
+    port: 9090
 

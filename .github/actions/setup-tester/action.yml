@@ -1,0 +1,19 @@
+name: Set Tester App
+
+description: Set up Tester App
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout E2E Tests
+      uses: actions/checkout@v4
+      with:
+        repository: helmify/testing.git
+        ref: main
+        path: testing
+    - name: Set Up Helmify Build Environment
+      uses: ./.github/actions/setup-build
+    - name: Start Helmify Docker Container
+      uses: ./.github/actions/run-helmify
+    - name: Set Up Cluster
+      uses: ./.github/actions/setup-cluster

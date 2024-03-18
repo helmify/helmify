@@ -6,8 +6,9 @@
 
     <link rel="stylesheet" href="https://unpkg.com/chota">
 
-    <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.js}"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script src="/components/navbar.js"></script>
     <link rel="stylesheet" href="/main.css"/>
 
 </head>
@@ -65,29 +66,16 @@
 </style>
 <body>
 <div class="row">
-    <header id="header" class="col-12">
-        <nav class="nav">
-            <div class="nav-left">
-                <a class="brand" href="/">helm-start</a>
-            </div>
-            <div class="nav-right">
-                <div class="tabs">
-                    <a class="active" href="https://github.com/helm-start/helm-start">Github</a>
-                    <a href="https://jenil.github.io/chota/#docs">Chota</a>
-                    <a href="https://htmx.org/docs/">htmx</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <navbar-component  class="col-12"></navbar-component>
 </div>
 <div class="row" hx-boost="true">
     <div class="col-12 text-center">
         <div>
-            Upload a (Spring) pom.xml / build.gradle, Get a Helm Chart :) <a href="/about">Tell me more ..</a>
+            Helping you get to production faster =) <a href="/about">Tell me more ..</a>
         </div>
     </div>
     <div class="col-12">
-        <div id="outlet" style="margin-top: 1em" class="col-12" th:insert="~{fragments :: first-form}"></div>
+        <div id="outlet" style="margin-top: 2em" class="col-12" th:insert="~{fragments :: first-form}"></div>
         <form id="form"
               hx-encoding="multipart/form-data"
               hx-post="/upload-file"
@@ -130,7 +118,7 @@
         Charts generated: <span th:text="${chartsGenerated}"></span>
     </div>
     <div class="col-4" style="padding-top: 0.9em;">
-        <i>Did you know:</i> You can use <a href="https://helm-start.com/spring">helm-start.com/spring</a> as a
+        <i>Did you know:</i> You can use <a href="https://helmify.me/spring">helmify.me/spring</a> as a
         Spring Initializr URL in your IDE.
     </div>
     <div class="col-4 text-right">

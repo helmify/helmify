@@ -18,50 +18,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 21
-      uses: oracle-actions/setup-java@v1
+    - name: Checkout Helmify
+      uses: actions/checkout@v3
+    - name: Set Build Environment
+      uses: ./.github/actions/setup-build
+    - name: Start Helmify Docker Container
+      uses: ./.github/actions/run-helmify
+    - name: Set up Cluster
+      uses: ./.github/actions/setup-cluster
+    - name: Install Test App with generated Helm Chart and Verify
+      run: |
+        curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT" && \
+        unzip helm.zip -d helm && \
+        cd helm && helm dependency update && \
+        helm install demo . && \
+        cd .. && \
+        mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
+    - name: Deploy Helmify
+      uses: ./.github/actions/deploy-helmify
       with:
-        website: jdk.java.net
-        release: 21
-    - name: Cache local Maven repository
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-    # This is a separate action that sets up buildx runner
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    # So now you can use Actions' own caching!
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-    - name: Build with Maven
-      run: mvn -B clean test spring-boot:build-image --file pom.xml -Dspring-boot.build-image.imageName=helmstart/helm-start
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Push Docker Image
-      run: docker push helmstart/helm-start:latest
-    - name: deploy
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: ${{ secrets.DEPLOY_USERNAME }}
-        key: ${{ secrets.DEPLOY_KEY }}
-        port: ${{ secrets.DEPLOY_PORT }}
-        script: |
-          docker pull helmstart/helm-start:latest && 
-          wget -O docker-compose.yml https://raw.githubusercontent.com/helm-start/helm-start/develop/docker-compose.yml &&
-          docker compose up -d --force-recreate --no-deps helm-start-dev
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    #- name: Update dependency graph
-    #  uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+        dockerhubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+        dockerhubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+        deployHost: ${{ secrets.DEPLOY_HOST }}
+        deployUsername: ${{ secrets.DEPLOY_USERNAME }}
+        deployKey: ${{ secrets.DEPLOY_KEY }}
+        deployPort: ${{ secrets.DEPLOY_PORT }}
+        instance: helmify-dev
+
+

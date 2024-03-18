@@ -31,7 +31,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`tfk.helm-start.com`)
+      - traefik.http.routers.dashboard.rule=Host(`tfk.helmify.me`)
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.routers.dashboard.middlewares=myauth
       - traefik.http.middlewares.myauth.basicauth.users=admin:$$2y$$05$$SSbOnlsTNOKAgKgsN.KvkeGUgdSVq/6Oknishx41WGAzH9GMbdxh2
@@ -39,7 +39,7 @@ services:
       - web
 
   initializr:
-    image: helmstart/spring-initializr:latest
+    image: helmify/spring-initializr:latest
     container_name: spring-initializr
     restart: always
     expose:
@@ -47,14 +47,14 @@ services:
     networks:
       - web
     labels:
-      - traefik.http.routers.start-spring-helm-start.rule=Host(`start-spring.helm-start.com`)
-      - traefik.http.routers.start-spring-helm-start.entrypoints=https
-      - traefik.http.routers.start-spring-helm-start.tls.certresolver=myresolver
+      - traefik.http.routers.start-spring-helmify.rule=Host(`spring.helmify.me`)
+      - traefik.http.routers.start-spring-helmify.entrypoints=https
+      - traefik.http.routers.start-spring-helmify.tls.certresolver=myresolver
       - traefik.enable=true
 
-  helm-start-dev:
-    image: helmstart/helm-start:latest
-    container_name: helm-start-dev
+  helmify-dev:
+    image: helmify/helmify:latest
+    container_name: helmify-dev
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
@@ -65,19 +65,19 @@ services:
     networks:
       - web
     labels:
-      - traefik.http.routers.dev-helm-start.rule=Host(`dev.helm-start.com`)
-      - traefik.http.routers.dev-helm-start.entrypoints=https
-      - traefik.http.routers.dev-helm-start.tls.certresolver=myresolver
+      - traefik.http.routers.dev-helmify.rule=Host(`dev.helmify.me`)
+      - traefik.http.routers.dev-helmify.entrypoints=https
+      - traefik.http.routers.dev-helmify.tls.certresolver=myresolver
       - traefik.enable=true
     volumes:
       - type: bind
-        source: /mnt/volume_fra1_01/helm-start-data/
-        target: /workspace/helm-start-data
+        source: /mnt/volume_fra1_01/helmify-data/
+        target: /workspace/helmify-data
 
 
-  helm-start:
-    image: helmstart/helm-start:prod
-    container_name: helm-start
+  helmify:
+    image: helmify/helmify:prod
+    container_name: helmify
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
@@ -88,15 +88,18 @@ services:
     networks:
       - web
     labels:
-      - traefik.http.routers.helm-start.rule=Host(`helm-start.com`)
-      - traefik.http.routers.helm-start.entrypoints=https
-      - traefik.http.routers.helm-start.tls.certresolver=myresolver
+      - traefik.http.routers.helmify.rule=Host(`helmify.me`)
+      - traefik.http.routers.helmify.entrypoints=https
+      - traefik.http.routers.helmify.tls.certresolver=myresolver
       - traefik.enable=true
     volumes:
       - type: bind
+        source: /mnt/volume_fra1_01/helmify-data/
+        target: /workspace/helmify-data
+      - type: bind
         source: /mnt/volume_fra1_01/helm-start-data/
         target: /workspace/helm-start-data
-
+        
 networks:
   web:
     external: true

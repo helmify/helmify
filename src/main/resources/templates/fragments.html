@@ -5,7 +5,7 @@
 <div th:fragment="first-form">
     <div class="row">
         <div class="col-12 text-center" id="main">
-            <div style="font-size: 1.2em;margin-bottom: 1em;">First upload a Spring Build File</div>
+            <div style="font-size: 1.2em;margin-bottom: 1em;">First upload a Spring/Quarkus Build File</div>
             <div id="upload-btn" class="button" onclick="document.getElementById('upload-input').click()" th:if="${helmContext == null}" >
                 <div>
                     <img src="/icons/gradle.svg" height="200" width="200" style="padding: 1em 2.5em 1em 0.5em; border-right: 1px inset">
@@ -25,23 +25,32 @@
         </div>
         <div class="col-12" th:if="${helmContext != null}">
             <div>
-                <span>This is a <span class="bold">Maven</span> based Application called
+                <div>
+                    This is a <span class="bold">Maven</span> based Application called
                     <span class="bold" th:text="${helmContext.appName}"></span>
+                </div>
+                <div>
                     in Version
                     <span class="bold" th:text="${helmContext.appVersion}"></span>
+                </div>
+                <div>
                     built with
                     <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
-                    <span th:if="${helmContext.createIngress}">
+                </div>
+                <div th:if="${helmContext.createIngress}">
+                    <span >
                         and should be exposed through an <span class="bold">Ingress</span>
                     </span>.
-                    <span th:if="${helmContext.helmDependencies.size() > 0}">
+                </div>
+                <div th:if="${helmContext.dependencyNames.size() > 0}">
+                    <span>
                         It depends on
-                        <span th:each="d,iter : ${helmContext.helmDependencies}">
-                            <span class="bold" th:text="${d.name}"></span>
+                        <span th:each="name,iter : ${helmContext.dependencyNames}">
+                            <span class="bold" th:text="${name}"></span>
                             <span th:if="${iter.last == false}">, </span>
                         </span>
                     </span>
-                </span>
+                </div>
             </div>
             <div style="margin-top: 1em;" th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
         </div>
@@ -83,7 +92,7 @@
                        th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
                        size="30"
                        type="text">
-                <input style="display: none;" id="helmContext" name="helmContext" th:value="${helmContext}"
+                <input style="display: none;" id="sessionId" name="sessionId" th:value="${sessionId}"
                        th:if="${helmContext.customized == false}"
                 >
             </div>
@@ -109,7 +118,7 @@
         </div>
     </div>
     <div class="col-12">
-        <div th:if="${helmContext != null}" style="text-align: center">
+        <div th:if="${zipLink != null}" style="text-align: center">
             <script lang="text/javascript">
                  function handleDlClick () {
                      let el = document.getElementById('notification-text');
@@ -120,13 +129,13 @@
             </script>
             <div
                     onclick="handleDlClick()"
-                    th:if="${helmContext.zipLink != null}"
                     class="primary button helm-dl-btn"
-                    th:text="'Download '+${helmContext.zipLink}"
+                    th:text="'Download '+${zipLink}"
                     hx-trigger="click"
                     hx-ext="json-enc"
-                    th:attrappend="hx-vars='helmContext: '+${helmContext}"
-                    th:attr="hx-post='/download/'+ ${helmContext.zipLink}"
+                    th:attrappend="hx-vars='sessionId: '+${sessionId}"
+                    th:attr="hx-post='/download/'+ ${zipLink}"
+
             >
             </div>
             <div style="margin-top: 2.5em; opacity: 0.5">

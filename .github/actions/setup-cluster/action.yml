@@ -1,0 +1,20 @@
+name: Set Up KinD Cluster
+
+description: Set up a KinD cluster for testing Helm charts
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.1
+    - name: create cluster
+      uses: helm/kind-action@v1.8.0
+    - name: set context
+      run: kubectl config use-context kind-chart-testing
+      shell: bash
+    - name: set context
+      run: kubectl config set-cluster chart-testing
+      shell: bash
+

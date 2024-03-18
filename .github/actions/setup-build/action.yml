@@ -1,0 +1,27 @@
+name: Set Up Helmify Build Environment
+description: Set up the environment for building Helmify
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 21
+      uses: oracle-actions/setup-java@v1
+      with:
+        website: jdk.java.net
+        release: 21
+    - name: Cache local Maven repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-

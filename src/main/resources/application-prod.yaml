@@ -1,5 +1,9 @@
+spring:
+  initializr:
+    host: start.spring.io
+
 server:
   port: 7070
 
-helm-start:
-  data-directory: /workspace/helm-start-data/
+helmify:
+  data-directory: /workspace/helmify-data/
