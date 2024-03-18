@@ -11,16 +11,14 @@ jobs:
   setupCluster:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Helmify
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set Up Cluster
         uses: ./.github/actions/setup-cluster
 
   setupBuild:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Helmify
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set Up Helmify Build Environment
         uses: ./.github/actions/setup-build
 
@@ -28,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setupBuild]
     steps:
+      - uses: actions/checkout@v4
       - name: Start Helmify Docker Container
         uses: ./.github/actions/run-helmify
 
@@ -35,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setupCluster, setupBuild, startHelmify]
     steps:
+      - uses: actions/checkout@v4
       - name: Checkout Helmify E2E Tests
         uses: actions/checkout@v4
         with:
@@ -53,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setupCluster, setupBuild, startHelmify]
     steps:
+      - uses: actions/checkout@v4
       - name: Checkout Helmify E2E Tests
         uses: actions/checkout@v4
         with:
