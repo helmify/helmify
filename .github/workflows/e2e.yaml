@@ -21,12 +21,14 @@ jobs:
           path: testing
 
   setupCluster:
+    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Set Up Cluster
         uses: ./.github/actions/setup-cluster
 
   setupBuild:
+    needs: checkout
     runs-on: ubuntu-latest
     steps:
       - name: Set Up Helmify Build Environment
@@ -34,14 +36,14 @@ jobs:
 
   startHelmify:
     runs-on: ubuntu-latest
-    needs: setupBuild
+    needs: [checkout, setupBuild]
     steps:
       - name: Start Helmify Docker Container
         uses: ./.github/actions/run-helmify
 
   springE2ePostgres:
     runs-on: ubuntu-latest
-    needs: [setupTestRepo, setupCluster, setupBuild, startHelmify]
+    needs: [checkout, setupCluster, setupBuild, startHelmify]
     steps:
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
@@ -53,7 +55,7 @@ jobs:
 
   quarkusE2ePostgres:
     runs-on: ubuntu-latest
-    needs: [setupTestRepo, setupCluster, setupBuild, startHelmify]
+    needs: [checkout, setupCluster, setupBuild, startHelmify]
     steps:
       - name: Run Quarkus Postgres Tester
         uses: ./.github/actions/run-tester
