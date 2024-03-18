@@ -44,4 +44,6 @@ runs:
       run: mvn test -Dtest=KindPingTest -Durl=http://localhost:18080/ping -Dexpected=${{inputs.expect}}
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
-      run: helm uninstall ${{ inputs.name }}
+      run: | 
+        helm uninstall ${{ inputs.name }} \
+        && pkill -f "port-forward"
