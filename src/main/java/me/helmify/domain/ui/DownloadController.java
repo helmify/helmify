@@ -7,6 +7,9 @@ import me.helmify.domain.ChartCountTracker;
 import me.helmify.domain.events.ChartDownloadedEvent;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.chart.HelmChartService;
+import me.helmify.domain.ui.args.HelmifySession;
+import me.helmify.domain.ui.model.SessionInfo;
+import me.helmify.domain.ui.session.SessionService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -38,6 +41,8 @@ public class DownloadController {
 
 	private final ApplicationEventPublisher publisher;
 
+	private final SessionService sessionService;
+
 	private Map<String, ByteArrayResource> cache = new HashMap<>();
 
 	@Getter
@@ -53,8 +58,9 @@ public class DownloadController {
 	 * {@link HelmContext} and caches the resulting zip as a byte array in memory.
 	 */
 	@PostMapping(path = "/download/{name}")
-	public ResponseEntity<?> prepareDownload(@RequestBody DownloadRequest request, @PathVariable("name") String name) {
-		HelmContext helmContext = request.getHelmContext();
+	public ResponseEntity<?> prepareDownload(@HelmifySession SessionInfo sessionInfo,
+			@PathVariable("name") String name) {
+		HelmContext helmContext = sessionInfo.getContext();
 		byte[] byteArray = helmChartService.process(helmContext);
 		ByteArrayResource resource = new ByteArrayResource(byteArray);
 		String uuid = UUID.randomUUID() + "-" + name;

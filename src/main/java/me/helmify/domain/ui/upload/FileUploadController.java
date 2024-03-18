@@ -1,17 +1,14 @@
-package me.helmify.domain.ui;
+package me.helmify.domain.ui.upload;
 
 import lombok.RequiredArgsConstructor;
-import me.helmify.domain.gradle.GradleFileUploadService;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.maven.MavenFileUploadService;
+import me.helmify.domain.ui.model.SessionInfo;
+import me.helmify.domain.ui.session.SessionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Controller for handling upload of a pom.xml / build.gradle file.
@@ -24,9 +21,9 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class FileUploadController {
 
-	private final MavenFileUploadService mavenFileUploadService;
+	private final CompositeFileUploadService fileUploadService;
 
-	private final GradleFileUploadService gradleFileUploadService;
+	private final SessionService sessionService;
 
 	/**
 	 * Method which handles a file upload from the client.
@@ -36,22 +33,17 @@ public class FileUploadController {
 	 * the View Model: {@link Model} to expose to the client.
 	 */
 	@PostMapping("/upload-file")
-	public String uploadFile(Model viewModel, @RequestParam("file") MultipartFile file) throws IOException {
+	public String uploadFile(Model viewModel, @RequestParam("file") MultipartFile file) {
 
 		final String fileName = file.getOriginalFilename();
 		validateFilename(fileName);
 
-		final String buildFile = new String(file.getBytes(), StandardCharsets.UTF_8);
+		HelmContext helmContext = fileUploadService.processUpload(file);
 
-		if (fileName.contains(".gradle")) {
-			HelmContext helmContext = gradleFileUploadService.processBuildFile(buildFile);
-			viewModel.addAttribute("helmContext", helmContext);
-		}
-
-		if (fileName.contains(".xml")) {
-			HelmContext helmContext = mavenFileUploadService.processBuildFile(buildFile);
-			viewModel.addAttribute("helmContext", helmContext);
-		}
+		SessionInfo sessionInfo = SessionInfo.from(helmContext);
+		sessionService.addSession(sessionInfo);
+		viewModel.addAttribute("helmContext", sessionInfo);
+		viewModel.addAttribute("sessionId", sessionInfo.getId());
 
 		return "fragments :: second-form";
 	}

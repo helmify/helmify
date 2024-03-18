@@ -69,4 +69,8 @@ public class GradleFileUploadService implements FileUploadService {
 		return context;
 	}
 
+	public boolean shouldHandle(String filename) {
+		return filename.contains(".gradle");
+	}
+
 }
