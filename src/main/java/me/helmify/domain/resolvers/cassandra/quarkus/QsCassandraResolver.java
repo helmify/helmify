@@ -42,9 +42,9 @@ public class QsCassandraResolver implements CassandraResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "quarkus.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.cassandra }}",
-                "quarkus.cassandra.keyspace", "{{ .Values.cassandra.keyspaceName }}",
-                "quarkus.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
+                "%prod.quarkus.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.cassandra }}",
+                "%prod.quarkus.cassandra.keyspace", "{{ .Values.cassandra.keyspaceName }}",
+                "%prod.quarkus.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
         );
     }
 

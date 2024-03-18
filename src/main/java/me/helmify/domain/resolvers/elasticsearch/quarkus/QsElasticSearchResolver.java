@@ -37,7 +37,7 @@ public class QsElasticSearchResolver implements ElasticSearchResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "quarkus.elasticsearch.hosts",
+                "%prod.quarkus.elasticsearch.hosts",
                 "{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
         );
     }

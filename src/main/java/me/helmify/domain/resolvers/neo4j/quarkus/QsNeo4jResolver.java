@@ -32,7 +32,8 @@ public class QsNeo4jResolver implements Neo4jResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.neo4j.uri", "bolt://{{ .Values.global.hosts.neo4j }}:{{ .Values.global.ports.neo4j }}");
+		return Map.of("%prod.quarkus.neo4j.uri",
+				"bolt://{{ .Values.global.hosts.neo4j }}:{{ .Values.global.ports.neo4j }}");
 	}
 
 }

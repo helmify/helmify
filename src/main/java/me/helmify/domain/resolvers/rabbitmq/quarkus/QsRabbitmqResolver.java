@@ -34,9 +34,9 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"rabbitmq-host", "{{ .Values.global.hosts.rabbitmq }}",
-				"rabbitmq-port", "{{ .Values.global.ports.rabbitmq }}",
-				"rabbitmq-virtual-host", "{{ .Values.rabbitmq.vhost }}"
+				"%prod.rabbitmq-host", "{{ .Values.global.hosts.rabbitmq }}",
+				"%prod.rabbitmq-port", "{{ .Values.global.ports.rabbitmq }}",
+				"%prod.rabbitmq-virtual-host", "{{ .Values.rabbitmq.vhost }}"
 		);
 	}
 

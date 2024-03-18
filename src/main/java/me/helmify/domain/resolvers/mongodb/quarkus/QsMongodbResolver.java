@@ -29,9 +29,9 @@ public class QsMongodbResolver implements MongodbResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.mongodb.connection-string",
+		return Map.of("%prod.quarkus.mongodb.connection-string",
 				"mongodb://{{ .Values.global.hosts.mongodb }}:{{ .Values.global.ports.mongodb }}",
-				"quarkus.mongodb.database", "{{ .Values.mongodb.database }}");
+				"%prod.quarkus.mongodb.database", "{{ .Values.mongodb.database }}");
 	}
 
 }

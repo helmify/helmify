@@ -29,7 +29,7 @@ public class QsRxPostgresResolver implements PostgresResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.datasource.reactive.url",
+		return Map.of("%prod.quarkus.datasource.reactive.url",
 				"vertx-reactive:postgresql://{{ .Values.global.hosts.postgresql }}:{{ .Values.global.ports.postgresql }}/{{ .Values.postgresql.database }}");
 	}
 

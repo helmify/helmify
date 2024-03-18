@@ -27,7 +27,7 @@ public class QsMySqlResolver implements MySqlResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.datasource.jdbc.url",
+		return Map.of("%prod.quarkus.datasource.jdbc.url",
 				"jdbc:mysql://{{ .Values.global.hosts.mysql }}:{{ .Values.global.ports.mysql }}/{{ .Values.mysql.database }}");
 	}
 

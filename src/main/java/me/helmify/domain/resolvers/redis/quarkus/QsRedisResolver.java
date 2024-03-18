@@ -16,7 +16,7 @@ public class QsRedisResolver implements RedisResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.redis.hosts",
+		return Map.of("%prod.quarkus.redis.hosts",
 				"redis://{{ .Values.global.hosts.redis }}:{{ .Values.global.ports.redis }}");
 	}
 

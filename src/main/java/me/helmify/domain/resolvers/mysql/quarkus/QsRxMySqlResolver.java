@@ -27,7 +27,7 @@ public class QsRxMySqlResolver implements MySqlResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.datasource.reactive.url",
+		return Map.of("%prod.quarkus.datasource.reactive.url",
 				"vertx-reactive:mysql://{{ .Values.global.hosts.mysql }}:{{ .Values.global.ports.mysql }}/{{ .Values.mysql.database }}");
 	}
 

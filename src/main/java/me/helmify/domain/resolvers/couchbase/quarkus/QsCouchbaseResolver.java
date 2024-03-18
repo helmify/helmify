@@ -38,7 +38,7 @@ public class QsCouchbaseResolver implements CouchbaseResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "quarkus.couchbase.connection-string","{{ .Values.global.hosts.couchbase }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.couchbase }}"
+                "%prod.quarkus.couchbase.connection-string","{{ .Values.global.hosts.couchbase }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.couchbase }}"
         );
     }
 

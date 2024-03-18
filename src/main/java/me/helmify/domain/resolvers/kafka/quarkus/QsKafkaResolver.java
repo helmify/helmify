@@ -15,7 +15,7 @@ public class QsKafkaResolver implements KafkaResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("mp.messaging.incoming.kafka.bootstrap.servers",
+		return Map.of("%prod.mp.messaging.incoming.kafka.bootstrap.servers",
 				"{{ .Values.global.hosts.kafka }}:{{ .Values.global.ports.kafka }}");
 	}
 

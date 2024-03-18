@@ -29,9 +29,9 @@ public class QsMariadbResolver implements MariaDbResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("quarkus.datasource.jdbc.url",
+		return Map.of("%prod.quarkus.datasource.jdbc.url",
 				"jdbc:mariadb://{{ .Values.global.hosts.mariadb }}:{{ .Values.global.ports.mariadb }}/{{ .Values.mariadb.database }}",
-				"quarkus.datasource.db-kind", "mariadb");
+				"%prod.quarkus.datasource.db-kind", "mariadb");
 	}
 
 	@Override
