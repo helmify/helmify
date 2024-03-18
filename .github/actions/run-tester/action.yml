@@ -35,10 +35,12 @@ runs:
         && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing \
         && helm install ${{ inputs.name }} . \
         && kubectl wait pod --all --for=condition=Ready --timeout=300s
+    - name: Port Forward ${{ inputs.name }} Tester
+      shell: bash
+      run: kubectl port-forward svc/${{inputs.name}} 18080:8080 &
     - name: Ping ${{ inputs.name }} Tester
       shell: bash
-      run: |
-        kubectl port-forward svc/${{inputs.name}} 18080:8080 && mvn test -Dtest=KindPingTest -Durl=http://localhost:18080/ping -Dexpected=${{inputs.expect}}
+      run: mvn test -Dtest=KindPingTest -Durl=http://localhost:18080/ping -Dexpected=${{inputs.expect}}
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
       run: helm uninstall ${{ inputs.name }}
