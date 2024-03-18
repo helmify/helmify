@@ -8,4 +8,6 @@ public interface FileUploadService {
 
 	HelmContext processBuildFile(String buildFile);
 
+	boolean shouldHandle(String filename);
+
 }

@@ -1,7 +1,11 @@
 package me.helmify.domain.ui;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.ui.args.HelmifySession;
+import me.helmify.domain.ui.model.SessionInfo;
+import me.helmify.domain.ui.session.SessionService;
 import me.helmify.util.JsonUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for customizing a {@link HelmContext}.
@@ -19,7 +24,10 @@ import java.util.Map;
  */
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class CustomizationController {
+
+	private final SessionService sessionService;
 
 	/**
 	 * Endpoint for handling customization of an existing {@link HelmContext}.
@@ -29,22 +37,20 @@ public class CustomizationController {
 	 * {@link HelmContext} back into the View Model: {@link Model}
 	 */
 	@PostMapping("/customize")
-	public String customize(@RequestBody Map<String, Object> map, Model viewModel) {
-		log.info("Customization request: {}", map);
-		if (map.containsKey("helmContext")) {
-			String json = map.get("helmContext").toString();
-			HelmContext helmContext = JsonUtil.fromJson(json, HelmContext.class);
-			helmContext.setCustomized(true);
+	public String customize(@HelmifySession SessionInfo info, Model viewModel) {
 
-			helmContext.setCustomizations(
-					new HelmContext.HelmContextCustomization(map.get("dockerImageRepositoryUrl").toString(),
-							map.getOrDefault("dockerImageTag", "latest").toString(),
-							map.getOrDefault("dockerImagePullSecret", "").toString(), Map.of()));
+		HelmContext context = info.getContext();
+		context.setCustomizations(new HelmContext.HelmContextCustomization(info.getDockerImageRepositoryUrl(),
+				Optional.ofNullable(info.getDockerImageTag()).orElse("latest"),
+				Optional.ofNullable(info.getDockerImagePullSecret()).orElse(""), Map.of()));
+		context.setZipLink("helm.zip");
+		context.setCustomized(true);
+		info.setZipLink(context.getZipLink());
+		info.setContext(context);
+		sessionService.addSession(info);
 
-			helmContext.setZipLink("helm.zip");
-			viewModel.addAttribute("helmContext", helmContext);
-		}
-
+		viewModel.addAttribute("sessionId", info.getId());
+		viewModel.addAttribute("zipLink", info.getZipLink());
 		viewModel.addAttribute("customized", true);
 
 		return "fragments :: third-form";

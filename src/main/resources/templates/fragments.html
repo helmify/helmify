@@ -45,8 +45,8 @@
                 <div th:if="${helmContext.dependencyNames.size() > 0}">
                     <span>
                         It depends on
-                        <span th:each="d,iter : ${helmContext.dependencyNames}">
-                            <span class="bold" th:text="${d.name}"></span>
+                        <span th:each="name,iter : ${helmContext.dependencyNames}">
+                            <span class="bold" th:text="${name}"></span>
                             <span th:if="${iter.last == false}">, </span>
                         </span>
                     </span>
@@ -92,7 +92,7 @@
                        th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
                        size="30"
                        type="text">
-                <input style="display: none;" id="helmContext" name="helmContext" th:value="${helmContext}"
+                <input style="display: none;" id="sessionId" name="sessionId" th:value="${sessionId}"
                        th:if="${helmContext.customized == false}"
                 >
             </div>
@@ -118,7 +118,7 @@
         </div>
     </div>
     <div class="col-12">
-        <div th:if="${helmContext != null}" style="text-align: center">
+        <div th:if="${zipLink != null}" style="text-align: center">
             <script lang="text/javascript">
                  function handleDlClick () {
                      let el = document.getElementById('notification-text');
@@ -129,13 +129,13 @@
             </script>
             <div
                     onclick="handleDlClick()"
-                    th:if="${helmContext.zipLink != null}"
                     class="primary button helm-dl-btn"
-                    th:text="'Download '+${helmContext.zipLink}"
+                    th:text="'Download '+${zipLink}"
                     hx-trigger="click"
                     hx-ext="json-enc"
-                    th:attrappend="hx-vars='helmContext: '+${helmContext}"
-                    th:attr="hx-post='/download/'+ ${helmContext.zipLink}"
+                    th:attrappend="hx-vars='sessionId: '+${sessionId}"
+                    th:attr="hx-post='/download/'+ ${zipLink}"
+
             >
             </div>
             <div style="margin-top: 2.5em; opacity: 0.5">

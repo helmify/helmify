@@ -31,4 +31,9 @@ public class MavenFileUploadService implements FileUploadService {
 		return helmContext;
 	}
 
+	@Override
+	public boolean shouldHandle(String filename) {
+		return filename.contains(".xml");
+	}
+
 }
