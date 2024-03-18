@@ -17,12 +17,12 @@ runs:
   using: "composite"
   steps:
     - name: Build  ${{ inputs.name }} Tester
-      if: ${{ inputs.type }} == 'spring'
+      if: ${{ inputs.type  == 'spring' }}
       shell: bash
       run: |
         mvn -B clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=${{ inputs.name }}:0.1.0  --file testing/${{ inputs.name }}/pom.xml
     - name: Build  ${{ inputs.name }} Tester
-      if: ${{ inputs.type }} == 'quarkus'
+      if: ${{ inputs.type  == 'quarkus' }}
       shell: bash
       run: |
         mvn clean compile quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml

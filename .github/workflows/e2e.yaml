@@ -22,13 +22,6 @@ jobs:
         uses: ./.github/actions/setup-build
       - name: Set Up Cluster
         uses: ./.github/actions/setup-cluster
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
       - name: Start Helmify Docker Container
         uses: ./.github/actions/run-helmify
       - name: Run Spring Postgres Tester
