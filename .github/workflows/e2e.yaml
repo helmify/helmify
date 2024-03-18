@@ -15,7 +15,7 @@ jobs:
       - name: Set Up Cluster
         uses: ./.github/actions/setup-cluster
 
-  startHelmify:
+  e2eTestHelmify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
