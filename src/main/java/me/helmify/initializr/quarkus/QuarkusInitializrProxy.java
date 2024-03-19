@@ -40,7 +40,7 @@ public class QuarkusInitializrProxy {
 
 		HttpEntity<Object> entity = new HttpEntity<>(body,
 				new MultiValueMapAdapter<>(Map.of("Content-Type", List.of("application/json"), "Host",
-						List.of("code.quarkus.io"), "User-Agent", List.of("helm-start.com"), "Accept", List.of("*/*"),
+						List.of("code.quarkus.io"), "User-Agent", List.of("helmify.me"), "Accept", List.of("*/*"),
 						"Accept-Encoding", List.of("gzip, deflate, br"))));
 		byte[] response = restTemplate.postForObject("https://code.quarkus.io/api/download", entity, byte[].class);
 

@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class FileDeleteService {
 
-	@Value("${helm-start.data-directory:helm-start-data}")
+	@Value("${helmify.data-directory:helmify-data}")
 	private String dataDirectory;
 
 	@Scheduled(fixedDelay = 1000 * 60 * 60)

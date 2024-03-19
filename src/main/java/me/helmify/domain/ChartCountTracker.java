@@ -20,7 +20,7 @@ public class ChartCountTracker {
 
 	private final ObjectMapper objectMapper;
 
-	@Value("${helm-start.data-directory:helm-start-data}")
+	@Value("${helmify.data-directory:helmify-data}")
 	private String dataDirectory;
 
 	private File getStore() {
