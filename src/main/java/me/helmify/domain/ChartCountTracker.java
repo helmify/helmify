@@ -23,6 +23,9 @@ public class ChartCountTracker {
 	@Value("${helmify.data-directory:helmify-data}")
 	private String dataDirectory;
 
+	@Value("${helmify.instance:dev}")
+	private String instance;
+
 	private File getStore() {
 		try {
 			Path dataDirectory = Paths.get(this.dataDirectory);
@@ -30,7 +33,7 @@ public class ChartCountTracker {
 				Files.createDirectory(dataDirectory);
 			}
 
-			Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count.json");
+			Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count-" + instance + ".json");
 			if (!Files.exists(filePath)) {
 				Files.createFile(filePath);
 				String json = this.objectMapper.writeValueAsString(new ChartCount(0));

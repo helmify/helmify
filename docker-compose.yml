@@ -58,6 +58,7 @@ services:
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
+      HELMIFY_INSTANCE: "dev"
       SERVER_PORT: 7080
       TZ: "Europe/Berlin"
     expose:
@@ -81,6 +82,7 @@ services:
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: "prod"
+      HELMIFY_INSTANCE: "prod"
       SERVER_PORT: 7070
       TZ: "Europe/Berlin"
     expose:
