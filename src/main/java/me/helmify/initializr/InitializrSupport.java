@@ -3,6 +3,7 @@ package me.helmify.initializr;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import me.helmify.domain.FileStoreService;
 import me.helmify.domain.events.ChartDownloadedEvent;
 import me.helmify.domain.gradle.GradleFileUploadService;
 import me.helmify.domain.helm.chart.HelmChartService;
@@ -35,12 +36,16 @@ public class InitializrSupport {
 
 	private final ApplicationEventPublisher publisher;
 
+	private final FileStoreService fileStoreService;
+
 	@SneakyThrows
 	public ByteArrayResource repackStarter(byte[] response) {
 		String uuid = UUID.randomUUID().toString();
-		Path dataDirectory = Paths.get("helmify-data");
-		File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp", uuid).toFile();
+
+		String tmpDir = fileStoreService.getTmpDirectory().toFile().getAbsolutePath();
+		File parentDir = Paths.get(tmpDir, uuid).toFile();
 		parentDir.mkdirs();
+
 		File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
 		helmDir.mkdirs();
 

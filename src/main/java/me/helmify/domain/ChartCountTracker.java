@@ -9,6 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,39 +19,13 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class ChartCountTracker {
 
+	private final FileStoreService fileStoreService;
+
 	private final ObjectMapper objectMapper;
-
-	@Value("${helmify.data-directory:helmify-data}")
-	private String dataDirectory;
-
-	@Value("${helmify.instance:dev}")
-	private String instance;
-
-	private File getStore() {
-		try {
-			Path dataDirectory = Paths.get(this.dataDirectory);
-			if (!Files.exists(dataDirectory)) {
-				Files.createDirectory(dataDirectory);
-			}
-
-			Path filePath = Paths.get(dataDirectory.toFile().getAbsolutePath(), "chart-count-" + instance + ".json");
-			if (!Files.exists(filePath)) {
-				Files.createFile(filePath);
-				String json = this.objectMapper.writeValueAsString(new ChartCount(0));
-				Files.write(filePath, json.getBytes());
-			}
-
-			return filePath.toFile();
-		}
-		catch (Exception e) {
-			log.error("Error getting store", e);
-		}
-		return null;
-	}
 
 	@SneakyThrows
 	public int getChartCount() {
-		File store = this.getStore();
+		File store = this.fileStoreService.getStore();
 		if (store == null)
 			return -1;
 		return Math.max(0, this.objectMapper.readValue(store, ChartCount.class).getChartsGenerated());
@@ -58,7 +33,7 @@ public class ChartCountTracker {
 
 	@SneakyThrows
 	private void setChartCount(int count) {
-		File store = this.getStore();
+		File store = this.fileStoreService.getStore();
 		if (store != null) {
 			objectMapper.writeValue(store, new ChartCount(count));
 		}
