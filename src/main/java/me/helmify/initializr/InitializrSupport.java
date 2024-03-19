@@ -38,7 +38,7 @@ public class InitializrSupport {
 	@SneakyThrows
 	public ByteArrayResource repackStarter(byte[] response) {
 		String uuid = UUID.randomUUID().toString();
-		Path dataDirectory = Paths.get("helm-start-data");
+		Path dataDirectory = Paths.get("helmify-data");
 		File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp", uuid).toFile();
 		parentDir.mkdirs();
 		File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();

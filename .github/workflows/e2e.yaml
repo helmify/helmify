@@ -1,8 +1,8 @@
 name: Helmify E2E Testing
 
 on:
-  push:
-    branches: [ "test-e2e" ]
+  schedule:
+    - cron: '30 5 * * *'
   pull_request:
     branches: [ "main" ]
 
