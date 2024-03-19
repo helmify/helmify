@@ -10,7 +10,7 @@ name: DEV Build
 
 on:
   push:
-    branches: [ "!main" ]
+    branches: [ "develop", "feat**", "*fix**" ]
 
 jobs:
   build:
