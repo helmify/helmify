@@ -8,7 +8,7 @@ class Navbar extends HTMLElement {
             <header id="header">
                 <nav class="nav">
                     <div class="nav-left">
-                        <a class="brand" href="/">HelmifyMe</a>
+                        <a class="brand" href="/">helmify.me</a>
                     </div>
                     <div class="nav-right">
                         <div class="tabs">
