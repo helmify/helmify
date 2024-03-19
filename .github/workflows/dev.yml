@@ -10,9 +10,7 @@ name: DEV Build
 
 on:
   push:
-    branches: [ "develop", "feature/**", "fix/**" ]
-  pull_request:
-    branches: [ "develop" ]
+    branches: [ "!main" ]
 
 jobs:
   build:
