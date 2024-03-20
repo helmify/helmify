@@ -71,7 +71,7 @@ public class QuarkusInitializrProxyTest {
 		this.mvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content(body))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/octet-stream"))
-			.andExpect(header().string("Content-Disposition", "attachment; filename=code-with-quarkus21.zip"))
+			.andExpect(header().string("Content-Disposition", "attachment; filename=starter.zip"))
 			.andDo(result -> {
 				byte[] content = result.getResponse().getContentAsByteArray();
 				assertNotNull(content);

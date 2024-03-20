@@ -1,10 +1,13 @@
 package me.helmify.domain.helm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import me.helmify.domain.FrameworkVendor;
+import me.helmify.domain.helm.chart.model.HelmFile;
 import me.helmify.util.JsonUtil;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Processing Context for a new Helm Chart.
@@ -76,6 +79,19 @@ public class HelmContext {
 	@Getter
 	@Setter
 	private String zipLink;
+
+	public List<HelmFile> getAllExtraFiles() {
+		return Stream
+			.concat(this.getHelmChartSlices()
+				.stream()
+				.filter(HelmChartSlice::hasExtraFiles)
+				.flatMap(f -> f.getExtraFiles().stream()),
+					this.getHelmChartSlices()
+						.stream()
+						.filter(HelmChartSlice::hasExtraSecrets)
+						.flatMap(f -> f.getExtraSecrets().stream()))
+			.toList();
+	}
 
 	public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
 		this.helmChartSlices.add(helmChartSlice);

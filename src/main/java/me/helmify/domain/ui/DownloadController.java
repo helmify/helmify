@@ -1,27 +1,18 @@
 package me.helmify.domain.ui;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import me.helmify.domain.ChartCountTracker;
-import me.helmify.domain.events.ChartDownloadedEvent;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.chart.HelmChartService;
 import me.helmify.domain.ui.args.HelmifySession;
 import me.helmify.domain.ui.model.SessionInfo;
-import me.helmify.domain.ui.session.SessionService;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+import me.helmify.initializr.ZipFileService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * Controller for File Download.
@@ -35,15 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DownloadController {
 
-	private final HelmChartService helmChartService;
-
-	private final ChartCountTracker chartCountTracker;
-
-	private final ApplicationEventPublisher publisher;
-
-	private final SessionService sessionService;
-
-	private Map<String, ByteArrayResource> cache = new HashMap<>();
+	private final ZipFileService zipFileService;
 
 	@Getter
 	@Setter
@@ -57,15 +40,9 @@ public class DownloadController {
 	 * Method for triggering a download. This method triggers processing of the current
 	 * {@link HelmContext} and caches the resulting zip as a byte array in memory.
 	 */
-	@PostMapping(path = "/download/{name}")
-	public ResponseEntity<?> prepareDownload(@HelmifySession SessionInfo sessionInfo,
-			@PathVariable("name") String name) {
-		HelmContext helmContext = sessionInfo.getContext();
-		byte[] byteArray = helmChartService.process(helmContext);
-		ByteArrayResource resource = new ByteArrayResource(byteArray);
-		String uuid = UUID.randomUUID() + "-" + name;
-		cache.put(uuid, resource);
-		return ResponseEntity.ok().header("HX-Redirect", "/download/execute?key=" + uuid).build();
+	@PostMapping(path = "/download")
+	public ResponseEntity<?> prepareDownload(@HelmifySession SessionInfo sessionInfo) {
+		return ResponseEntity.ok().header("HX-Redirect", "/download/execute?sessionId=" + sessionInfo.getId()).build();
 	}
 
 	/**
@@ -74,26 +51,9 @@ public class DownloadController {
 	 * response).
 	 */
 	@GetMapping(path = "/download/execute")
-	public ResponseEntity<Resource> download(@RequestParam("key") String key) {
-		ByteArrayResource resource = cache.remove(key);
-		publisher.publishEvent(new ChartDownloadedEvent());
-		return ResponseEntity.ok()
-			.headers(this.headers("helm.zip"))
-			.contentLength(resource.contentLength())
-			.contentType(MediaType.parseMediaType("application/octet-stream"))
-			.body(resource);
-	}
-
-	/**
-	 * Util method for adding the headers necessary for a file download.
-	 */
-	private HttpHeaders headers(String name) {
-		HttpHeaders header = new HttpHeaders();
-		header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + name);
-		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		header.add("Pragma", "no-cache");
-		header.add("Expires", "0");
-		return header;
+	public void download(@HelmifySession SessionInfo sessionInfo, HttpServletResponse response) throws Exception {
+		HelmContext context = sessionInfo.getContext();
+		zipFileService.streamZip(context, response.getOutputStream());
 	}
 
 }

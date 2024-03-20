@@ -37,4 +37,12 @@ public class HelmChartSlice {
 
 	private String dependencyName;
 
+	public boolean hasExtraFiles() {
+		return extraFiles != null && !extraFiles.isEmpty();
+	}
+
+	public boolean hasExtraSecrets() {
+		return extraSecrets != null && !extraSecrets.isEmpty();
+	}
+
 }

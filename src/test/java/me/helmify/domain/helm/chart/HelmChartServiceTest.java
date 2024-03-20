@@ -3,15 +3,16 @@ package me.helmify.domain.helm.chart;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.maven.MavenModelParser;
 import me.helmify.domain.maven.MavenModelProcessor;
+import me.helmify.domain.ui.upload.CompositeFileUploadService;
+import me.helmify.initializr.ZipFileService;
 import me.helmify.util.TestUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -25,10 +26,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class HelmChartServiceTest {
 
 	@Autowired
-	private HelmChartService service;
+	private MavenModelProcessor mavenModelProcessor;
 
 	@Autowired
-	private MavenModelProcessor mavenModelProcessor;
+	private ZipFileService zipFileService;
+
+	@Autowired
+	private CompositeFileUploadService compositeFileUploadService;
 
 	@Test
 	void process() throws Exception {
@@ -98,11 +102,15 @@ class HelmChartServiceTest {
 		context.setCustomizations(new HelmContext.HelmContextCustomization("test", "latest", null, Map.of()));
 		context.setCustomized(true);
 
-		byte[] process = service.process(context);
-		Files.write(Paths.get("helm.zip"), process);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		zipFileService.streamZip(context, outputStream);
+
+		byte[] byteArray = outputStream.toByteArray();
+
+		Files.write(Paths.get("helm.zip"), byteArray);
 		File helmFile = new File("helm.zip");
 		ZipFile zipFile = new ZipFile(helmFile);
-		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(process));
+		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(byteArray));
 		Map<String, String> contents = new HashMap<>();
 		List<String> names = new ArrayList<>();
 		ZipEntry entry;
@@ -114,18 +122,20 @@ class HelmChartServiceTest {
 			contents.put(name, new String(bytes));
 		}
 
-		assertAll(() -> assertTrue(names.contains("templates/")), () -> assertTrue(names.contains("Chart.yaml")),
-				() -> assertTrue(names.contains("templates/configmap.yaml")),
-				() -> assertTrue(names.contains("templates/deployment.yaml")),
-				() -> assertTrue(names.contains("templates/_helpers.tpl")),
-				() -> assertTrue(names.contains("templates/hpa.yaml")), () -> assertTrue(names.contains(".helmignore")),
-				() -> assertTrue(names.contains("README.MD")),
-				() -> assertTrue(names.contains("templates/ingress.yaml")),
-				() -> assertTrue(names.contains("templates/NOTES.txt")),
-				() -> assertTrue(names.contains("templates/secrets.yaml")),
-				() -> assertTrue(names.contains("templates/serviceaccount.yaml")),
-				() -> assertTrue(names.contains("templates/service.yaml")),
-				() -> assertTrue(names.contains("values.yaml")));
+		assertAll(() -> assertTrue(names.contains("helm/templates/")),
+				() -> assertTrue(names.contains("helm/Chart.yaml")),
+				() -> assertTrue(names.contains("helm/templates/configmap.yaml")),
+				() -> assertTrue(names.contains("helm/templates/deployment.yaml")),
+				() -> assertTrue(names.contains("helm/templates/_helpers.tpl")),
+				() -> assertTrue(names.contains("helm/templates/hpa.yaml")),
+				() -> assertTrue(names.contains("helm/.helmignore")),
+				() -> assertTrue(names.contains("helm/README.MD")),
+				() -> assertTrue(names.contains("helm/templates/ingress.yaml")),
+				() -> assertTrue(names.contains("helm/templates/NOTES.txt")),
+				() -> assertTrue(names.contains("helm/templates/secrets.yaml")),
+				() -> assertTrue(names.contains("helm/templates/serviceaccount.yaml")),
+				() -> assertTrue(names.contains("helm/templates/service.yaml")),
+				() -> assertTrue(names.contains("helm/values.yaml")));
 
 		assertTrue(contents.keySet().containsAll(names));
 
@@ -135,7 +145,7 @@ class HelmChartServiceTest {
 	}
 
 	private static void checkDeploymentYaml(Map<String, String> contents) {
-		String deploymentYaml = contents.get("templates/deployment.yaml");
+		String deploymentYaml = contents.get("helm/templates/deployment.yaml");
 
 		// look for init containers
 		assertTrue(deploymentYaml.contains("-neo4jchecker"));
@@ -189,7 +199,7 @@ class HelmChartServiceTest {
 	}
 
 	private static void checkConfigMapYaml(Map<String, String> contents) {
-		String configmapYaml = contents.get("templates/configmap.yaml");
+		String configmapYaml = contents.get("helm/templates/configmap.yaml");
 		assertTrue(configmapYaml.contains("  application.properties: |-"));
 		assertTrue(configmapYaml.contains("    spring.application.name="));
 		assertTrue(configmapYaml.contains("    spring.rabbitmq.virtual-host="));
@@ -205,7 +215,7 @@ class HelmChartServiceTest {
 	}
 
 	private static void checkChartYaml(HelmContext context, Map<String, String> contents) {
-		String chartYaml = contents.get("Chart.yaml");
+		String chartYaml = contents.get("helm/Chart.yaml");
 		assertTrue(chartYaml.contains("name: " + context.getAppName()));
 		assertTrue(chartYaml.contains("appVersion: " + context.getAppVersion()));
 		assertTrue(chartYaml.contains("type: application"));

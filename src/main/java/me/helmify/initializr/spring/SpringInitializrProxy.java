@@ -1,16 +1,22 @@
 package me.helmify.initializr.spring;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import me.helmify.domain.ui.upload.CompositeFileUploadService;
 import me.helmify.initializr.InitializrSupport;
-import me.helmify.util.DownloadUtil;
+import me.helmify.initializr.ZipFileService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -23,13 +29,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
-public class SpringInitializrProxy {
-
-	private final InitializrSupport initializrSupport;
+public class SpringInitializrProxy extends InitializrSupport {
 
 	@Value("${spring.initializr.host}")
 	private String initializrHost;
+
+	public SpringInitializrProxy(CompositeFileUploadService fileUploadService, ZipFileService zipFileService) {
+		super(fileUploadService, zipFileService);
+	}
 
 	private String getInitializrHost() {
 		return String.format("https://%s/", this.initializrHost);
@@ -47,9 +54,8 @@ public class SpringInitializrProxy {
 	}
 
 	@GetMapping(value = "/spring/starter.zip")
-	public ResponseEntity<?> getStarter(HttpServletRequest request) throws IOException {
-
-		RestTemplate restTemplate = new RestTemplate();
+	public void getStarter(@RequestParam("artifactId") String artifactId, @RequestParam("version") String version,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		Map<String, List<String>> collected = request.getParameterMap()
 			.keySet()
@@ -61,20 +67,15 @@ public class SpringInitializrProxy {
 			.build()
 			.toUri();
 
-		ResponseEntity<byte[]> forEntity = restTemplate.getForEntity(uri, byte[].class);
+		RestClient r = RestClient.builder().build();
 
-		if (forEntity.getStatusCode().is2xxSuccessful() && forEntity.getBody() != null) {
+		byte[] originalStarter = r.get().uri(uri).retrieve().body(new ParameterizedTypeReference<byte[]>() {
+		});
 
-			ByteArrayResource merged = this.initializrSupport.repackStarter(forEntity.getBody());
+		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
+		response.setContentType("application/octet-stream");
+		streamStarter(originalStarter, response.getOutputStream(), artifactId, version);
 
-			return ResponseEntity.ok()
-				.headers(DownloadUtil.headers("starter.zip"))
-				.contentLength(merged.contentLength())
-				.contentType(MediaType.parseMediaType("application/octet-stream"))
-				.body(merged);
-		}
-
-		return ResponseEntity.internalServerError().build();
 	}
 
 }

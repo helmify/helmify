@@ -1,115 +1,67 @@
 package me.helmify.initializr.quarkus;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import me.helmify.domain.ui.upload.CompositeFileUploadService;
 import me.helmify.initializr.InitializrSupport;
-import me.helmify.util.DownloadUtil;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
+import me.helmify.initializr.ZipFileService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
-public class QuarkusInitializrProxy {
+public class QuarkusInitializrProxy extends InitializrSupport {
 
-	private final InitializrSupport in;
+	private static final String quarkusStreamApiUrl = "https://code.quarkus.io/api/streams";
 
-	private final RestTemplate restTemplate;
+	private static final String quarkusExtensionsApiUrl = "https://code.quarkus.io/api/extensions/stream/%s?platformOnly=%s";
+
+	private static final String quarkusDownloadUrl = "https://code.quarkus.io/api/download";
+
+	private final RestClient r;
+
+	public QuarkusInitializrProxy(CompositeFileUploadService fileUploadService, ZipFileService zipFileService) {
+		super(fileUploadService, zipFileService);
+		this.r = RestClient.builder().build();
+	}
 
 	@GetMapping(value = "/quarkus/api/streams")
 	public Object getCapabilities() {
-		return restTemplate.getForObject("https://code.quarkus.io/api/streams", Object.class);
+		return r.get().uri(quarkusStreamApiUrl).retrieve().body(objectType);
+	}
+
+	@GetMapping(value = "/quarkus/api/extensions")
+	public Object getExtensions() {
+		return r.get().uri("https://code.quarkus.io/api/extensions").retrieve().body(objectType);
 	}
 
 	@GetMapping(value = "/quarkus/api/extensions/stream/{version}")
 	public Object getExtensions(@PathVariable String version, @RequestParam("platformOnly") boolean platformOnly) {
-		String url = "https://code.quarkus.io/api/extensions/stream/%s?platformOnly=%s";
-		return restTemplate.getForObject(String.format(url, version, platformOnly), Object.class);
+		return r.get().uri(String.format(quarkusExtensionsApiUrl, version, platformOnly)).retrieve().body(objectType);
 	}
 
 	@PostMapping(value = "/quarkus/api/download")
-	public Object getStarter(@RequestBody Map<String, Object> body) {
+	public void getStarter(@RequestBody Map<String, Object> body, HttpServletResponse response) throws IOException {
+		byte[] originalStarter = r.post()
+			.uri(quarkusDownloadUrl)
+			.body(body)
+			.contentType(MediaType.APPLICATION_JSON)
+			.header("Host", "code.quarkus.io")
+			.header("User-Agent", "helmify.me")
+			.header("Accept", "*/*")
+			.header("Accept-Encoding", "gzip, deflate, br")
+			.retrieve()
+			.body(byteArrayType);
 
-		HttpEntity<Object> entity = new HttpEntity<>(body,
-				new MultiValueMapAdapter<>(Map.of("Content-Type", List.of("application/json"), "Host",
-						List.of("code.quarkus.io"), "User-Agent", List.of("helmify.me"), "Accept", List.of("*/*"),
-						"Accept-Encoding", List.of("gzip, deflate, br"))));
-		byte[] response = restTemplate.postForObject("https://code.quarkus.io/api/download", entity, byte[].class);
-
-		if (response != null) {
-
-			ByteArrayResource merged = this.in.repackStarter(response);
-
-			return ResponseEntity.ok()
-				.headers(DownloadUtil.headers(body.getOrDefault("artifactId", "starter") + ".zip"))
-				.contentLength(merged.contentLength())
-				.contentType(MediaType.parseMediaType("application/octet-stream"))
-				.body(merged);
-		}
-
-		return ResponseEntity.internalServerError().build();
+		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
+		response.setContentType("application/octet-stream");
+		streamStarter(originalStarter, response.getOutputStream(), body.get("artifactId").toString(),
+				body.get("version").toString());
 	}
-
-	// @GetMapping(value = "/spring/starter.zip")
-	// public ResponseEntity<?> getStarter(HttpServletRequest request) throws IOException
-	// {
-	//
-	// RestTemplate restTemplate = new RestTemplate();
-	//
-	// Map<String, List<String>> collected = request.getParameterMap()
-	// .keySet()
-	// .stream()
-	// .collect(Collectors.toMap(k -> k, k ->
-	// Arrays.asList(request.getParameterMap().get(k))));
-	//
-	// URI uri = UriComponentsBuilder.fromHttpUrl("https://start.spring.io/starter.zip")
-	// .queryParams(new MultiValueMapAdapter<>(collected))
-	// .build()
-	// .toUri();
-	//
-	// ResponseEntity<byte[]> forEntity = restTemplate.getForEntity(uri, byte[].class);
-	//
-	// if (forEntity.getStatusCode().is2xxSuccessful() && forEntity.getBody() != null) {
-	//
-	// byte[] body = forEntity.getBody();
-	// String uuid = UUID.randomUUID().toString();
-	// Path dataDirectory = Paths.get("helm-start-data");
-	// File parentDir = Paths.get(dataDirectory.toFile().getAbsolutePath(), "tmp",
-	// uuid).toFile();
-	// parentDir.mkdirs();
-	// File helmDir = Paths.get(parentDir.getAbsolutePath(), "helm").toFile();
-	// helmDir.mkdirs();
-	//
-	// org.zeroturnaround.zip.ZipUtil.unpack(new ByteArrayInputStream(body), parentDir);
-	//
-	// ByteArrayResource helmChart = this.generateHelmChart(new ByteArrayResource(body));
-	//
-	// org.zeroturnaround.zip.ZipUtil.unpack(helmChart.getInputStream(), helmDir);
-	//
-	// ByteArrayOutputStream outputStream = new ByteArrayOutputStream(body.length);
-	//
-	// org.zeroturnaround.zip.ZipUtil.pack(parentDir, outputStream);
-	//
-	// ByteArrayResource merged = new ByteArrayResource(outputStream.toByteArray());
-	//
-	// publisher.publishEvent(new ChartDownloadedEvent());
-	//
-	// return ResponseEntity.ok()
-	// .headers(DownloadUtil.headers("starter.zip"))
-	// .contentLength(merged.contentLength())
-	// .contentType(MediaType.parseMediaType("application/octet-stream"))
-	// .body(merged);
-	// }
-	//
-	// return ResponseEntity.internalServerError().build();
-	// }
 
 }

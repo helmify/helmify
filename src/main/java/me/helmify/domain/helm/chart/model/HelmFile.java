@@ -9,12 +9,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class HelmFile {
 
-	@Getter
 	@Setter
 	protected String fileName;
 
 	@Getter
 	@Setter
 	protected String content;
+
+	public String getFileName() {
+		return "templates/" + fileName;
+	}
 
 }
