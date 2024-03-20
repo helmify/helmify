@@ -30,7 +30,7 @@ jobs:
         unzip helm.zip -d helm && \
         cd helm/helm && helm dependency update && \
         helm install demo . && \
-        cd .. && \
+        cd ../.. && \
         mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
     - name: Deploy Helmify
       uses: ./.github/actions/deploy-helmify
