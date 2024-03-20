@@ -1,5 +1,6 @@
 package me.helmify.initializr;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.ui.upload.CompositeFileUploadService;
@@ -22,11 +23,12 @@ public class InitializrSupport {
 	protected static final ParameterizedTypeReference<Object> objectType = new ParameterizedTypeReference<>() {
 	};
 
-	protected void streamStarter(byte[] originalStarter, OutputStream out, String artifactId, String version) {
+	protected void streamStarter(byte[] originalStarter, HttpServletResponse response, String artifactId,
+			String version, String filename) {
 		if (originalStarter != null) {
 			String buildFile = ZipUtil.tryReadBuildFile(new ByteArrayInputStream(originalStarter)).orElseThrow();
 			HelmContext helmContext = fileUploadService.processBuildfile(buildFile, artifactId, version);
-			zipFileService.streamZip(helmContext, originalStarter, out);
+			zipFileService.streamZip(helmContext, originalStarter, response, filename);
 		}
 	}
 

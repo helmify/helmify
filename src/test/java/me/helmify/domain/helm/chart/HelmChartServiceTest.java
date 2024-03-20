@@ -1,5 +1,8 @@
 package me.helmify.domain.helm.chart;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletResponse;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.maven.MavenModelParser;
 import me.helmify.domain.maven.MavenModelProcessor;
@@ -9,6 +12,7 @@ import me.helmify.util.TestUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -102,10 +106,53 @@ class HelmChartServiceTest {
 		context.setCustomizations(new HelmContext.HelmContextCustomization("test", "latest", null, Map.of()));
 		context.setCustomized(true);
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		zipFileService.streamZip(context, outputStream);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		byte[] byteArray = outputStream.toByteArray();
+		HttpServletResponse mock = Mockito.mock(HttpServletResponse.class);
+		Mockito.when(mock.getOutputStream()).thenReturn(new ServletOutputStream() {
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener(WriteListener listener) {
+
+			}
+
+			@Override
+			public void write(int b) throws IOException {
+				baos.write(b);
+			}
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				baos.write(b, off, len);
+			}
+
+			@Override
+			public void write(byte[] b) throws IOException {
+				baos.write(b);
+			}
+
+			@Override
+			public void flush() throws IOException {
+				baos.flush();
+			}
+
+			@Override
+			public void close() throws IOException {
+				baos.close();
+			}
+
+			public byte[] toByteArray() {
+				return baos.toByteArray();
+			}
+		});
+
+		zipFileService.streamZip(context, mock, "helm.zip");
+
+		byte[] byteArray = baos.toByteArray();
 
 		Files.write(Paths.get("helm.zip"), byteArray);
 		File helmFile = new File("helm.zip");

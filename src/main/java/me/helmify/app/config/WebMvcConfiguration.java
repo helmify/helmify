@@ -33,7 +33,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 				if (response.getStatus() == 200 && response.containsHeader("Content-Disposition"))
 					eventPublisher.publishEvent(new ChartDownloadedEvent());
 			}
-		}).addPathPatterns("/api/**");
+		}).addPathPatterns("/**/*");
 	}
 
 	@Override

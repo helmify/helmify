@@ -60,8 +60,8 @@ public class QuarkusInitializrProxy extends InitializrSupport {
 
 		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
 		response.setContentType("application/octet-stream");
-		streamStarter(originalStarter, response.getOutputStream(), body.get("artifactId").toString(),
-				body.get("version").toString());
+		streamStarter(originalStarter, response, body.get("artifactId").toString(), body.get("version").toString(),
+				"starter.zip");
 	}
 
 }

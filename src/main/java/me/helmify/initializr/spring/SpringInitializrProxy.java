@@ -74,7 +74,7 @@ public class SpringInitializrProxy extends InitializrSupport {
 
 		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
 		response.setContentType("application/octet-stream");
-		streamStarter(originalStarter, response.getOutputStream(), artifactId, version);
+		streamStarter(originalStarter, response, artifactId, version, "starter.zip");
 
 	}
 

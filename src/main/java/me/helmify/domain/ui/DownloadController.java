@@ -53,7 +53,7 @@ public class DownloadController {
 	@GetMapping(path = "/download/execute")
 	public void download(@HelmifySession SessionInfo sessionInfo, HttpServletResponse response) throws Exception {
 		HelmContext context = sessionInfo.getContext();
-		zipFileService.streamZip(context, response.getOutputStream());
+		zipFileService.streamZip(context, response, "helm.zip");
 	}
 
 }

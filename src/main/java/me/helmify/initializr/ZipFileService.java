@@ -1,10 +1,13 @@
 package me.helmify.initializr;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.chart.providers.HelmFileProvider;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -24,11 +27,15 @@ public class ZipFileService {
 	private final List<HelmFileProvider> providers;
 
 	@SneakyThrows
-	public void streamZip(HelmContext context, OutputStream outputStream) {
+	public void streamZip(HelmContext context, HttpServletResponse response, String filename) {
 
+		OutputStream outputStream = response.getOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(outputStream);
 		ByteArrayInputStream in = new ByteArrayInputStream(new byte[0]);
 		addHelmFiles(context, zos, in);
+
+		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+		response.setContentType("application/octet-stream");
 
 		zos.flush();
 		zos.close();
@@ -36,8 +43,8 @@ public class ZipFileService {
 	}
 
 	@SneakyThrows
-	public void streamZip(HelmContext context, byte[] originalStarter, OutputStream outputStream) {
-		final ZipOutputStream zos = new ZipOutputStream(outputStream);
+	public void streamZip(HelmContext context, byte[] originalStarter, HttpServletResponse response, String filename) {
+		final ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
 
 		Optional.of(originalStarter)
 			.map(ByteArrayInputStream::new)
@@ -45,9 +52,12 @@ public class ZipFileService {
 			.map(bytes -> addHelmFiles(context, zos, bytes))
 			.ifPresent(bytes -> {
 				try {
+					response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+					response.setContentType("application/octet-stream");
+
 					zos.flush();
 					zos.close();
-					outputStream.flush();
+					response.getOutputStream().flush();
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e);

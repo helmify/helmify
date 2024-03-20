@@ -27,7 +27,7 @@ public class CliApi {
 			@RequestBody String buildFileContents, HttpServletResponse response) throws IOException {
 
 		HelmContext helmContext = fileUploadService.processBuildfile(buildFileContents, name, version);
-		zipFileService.streamZip(helmContext, response.getOutputStream());
+		zipFileService.streamZip(helmContext, response, "helm.zip");
 	}
 
 }
