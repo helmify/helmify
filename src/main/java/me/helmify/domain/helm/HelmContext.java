@@ -1,8 +1,7 @@
 package me.helmify.domain.helm;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import me.helmify.domain.FrameworkVendor;
+import me.helmify.domain.helm.resolvers.FrameworkVendor;
 import me.helmify.domain.helm.chart.model.HelmFile;
 import me.helmify.util.JsonUtil;
 

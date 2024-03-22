@@ -2,7 +2,7 @@ package me.helmify.domain.helm.chart.providers;
 
 import lombok.RequiredArgsConstructor;
 import me.helmify.app.config.YamlConfig;
-import me.helmify.domain.FrameworkVendor;
+import me.helmify.domain.helm.resolvers.FrameworkVendor;
 import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.util.HelmUtil;
@@ -11,8 +11,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.util.List;
 
-import static me.helmify.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
-import static me.helmify.domain.helm.chart.customizers.TemplateStringPatcher.removeBetween;
+import static me.helmify.domain.helm.chart.TemplateStringPatcher.insertAfter;
+import static me.helmify.domain.helm.chart.TemplateStringPatcher.removeBetween;
 
 @Component
 @RequiredArgsConstructor

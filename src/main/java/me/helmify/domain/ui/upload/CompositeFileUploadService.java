@@ -2,11 +2,11 @@ package me.helmify.domain.ui.upload;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import me.helmify.domain.FileUploadService;
-import me.helmify.domain.gradle.GradleFileUploadService;
+import me.helmify.domain.build.FileUploadService;
+import me.helmify.domain.build.gradle.GradleFileUploadService;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.maven.MavenFileUploadService;
-import me.helmify.domain.maven.MavenModelParser;
+import me.helmify.domain.build.maven.MavenFileUploadService;
+import me.helmify.domain.build.maven.MavenModelParser;
 import me.helmify.util.GradleUtil;
 import org.apache.maven.api.model.Model;
 import org.springframework.stereotype.Component;
