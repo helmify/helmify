@@ -3,7 +3,7 @@ package me.helmify.app.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import me.helmify.domain.helm.resolvers.DependencyResolver;
+import me.helmify.domain.helm.dependencies.DependencyResolver;
 import me.helmify.domain.ui.counter.ChartDownloadedEvent;
 import me.helmify.app.annotations.args.HelmifySessionArgumentResolver;
 import me.helmify.domain.ui.session.SessionService;

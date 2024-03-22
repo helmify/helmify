@@ -1,5 +1,6 @@
 package me.helmify.domain.helm.chart.model;
 
+import me.helmify.domain.helm.model.HelmSecret;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package me.helmify.domain.helm.chart.providers;
 
 import lombok.RequiredArgsConstructor;
 import me.helmify.app.config.YamlConfig;
-import me.helmify.domain.helm.resolvers.FrameworkVendor;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.util.HelmUtil;

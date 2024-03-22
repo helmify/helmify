@@ -1,6 +1,6 @@
 package me.helmify.util;
 
-import me.helmify.domain.helm.resolvers.FrameworkVendor;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 
 import java.util.Arrays;
 import java.util.List;

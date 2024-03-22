@@ -2,7 +2,7 @@ package me.helmify.domain.helm.chart.providers;
 
 import lombok.RequiredArgsConstructor;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.chart.model.HelmValues;
+import me.helmify.domain.helm.model.HelmValues;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 

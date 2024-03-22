@@ -1,6 +1,6 @@
 package me.helmify.domain.helm.chart.providers;
 
-import me.helmify.domain.helm.resolvers.FrameworkVendor;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.chart.TemplateStringPatcher;
 import me.helmify.util.HelmUtil;

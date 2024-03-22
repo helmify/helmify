@@ -1,8 +1,8 @@
 package me.helmify.domain.helm;
 
 import lombok.*;
-import me.helmify.domain.helm.resolvers.FrameworkVendor;
-import me.helmify.domain.helm.chart.model.HelmFile;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
+import me.helmify.domain.helm.model.HelmFile;
 import me.helmify.util.JsonUtil;
 
 import java.util.*;
