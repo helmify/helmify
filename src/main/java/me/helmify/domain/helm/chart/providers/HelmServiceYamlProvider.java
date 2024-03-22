@@ -5,7 +5,7 @@ import me.helmify.domain.helm.HelmContext;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
 
-import static me.helmify.domain.helm.chart.customizers.TemplateStringPatcher.insertAfter;
+import static me.helmify.domain.helm.chart.TemplateStringPatcher.insertAfter;
 
 @Component
 @RequiredArgsConstructor

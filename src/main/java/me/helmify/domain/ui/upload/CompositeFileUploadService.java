@@ -2,15 +2,17 @@ package me.helmify.domain.ui.upload;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import me.helmify.domain.FileUploadService;
-import me.helmify.domain.gradle.GradleFileUploadService;
+import me.helmify.domain.build.FileUploadService;
+import me.helmify.domain.build.gradle.GradleFileUploadService;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.maven.MavenFileUploadService;
+import me.helmify.domain.build.maven.MavenFileUploadService;
+import me.helmify.domain.build.maven.MavenModelParser;
+import me.helmify.util.GradleUtil;
+import org.apache.maven.api.model.Model;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.stream.Stream;
 
 @Component
@@ -28,6 +30,33 @@ public class CompositeFileUploadService {
 		FileUploadService service = chooseService(originalFilename);
 		final String buildFile = new String(file.getBytes(), StandardCharsets.UTF_8);
 		return service.processBuildFile(buildFile);
+	}
+
+	@SneakyThrows
+	public HelmContext processBuildfile(String buildFile) {
+		boolean isXml = buildFile.contains("<?xml");
+		String originalFilename = isXml ? "pom.xml" : "build.gradle";
+		FileUploadService service = chooseService(originalFilename);
+
+		String appName, appVersion;
+		if (isXml) {
+			Model model = MavenModelParser.parsePom(buildFile).orElseThrow();
+			appName = model.getArtifactId();
+			appVersion = model.getVersion();
+		}
+		else {
+			appName = GradleUtil.extractName(buildFile);
+			appVersion = GradleUtil.extractVersion(buildFile);
+		}
+
+		return service.processBuildFile(buildFile, appName, appVersion);
+	}
+
+	@SneakyThrows
+	public HelmContext processBuildfile(String buildFile, String name, String version) {
+		String originalFilename = buildFile.contains("<?xml") ? "pom.xml" : "build.gradle";
+		FileUploadService service = chooseService(originalFilename);
+		return service.processBuildFile(buildFile, name, version);
 	}
 
 	private static void validateFilename(String fileName) {

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import me.helmify.domain.helm.chart.customizers.TemplateStringPatcher;
+import me.helmify.domain.helm.chart.TemplateStringPatcher;
 import me.helmify.util.HelmUtil;
 
 @NoArgsConstructor

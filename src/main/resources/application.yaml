@@ -2,7 +2,7 @@ spring:
   application:
     name: helmify
   initializr:
-    host: start.spring.io
+    host: spring.helmify.me
   devtools:
     restart:
       additional-paths: src/main/resources/static

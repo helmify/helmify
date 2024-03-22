@@ -28,9 +28,9 @@ jobs:
       run: |
         curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT" && \
         unzip helm.zip -d helm && \
-        cd helm && helm dependency update && \
+        cd helm/helm && helm dependency update && \
         helm install demo . && \
-        cd .. && \
+        cd ../.. && \
         mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
     - name: Deploy Helmify
       uses: ./.github/actions/deploy-helmify
