@@ -105,28 +105,29 @@
     </div>
 
 </div>
-<div class="row" id="footer" style="padding-top: 0.5em; ">
+<div class="row" id="footer" style="padding-top: 0.5em; background-color: #333">
     <div class="col-2 text-left" style="padding-top: 0.5em; padding-bottom: 0.5em">
         <span id="notification-text"></span>
     </div>
     <div class="col-8 text-center" style="padding: 0.5em;">
-        Supported Technologies: Maven, Gradle, <span th:text="${supportedDependencies}"></span>
+        Supported Technologies: Spring, Quarkus, Maven, Gradle,
+        <span th:each="name,iter : ${supportedDependencies}">
+                            <span th:text="${name}"></span>
+                            <span th:if="${name != '' && iter.last == false}">, </span>
+                        </span>
     </div>
     <div class="col-2"></div>
     <div class="col-12" style="border-bottom: 0.1rem solid #d1d1d1;"></div>
-    <div class="col-4 text-left" style="padding-top: 0.9em;">
+    <div class="col-4 text-left" style="padding-top: 0.5em;">
         Charts generated: <span th:text="${chartsGenerated}"></span>
     </div>
-    <div class="col-4" style="padding-top: 0.9em;">
+    <div class="col-4" style="padding-top: 0.5em;">
         <i>Did you know:</i> You can use <a href="https://helmify.me/spring">helmify.me/spring</a> as a
         Spring Initializr URL in your IDE.
     </div>
-    <div class="col-4 text-right">
+    <div class="col-4 text-right" style="padding-top: 0.5em;">
         <div>
             Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
-        </div>
-        <div>
-            Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
         </div>
     </div>
 </div>
@@ -154,5 +155,8 @@
         }
     }
 </script>
+<div style="display: none;position:absolute;bottom: 10px;right: 310px;">
+    Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
+</div>
 </body>
 </html>

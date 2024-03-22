@@ -19,82 +19,96 @@
     </div>
 </div>
 <div th:fragment="second-form">
-    <div class="row">
-        <div class="col-12 text-center">
-            <div style="font-size: 1.2em;">App Summary</div>
-        </div>
-        <div class="col-12" th:if="${helmContext != null}">
-            <div>
+    <div class="row" th:if="${helmContext != null}">
+        <div class="col-4">
+            <div style="text-align: left">
                 <div>
-                    This is a <span class="bold">Maven</span> based Application called
-                    <span class="bold" th:text="${helmContext.appName}"></span>
+                    App Summary
                 </div>
                 <div>
-                    in Version
-                    <span class="bold" th:text="${helmContext.appVersion}"></span>
-                </div>
-                <div>
-                    built with
-                    <span class="bold" th:text="${helmContext.frameworkVendor}"></span>
-                </div>
-                <div th:if="${helmContext.createIngress}">
-                    <span >
-                        and should be exposed through an <span class="bold">Ingress</span>
-                    </span>.
+                    <label for="appName">Name</label>
+                    <input type="text" class="disabled-input" id="appName" disabled th:value="${helmContext.appName}"/>
+                    <label for="appVersion">Version</label>
+                    <input type="text" class="disabled-input" id="appVersion" disabled
+                           th:value="${helmContext.appVersion}"/>
+                    <label for="appFramework">Framework</label>
+                    <input type="text" class="disabled-input" id="appFramework" disabled
+                           th:value="${helmContext.frameworkVendor}"/>
+                    <label for="isWebapp">Is WebApp</label>
+                    <input type="text" class="disabled-input" id="isWebapp" disabled
+                           th:value="${helmContext.createIngress ? 'Yes': 'No'}"/>
+
                 </div>
                 <div th:if="${helmContext.dependencyNames.size() > 0}">
                     <span>
-                        It depends on
+                        Dependencies:
                         <span th:each="name,iter : ${helmContext.dependencyNames}">
                             <span class="bold" th:text="${name}"></span>
-                            <span th:if="${iter.last == false}">, </span>
+                            <span th:if="${name != '' && iter.last == false}">, </span>
                         </span>
                     </span>
                 </div>
             </div>
-            <div style="margin-top: 1em;" th:if="${helmContext != null}" th:insert="~{fragments :: customization-input-form}"></div>
+        </div>
+        <div class="col-4">
+            <div th:insert="~{fragments :: customization-input-form}"></div>
         </div>
     </div>
 </div>
 
 <div th:fragment="customization-input-form">
+    <div>Docker Image</div>
+
     <form id="dockerImageForm"
           hx-post="/customize"
           hx-ext="json-enc"
           hx-target="#outlet"
     >
-        <div th:if="${helmContext.customized == false}" class="text-error" style="font-size: 1.2em;">Inputs required:</div>
-        <div th:if="${helmContext.customized == true}" class="text-success" style="font-size: 1.2em;">Inputs provided:</div>
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <h5>Docker Image Coordinates</h5>
-            <div style="width: 300px;">
+        <div style="display: flex; flex-direction: column; justify-content: start; align-items: normal;">
+            <div>
                 <label for="imageUrl">Docker Image Repository URL</label>
-                <input type="text"
-                       th:value="${helmContext.appName}"
-                       th:disabled="${helmContext.customized == true}"
-                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                       name="dockerImageRepositoryUrl"
-                       size="30"
-                       id="imageUrl">
+                <div style="display: flex">
+                    <span style="padding: 10px;">&#9998;</span>
+                    <input type="text"
+                           autofocus
+                           th:value="${helmContext.appName}"
+                           th:disabled="${helmContext.customized == true}"
+                           th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                           name="dockerImageRepositoryUrl"
+                           size="30"
+                           id="imageUrl">
+                </div>
             </div>
-            <div style="margin-top: 1em; width: 300px;">
+            <div>
                 <label for="imageTag">Docker Image Tag</label>
-                <input id="imageTag" th:value="${helmContext.appVersion}" name="dockerImageTag"
-                       th:disabled="${helmContext.customized == true}"
-                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                       size="30"
-                       type="text">
+                <div style="display: flex">
+                    <span style="padding: 10px;">&#9998;</span>
+                    <input id="imageTag" th:value="${helmContext.appVersion}" name="dockerImageTag"
+                           th:disabled="${helmContext.customized == true}"
+                           th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                           size="30"
+                           type="text">
+                </div>
             </div>
-            <div style="margin-top: 1em; width: 300px;">
+            <div>
                 <label for="imagePullSecret">Docker Image Pull Secret (optional)</label>
-                <input id="imagePullSecret" th:value="''" name="dockerImagePullSecret"
-                       th:disabled="${helmContext.customized == true}"
-                       th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
-                       size="30"
-                       type="text">
-                <input style="display: none;" id="sessionId" name="sessionId" th:value="${sessionId}"
-                       th:if="${helmContext.customized == false}"
-                >
+                <div style="display: flex">
+                    <span style="padding: 10px;">&#9998;</span>
+                    <input id="imagePullSecret" th:value="''" name="dockerImagePullSecret"
+                           th:disabled="${helmContext.customized == true}"
+                           th:styleappend="${helmContext.customized == true ? 'color: white' : ''}"
+                           size="30"
+                           type="text">
+                </div>
+            </div>
+            <div style="padding-left: 2.15em">
+                <label for="chartFlavor">Chart Flavor</label>
+                <div style="display: flex">
+                    <select id="chartFlavor" name="chartFlavor" th:disabled="${helmContext.customized == true}">
+                        <option value="helm">Helm Create</option>
+                        <option value="bitnami">Bitnami</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -107,6 +121,11 @@
             >
                 <span th:text="${helmContext.customized ? 'Submitted' : 'Submit'}"></span>
             </button>
+        </div>
+        <div style="display: none">
+            <input style="display: none;" id="sessionId" name="sessionId" th:value="${sessionId}"
+                   th:if="${helmContext.customized == false}"
+            >
         </div>
     </form>
 </div>
