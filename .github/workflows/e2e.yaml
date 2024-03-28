@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main"]
   push:
-    branches: [ "feature/bitnamis-charts" ]
+    branches: [ "feature/bitnami-charts" ]
 
 jobs:
 
