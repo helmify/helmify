@@ -19,8 +19,10 @@ public class QsRxPostgresResolver implements PostgresResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "QUARKUS_DATASOURCE_USERNAME", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "QUARKUS_DATASOURCE_PASSWORD", context.getAppName()));
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "QUARKUS_DATASOURCE_USERNAME",
+						context.getAppName()),
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "QUARKUS_DATASOURCE_PASSWORD",
+						context.getAppName()));
 	}
 
 	public Map<String, Object> getSecretEntries() {
