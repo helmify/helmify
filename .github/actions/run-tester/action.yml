@@ -32,20 +32,6 @@ runs:
       run: |
         mvn clean compile quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml \
         && docker tag runner/${{ inputs.name }}:0.1.0 ${{ inputs.name }}:0.1.0
-    - name: Deploy ${{ inputs.name }} Tester
-      uses: ./.github/actions/deploy-tester
-      with:
-          name: ${{ inputs.name }}
-          chartFlavor: "helm"
-    - name: Port Forward ${{ inputs.name }} Tester
-      shell: bash
-      run: kubectl port-forward svc/${{inputs.name}} ${{inputs.port}}:8080 &
-    - name: Ping ${{ inputs.name }} Tester
-      shell: bash
-      run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
-    - name: Uninstall ${{ inputs.name }} Tester
-      shell: bash
-      run: helm uninstall ${{ inputs.name }}
     - name: Deploy ${{ inputs.name }} ${{ inputs.chartFlavor }} Tester
       uses: ./.github/actions/deploy-tester
       with:
