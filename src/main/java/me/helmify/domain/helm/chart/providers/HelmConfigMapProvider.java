@@ -61,8 +61,7 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 			String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.healthcheck"
 					: ".Values.healthcheck.port";
 
-			String exposureInclude = "bitnami".equals(chartFlavor) ? "\"*\""
-					: "*";
+			String exposureInclude = "bitnami".equals(chartFlavor) ? "\"*\"" : "*";
 
 			if (vendor.equals(FrameworkVendor.Spring)) {
 				patch.append("management.server.port={{ %s }}\n".formatted(portExpression));
