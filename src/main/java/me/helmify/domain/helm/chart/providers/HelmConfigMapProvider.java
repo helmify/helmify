@@ -6,6 +6,8 @@ import me.helmify.domain.helm.chart.TemplateStringPatcher;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class HelmConfigMapProvider implements HelmFileProvider {
 
@@ -55,25 +57,36 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 		// set separate port for actuator, we don't want to expose actuator through an
 		// ingress
 		if (context.isHasActuator()) {
+			String chartFlavor = context.getChartFlavor();
+			String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.healthcheck"
+					: ".Values.healthcheck.port";
+
 			if (vendor.equals(FrameworkVendor.Spring)) {
-				patch.append("management.server.port={{ .Values.healthcheck.port }}\n");
+				patch.append("management.server.port={{ %s }}\n".formatted(portExpression));
+				patch.append("management.endpoints.web.exposure.include=\"*\"\n".formatted(portExpression));
 			}
 
 			if (vendor.equals(FrameworkVendor.Quarkus)) {
 				patch.append("quarkus.management.enabled=true\n");
-				patch.append("quarkus.management.port={{ .Values.healthcheck.port }}\n");
+				patch.append("quarkus.management.port={{ %s }}\n".formatted(portExpression));
 			}
 
 		}
 
 		// set server port
 		if (context.isCreateIngress()) {
+
+			String chartFlavor = context.getChartFlavor();
+			String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.http"
+					: ".Vales.service.port";
+
 			if (vendor.equals(FrameworkVendor.Spring)) {
-				patch.append("server.port={{ .Values.service.port }}\n");
+
+				patch.append("server.port={{ %s }}\n".formatted(portExpression));
 			}
 
 			if (vendor.equals(FrameworkVendor.Quarkus)) {
-				patch.append("quarkus.http.port={{ .Values.service.port }}\n");
+				patch.append("quarkus.http.port={{ %s }}\n".formatted(portExpression));
 			}
 		}
 
@@ -84,8 +97,26 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 				.append("quarkus.log.console.format=%d{HH:mm:ss} %-5p [%c] %s%e%n\n");
 		}
 
-		return HelmUtil
-			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helmify:configmap", patch.toString(), 4));
+		String string = patch.toString();
+		String filled = HelmUtil
+			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helmify:configmap", string, 4));
+
+		if ("bitnami".equals(context.getChartFlavor())) {
+			filled = filled.lines().map(line -> {
+				if (line.contains("  application-prod.properties: |"))
+					return "";
+				// convert property notation to env var notation
+				if (line.contains(".") && line.contains("=")) {
+					String[] split = line.split("=");
+					return "  " + (split[0].toUpperCase().replaceAll("\\.", "_") + ": \"" + split[1] + "\"")
+						.replaceAll("\"\"", "\"")
+						.trim();
+				}
+				return line;
+			}).filter(line -> !line.trim().isEmpty()).collect(Collectors.joining("\r\n"));
+		}
+
+		return filled;
 	}
 
 	@Override

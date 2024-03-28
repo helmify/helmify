@@ -98,12 +98,12 @@ public class HelmContext {
 
 	public void addHelmChartFragment(HelmChartSlice helmChartSlice) {
 		this.helmChartSlices.add(helmChartSlice);
-		Map<String, String> preferredChart = helmChartSlice.getPreferredChart();
+		Map<String, Object> preferredChart = helmChartSlice.getPreferredChart();
 		this.addDependencyName(helmChartSlice.getDependencyName());
 
 		if (preferredChart != null && !preferredChart.isEmpty()) {
-			this.addHelmDependency(new HelmDependency(preferredChart.get("name"), preferredChart.get("version"),
-					preferredChart.get("repository"), List.of()));
+			this.addHelmDependency(new HelmDependency(preferredChart.get("name").toString(),
+					preferredChart.get("version").toString(), preferredChart.get("repository").toString(), List.of()));
 
 			Map<String, Object> valuesBlocks = helmChartSlice.getValuesEntries();
 			if (valuesBlocks.containsKey("global")) {

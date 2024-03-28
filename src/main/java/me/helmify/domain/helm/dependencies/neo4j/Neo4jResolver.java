@@ -43,7 +43,7 @@ public interface Neo4jResolver extends DependencyResolver {
         );
     }
     @Override
-    default Map<String, String> getPreferredChart() {
+    default Map<String, Object> getPreferredChart() {
         return Map.of(
                 "name", "neo4j",
                 "version", "5.12.0",

@@ -13,7 +13,7 @@ public interface RedisResolver extends DependencyResolver {
 	}
 
 	@Override
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "redis", "version", "18.1.2", "repository", "https://charts.bitnami.com/bitnami");
 	}
 

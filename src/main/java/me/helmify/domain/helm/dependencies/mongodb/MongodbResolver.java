@@ -22,7 +22,7 @@ public interface MongodbResolver extends DependencyResolver {
 						Map.of("mongodb", 27017)));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "mongodb", "version", "14.0.11", "repository", "https://charts.bitnami.com/bitnami");
 	}
 

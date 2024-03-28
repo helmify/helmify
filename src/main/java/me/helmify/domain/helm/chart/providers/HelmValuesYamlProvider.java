@@ -57,16 +57,6 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 		return stringBuffer.toString();
 	}
 
-	private Map<Object, Object> stringBufferAsYaml(StringBuffer buffer) {
-		try {
-			return yaml.loadAs(buffer.toString(), Map.class);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return new HashMap<>();
-		}
-	}
-
 	private void mergeValuesGlobalsBlocks(HelmContext context, StringBuffer buffer) {
 		Map<Object, Object> globalMap = new HashMap<>();
 

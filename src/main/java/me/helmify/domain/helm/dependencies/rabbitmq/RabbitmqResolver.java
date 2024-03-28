@@ -21,7 +21,7 @@ public interface RabbitmqResolver extends DependencyResolver {
 						Map.of("rabbitmq", 5672)));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "rabbitmq", "version", "11.9.0", "repository", "https://charts.bitnami.com/bitnami");
 	}
 

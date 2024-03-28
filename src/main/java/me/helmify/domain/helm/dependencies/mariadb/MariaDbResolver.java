@@ -21,7 +21,7 @@ public interface MariaDbResolver extends DependencyResolver {
 						Map.of("mariadb", 3306)));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "mariadb", "version", "14.0.3", "repository", "https://charts.bitnami.com/bitnami");
 	}
 

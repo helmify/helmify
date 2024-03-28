@@ -10,7 +10,7 @@ public interface PostgresResolver extends DependencyResolver {
 
 	//@formatter:off
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of(
 				"name", "postgresql",
 				"version", "11.9.2",

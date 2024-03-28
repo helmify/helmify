@@ -33,7 +33,7 @@ public interface CouchbaseResolver extends DependencyResolver {
                                 "couchbase", getPort())));
     }
 
-    default Map<String, String> getPreferredChart() {
+    default Map<String, Object> getPreferredChart() {
         return Map.of(  );
     }
 

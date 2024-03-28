@@ -3,6 +3,7 @@ Copyright VMware, Inc.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
+{{- if .Values.%%MAIN_OBJECT_BLOCK%%.enableDaemonSet }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -114,6 +115,8 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+            - name: healthcheck
+              containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.healthcheck }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.resources }}
           resources: {{- toYaml .Values.%%MAIN_OBJECT_BLOCK%%.resources | nindent 12 }}
           {{- end }}
@@ -123,16 +126,16 @@ spec:
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
-              path: /
-              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+              path: /actuator/health/liveness
+              port: healthcheck
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
-              path: /
-              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+              path: /actuator/health/readiness
+              port: healthcheck
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks "context" $) | nindent 12 }}
@@ -162,3 +165,4 @@ spec:
         {{- if .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
+  {{- end }}

@@ -35,6 +35,9 @@ spec:
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   {{- end }}
   ports:
+    - name: healthcheck
+      port: {{ .Values.service.ports.healthcheck }}
+      protocol: TCP
     - name: http
       port: {{ .Values.service.ports.http }}
       {{- if not (eq .Values.service.ports.http .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http) }}

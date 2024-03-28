@@ -23,7 +23,7 @@ public class HelmChartSlice {
 
 	private Map<String, String> defaultConfig;
 
-	private Map<String, String> preferredChart;
+	private Map<String, Object> preferredChart;
 
 	private Map<String, Object> valuesEntries;
 

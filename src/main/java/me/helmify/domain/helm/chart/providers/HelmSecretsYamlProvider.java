@@ -22,8 +22,7 @@ public class HelmSecretsYamlProvider implements HelmFileProvider {
 			""";
 
 	@Override
-	public String getFileContent(HelmContext context) {
-		String template = HelmSecretsYamlProvider.template.replace("REPLACEME", context.getAppName());
+	public String patchContent(String content, HelmContext context) {
 		StringBuffer patch = new StringBuffer();
 
 		context.getHelmChartSlices()
@@ -32,8 +31,14 @@ public class HelmSecretsYamlProvider implements HelmFileProvider {
 			.flatMap(f -> f.getSecretEntries().entrySet().stream())
 			.forEach(e -> patch.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
 
-		String patched = TemplateStringPatcher.insertAfter(template, "###@helmify:secrets", patch.toString(), 2);
+		String patched = TemplateStringPatcher.insertAfter(content, "###@helmify:secrets", patch.toString(), 2);
 		return HelmUtil.removeMarkers(patched);
+	}
+
+	@Override
+	public String getFileContent(HelmContext context) {
+		String template = HelmSecretsYamlProvider.template.replace("REPLACEME", context.getAppName());
+		return patchContent(template, context);
 	}
 
 	@Override

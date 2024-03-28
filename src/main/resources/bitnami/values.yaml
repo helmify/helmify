@@ -109,8 +109,9 @@ diagnosticMode:
   ## @param %%MAIN_OBJECT_BLOCK%%.containerPorts.https %%MAIN_CONTAINER_NAME%% HTTPS container port
   ##
   containerPorts:
-    http: 80
+    http: 8080
     https: 443
+    healthcheck: 8090
   ## Configure extra options for %%MAIN_CONTAINER_NAME%% containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param %%MAIN_OBJECT_BLOCK%%.livenessProbe.enabled Enable livenessProbe on %%MAIN_CONTAINER_NAME%% containers
@@ -364,6 +365,18 @@ diagnosticMode:
   ##
   initContainers: []
 
+  ## @param enableDaemonSet Enable DaemonSet instead of Deployment for %%MAIN_CONTAINER_NAME%% pods
+  ##
+  enableDaemonSet: false
+
+  ## @param enableStatefulSet Enable StatefulSet instead of Deployment for %%MAIN_CONTAINER_NAME%% pods
+  ##
+  enableStatefulSet: false
+
+  ## @param @enableReplicaSet Enable ReplicaSet instead of Deployment for %%MAIN_CONTAINER_NAME%% pods
+  ##
+  enableReplicaSet: true
+
 ## %%SECONDARY_CONTAINER/POD_DESCRIPTION%%
 ##
 %%SECONDARY_OBJECT_BLOCK%%:
@@ -384,8 +397,9 @@ service:
   ## @param service.ports.https %%MAIN_CONTAINER_NAME%% service HTTPS port
   ##
   ports:
-    http: 80
+    http: 8080
     https: 443
+    healthcheck: 8090
   ## Node ports to expose
   ## @param service.nodePorts.http Node port for HTTP
   ## @param service.nodePorts.https Node port for HTTPS

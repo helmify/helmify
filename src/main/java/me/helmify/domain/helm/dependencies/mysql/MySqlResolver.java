@@ -20,7 +20,7 @@ public interface MySqlResolver extends DependencyResolver {
 				Map.of("hosts", Map.of("mysql", context.getAppName() + "-mysql"), "ports", Map.of("mysql", 3306)));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "mysql", "version", "9.12.5", "repository", "https://charts.bitnami.com/bitnami");
 	}
 

@@ -16,7 +16,7 @@ public interface ElasticSearchResolver extends DependencyResolver {
 						Map.of("elasticsearch", getPort())));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "elasticsearch", "version", "19.19.3", "repository",
 				"https://charts.bitnami.com/bitnami");
 	}

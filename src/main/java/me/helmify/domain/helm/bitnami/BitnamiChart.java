@@ -1,8 +1,8 @@
 package me.helmify.domain.helm.bitnami;
 
 import me.helmify.domain.helm.chart.providers.HelmConfigMapProvider;
+import me.helmify.domain.helm.chart.providers.HelmSecretsYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmValuesYamlProvider;
-import me.helmify.util.HelmUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.yaml.snakeyaml.Yaml;
@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BitnamiChart {
 
@@ -79,7 +78,15 @@ public class BitnamiChart {
 		postProcessChartsYaml(files, context);
 		postProcessValuesYaml(files, context);
 		postProcessConfigMap(files, context);
+		postProcessSecrets(files, context);
 
+	}
+
+	private static void postProcessSecrets(Map<String, String> files, BitnamiChartContext context) {
+		String secretsFile = "templates/secrets.yaml";
+		String secrets = files.get(secretsFile);
+		String patchedSecrets = new HelmSecretsYamlProvider().patchContent(secrets, context.getOriginalContext());
+		files.put(secretsFile, patchedSecrets);
 	}
 
 	private static void postProcessConfigMap(Map<String, String> files, BitnamiChartContext context) {
@@ -98,7 +105,36 @@ public class BitnamiChart {
 			.collect(Collectors.joining("\r\n"));
 		clean = clean.replaceAll("## @section", "\r\n## @section");
 		clean = new HelmValuesYamlProvider(new Yaml()).patchContent(clean, context.getOriginalContext());
-		files.put("values.yaml", clean);
+
+		StringBuffer buf = new StringBuffer(clean);
+
+		context.getOriginalContext()
+			.getHelmChartSlices()
+			.stream()
+			.filter(slice -> !slice.getValuesEntries().isEmpty())
+			.forEach(slice -> {
+				Map<String, Object> valuesEntries = new HashMap<>(slice.getValuesEntries());
+				if (valuesEntries.containsKey("global")) {
+					valuesEntries.remove("global");
+					String valuesBlock = new Yaml().dumpAsMap(valuesEntries);
+
+					buf.append("\r\n")
+						.append("\r\n")
+						.append("## @section ")
+						.append(slice.getDependencyName())
+						.append(" Parameters\r\n")
+						.append(valuesBlock);
+				}
+			});
+
+		String appName = context.getOriginalContext().getAppName();
+
+		String string = buf.toString()
+			.replace("fullnameOverride: \"\"", "fullnameOverride: \"%s\"".formatted(appName))
+			.replace("extraEnvVarsSecret: \"\"", "extraEnvVarsSecret: \"%s\"".formatted(appName))
+			.replace("extraEnvVarsCM: \"\"", "extraEnvVarsCM: \"%s\"".formatted(appName));
+
+		files.put("values.yaml", string);
 	}
 
 	private static void postProcessChartsYaml(Map<String, String> files, BitnamiChartContext context) {
@@ -108,7 +144,15 @@ public class BitnamiChart {
 		map.put("appVersion", context.getOriginalContext().getAppVersion());
 		map.put("description", "Bitnami Helm Chart for " + context.getOriginalContext().getAppName());
 		map.put("name", context.getChartName());
-		files.put("Chart.yaml", yaml.dump(map));
+		List<Map<String, Object>> dependencies = (List<Map<String, Object>>) map.get("dependencies");
+
+		context.getOriginalContext()
+			.getHelmChartSlices()
+			.stream()
+			.filter(slice -> Objects.nonNull(slice.getPreferredChart()) && !slice.getPreferredChart().isEmpty())
+			.forEach(slice -> dependencies.add(slice.getPreferredChart()));
+
+		files.put("Chart.yaml", yaml.dumpAsMap(map));
 	}
 
 	private String getResourceContent(Resource resource) {

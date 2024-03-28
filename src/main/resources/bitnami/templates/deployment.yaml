@@ -3,6 +3,7 @@ Copyright VMware, Inc.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
+{{- if .Values.%%MAIN_OBJECT_BLOCK%%.enableReplicaSet }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -127,6 +128,8 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+            - name: healthcheck
+              containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.healthcheck }}
             - name: https
               containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.https }}
           {{- if not .Values.diagnosticMode.enabled }}
@@ -135,24 +138,24 @@ spec:
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
-              path: /
-              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+              path: /actuator/health/liveness
+              port: healthcheck
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
-              path: /
-              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+              path: /actuator/health/readiness
+              port: healthcheck
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customStartupProbe }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customStartupProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.startupProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
-              path: /
-              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
+              path: /actuator/health/readiness
+              port: healthcheck
           {{- end }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks }}
@@ -181,3 +184,4 @@ spec:
         {{- if .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
+  {{- end }}

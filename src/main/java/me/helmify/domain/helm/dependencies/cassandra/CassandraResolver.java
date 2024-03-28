@@ -41,7 +41,7 @@ public interface CassandraResolver extends DependencyResolver {
 								"cassandra", getPort())));
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return Map.of(
 				"name", "cassandra",
 				"version", "10.11.2",

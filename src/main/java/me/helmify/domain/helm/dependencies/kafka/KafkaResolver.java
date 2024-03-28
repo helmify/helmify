@@ -28,7 +28,7 @@ public interface KafkaResolver extends DependencyResolver {
         );
     }
 
-    default Map<String, String> getPreferredChart() {
+    default Map<String, Object> getPreferredChart() {
         return Map.of(
                 "name", "kafka",
                 "version", "26.4.2",

@@ -15,7 +15,7 @@ public interface HelmChartSliceBuilder {
 		return new HashMap<>();
 	}
 
-	default Map<String, String> getPreferredChart() {
+	default Map<String, Object> getPreferredChart() {
 		return new HashMap<>();
 	}
 
