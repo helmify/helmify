@@ -72,8 +72,7 @@ spec:
         - name: volume-permissions
           image: {{ include "%%TEMPLATE_NAME%%.volumePermissions.image" . }}
           imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
-          command:
-            - %%commands%%
+          command: []
           securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.volumePermissions.containerSecurityContext "context" $) | nindent 12 }}
           {{- if .Values.volumePermissions.resources }}
           resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
@@ -135,19 +134,25 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
+            httpGet:
+              path: /
+              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
+            httpGet:
+              path: /
+              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customStartupProbe }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customStartupProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.startupProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
+            httpGet:
+              path: /
+              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- end }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks }}

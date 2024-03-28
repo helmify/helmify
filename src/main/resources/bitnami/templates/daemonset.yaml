@@ -63,8 +63,7 @@ spec:
         - name: volume-permissions
           image: {{ include "%%TEMPLATE_NAME%%.volumePermissions.image" . }}
           imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
-          command:
-            - %%commands%%
+          command: []
           securityContext:
             runAsUser: 0
           {{- if .Values.volumePermissions.resources }}
@@ -99,9 +98,7 @@ spec:
           {{- end }}
           env:
             - name: BITNAMI_DEBUG
-              value: {{ ternary "true" "false" (or .Values.image.debug .Values.diagnosticMode.enabled) | quote }}
-            - name: foo
-              value: bar
+              value: {{ ternary "true" "false" (or .Values.%%MAIN_OBJECT_BLOCK%%.image.debug .Values.diagnosticMode.enabled) | quote }}
             {{- if .Values.%%MAIN_OBJECT_BLOCK%%.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
@@ -115,8 +112,8 @@ spec:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.extraEnvVarsSecret "context" $) }}
             {{- end }}
           ports:
-            - containerPort: foo
-              protocol: bar
+            - name: http
+              containerPort: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.resources }}
           resources: {{- toYaml .Values.%%MAIN_OBJECT_BLOCK%%.resources | nindent 12 }}
           {{- end }}
@@ -125,11 +122,17 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.%%MAIN_OBJECT_BLOCK%%.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: {{ .Values.%%MAIN_OBJECT_BLOCK%%.containerPorts.http }}
           {{- end }}
           {{- if .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.lifecycleHooks "context" $) | nindent 12 }}

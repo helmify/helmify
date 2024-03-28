@@ -15,4 +15,4 @@ metadata:
   {{- end }}
 data:
   %%CONFIG_FILE_NAME%%: |
-  # Config file
+  ###@helmify:configmap

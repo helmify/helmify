@@ -31,6 +31,11 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 		return HelmUtil.removeMarkers(customize(filledTemplate, context));
 	}
 
+	@Override
+	public String patchContent(String content, HelmContext context) {
+		return HelmUtil.removeMarkers(customize(content, context));
+	}
+
 	private String customize(String content, HelmContext context) {
 		StringBuffer patch = new StringBuffer();
 		context.getHelmChartSlices()

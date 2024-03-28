@@ -21,7 +21,7 @@ Return the proper image name (for the init container volume-permissions image)
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "%%TEMPLATE_NAME%%.imagePullSecrets" -}}
-{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.%%MAIN_OBJECT_BLOCK%%.image .Values.%%SECONDARY_OBJECT_BLOCK%%.image .Values.volumePermissions.image) "context" $) -}}
+{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.%%MAIN_OBJECT_BLOCK%%.image  .Values.volumePermissions.image) "context" $) -}}
 {{- end -}}
 
 {{/*
@@ -50,8 +50,6 @@ Compile all warnings into a single message.
 */}}
 {{- define "%%TEMPLATE_NAME%%.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "%%TEMPLATE_NAME%%.validateValues.foo" .) -}}
-{{- $messages := append $messages (include "%%TEMPLATE_NAME%%.validateValues.bar" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 

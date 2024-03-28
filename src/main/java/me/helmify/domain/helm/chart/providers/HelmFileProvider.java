@@ -17,6 +17,10 @@ public interface HelmFileProvider {
 	 */
 	String getFileContent(HelmContext context);
 
+	default String patchContent(String content, HelmContext context) {
+		return content;
+	}
+
 	/**
 	 * Returns the name of the file under which the contents from getFileContent should be
 	 * stored

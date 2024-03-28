@@ -1,11 +1,12 @@
 package me.helmify.domain.ui;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.bitnami.BitnamiChart;
+import me.helmify.domain.helm.bitnami.BitnamiChartContext;
 import me.helmify.domain.helm.chart.providers.HelmFileProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -115,18 +116,42 @@ public class ZipFileService {
 		String helmDir = addHelmDir(bytes, zos);
 		addTemplatesDir(helmDir, zos);
 
-		providers.forEach(p -> {
-			String fileContent = p.getFileContent(context);
-			String fileName = p.getFileName();
-			addZipEntry(helmDir + fileName, fileContent, zos);
-		});
+		switch (context.getChartFlavor()) {
+			case "bitnami" -> {
+				log.info("Creating Bitnami Chart {}", context.getAppName());
+				BitnamiChartContext bitnamiContext = BitnamiChartContext.from(context);
+				BitnamiChart bitnamiChart = new BitnamiChart();
+				bitnamiChart.load();
+				bitnamiChart.populateBitnamiChart(bitnamiContext).forEach((key, value) -> {
+					try {
+						addZipEntry(helmDir + key, value, zos);
+					}
+					catch (Exception e) {
+						log.error("Error while processing file: {}", key, e);
+					}
+				});
 
-		context.getAllExtraFiles().forEach(extraFile -> {
-			String fileContent = extraFile.getContent();
-			String fileName = helmDir + extraFile.getFileName();
-			log.info("Adding extra file {}", fileName);
-			addZipEntry(fileName, fileContent, zos);
-		});
+			}
+			case "custom" -> {
+				log.info("Creating Helm Chart {}", context.getAppName());
+
+				providers.forEach(p -> {
+					String fileContent = p.getFileContent(context);
+					String fileName = p.getFileName();
+					addZipEntry(helmDir + fileName, fileContent, zos);
+				});
+
+				context.getAllExtraFiles().forEach(extraFile -> {
+					String fileContent = extraFile.getContent();
+					String fileName = helmDir + extraFile.getFileName();
+					log.info("Adding extra file {}", fileName);
+					addZipEntry(fileName, fileContent, zos);
+				});
+			}
+			default -> {
+				throw new IllegalArgumentException("Unsupported chart flavor: " + context.getChartFlavor());
+			}
+		}
 
 		return zos;
 	}
@@ -158,6 +183,7 @@ public class ZipFileService {
 
 	private void addZipEntry(String filename, String content, ZipOutputStream zipOutputStream) {
 		ZipEntry zipEntry = new ZipEntry(filename);
+		log.debug("Adding Zip Entry {} with {} bytes", filename, content.getBytes().length);
 		try {
 			zipOutputStream.putNextEntry(zipEntry);
 			zipOutputStream.write(content.getBytes());

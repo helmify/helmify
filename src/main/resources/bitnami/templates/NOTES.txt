@@ -29,5 +29,4 @@ In order to replicate the container startup scripts execute this command:
 {{- end }}
 
 {{- include "common.warnings.rollingTag" .Values.%%MAIN_OBJECT_BLOCK%%.image }}
-{{- include "common.warnings.rollingTag" .Values.%%OTHER_OBJECT_BLOCK%%.image }}
 {{- include "%%TEMPLATE_NAME%%.validateValues" . }}

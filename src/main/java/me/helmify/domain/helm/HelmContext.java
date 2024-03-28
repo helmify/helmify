@@ -79,6 +79,10 @@ public class HelmContext {
 	@Setter
 	private String zipLink;
 
+	@Getter
+	@Setter
+	private String chartFlavor;
+
 	public List<HelmFile> getAllExtraFiles() {
 		return Stream
 			.concat(this.getHelmChartSlices()
