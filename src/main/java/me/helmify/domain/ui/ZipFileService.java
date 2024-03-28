@@ -132,7 +132,7 @@ public class ZipFileService {
 				});
 
 			}
-			case "custom" -> {
+			case "helm" -> {
 				log.info("Creating Helm Chart {}", context.getAppName());
 
 				providers.forEach(p -> {

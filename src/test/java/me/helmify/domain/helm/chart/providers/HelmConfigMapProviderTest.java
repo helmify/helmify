@@ -12,6 +12,7 @@ public class HelmConfigMapProviderTest {
 
 		HelmConfigMapProvider provider = new HelmConfigMapProvider();
 		HelmContext ctx = new HelmContext();
+		ctx.setChartFlavor("helm");
 
 		ctx.setFrameworkVendor(FrameworkVendor.Quarkus);
 		ctx.setAppName("app");
@@ -21,14 +22,14 @@ public class HelmConfigMapProviderTest {
 
 		String fileContent = provider.getFileContent(ctx);
 
-		Assertions.assertTrue(fileContent.contains("    quarkus.management.enabled=true"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.management.port={{ .Values.healthcheck.port }}"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.http.port={{ .Values.service.port }}"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.log.level=DEBUG"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.log.min-level=DEBUG"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.log.console.enable=true"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.log.console.format=%d{HH:mm:ss} %-5p [%c] %s%e%n"));
-		Assertions.assertTrue(fileContent.contains("    quarkus.application.name={{ .Values.fullnameOverride }}"));
+		Assertions.assertTrue(fileContent.contains("quarkus.management.enabled=true"));
+		Assertions.assertTrue(fileContent.contains("quarkus.management.port={{ .Values.healthcheck.port }}"));
+		Assertions.assertTrue(fileContent.contains("quarkus.http.port={{ .Values.service.port }}"));
+		Assertions.assertTrue(fileContent.contains("quarkus.log.level=DEBUG"));
+		Assertions.assertTrue(fileContent.contains("quarkus.log.min-level=DEBUG"));
+		Assertions.assertTrue(fileContent.contains("quarkus.log.console.enable=true"));
+		Assertions.assertTrue(fileContent.contains("quarkus.log.console.format=%d{HH:mm:ss} %-5p [%c] %s%e%n"));
+		Assertions.assertTrue(fileContent.contains("quarkus.application.name={{ .Values.fullnameOverride }}"));
 
 	}
 

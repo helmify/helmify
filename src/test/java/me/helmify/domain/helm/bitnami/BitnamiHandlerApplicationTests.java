@@ -1,5 +1,7 @@
 package me.helmify.domain.helm.bitnami;
 
+import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -22,6 +24,11 @@ class BitnamiHandlerApplicationTests {
 		context.setConfigFileName("config-file-name");
 		context.setMainObjectBlock("mainObjectBlock");
 
+		HelmContext originalContext = new HelmContext();
+		originalContext.setAppName("test-chart");
+		originalContext.setFrameworkVendor(FrameworkVendor.Spring);
+		context.setOriginalContext(originalContext);
+
 		Map<String, String> stringStringMap = bitnamiChart.populateBitnamiChart(context);
 
 		Path helmchart = Paths.get("helmchart-" + System.nanoTime());
@@ -36,7 +43,7 @@ class BitnamiHandlerApplicationTests {
 				path = Paths.get(helmchart.toFile().getAbsolutePath(), key);
 			}
 			else {
-				path = Paths.get(helmchart.toFile().getAbsolutePath(), "templates", key);
+				path = Paths.get(helmchart.toFile().getAbsolutePath(), key);
 			}
 
 			byte[] bytes = stringStringMap.get(key).toString().getBytes();

@@ -46,6 +46,7 @@ class HelmChartServiceTest {
 		Model m = model.get();
 		HelmContext context = mavenModelProcessor.process(m);
 
+		context.setChartFlavor("helm");
 		context.setAppName("test");
 		context.setAppVersion("1.0.0");
 

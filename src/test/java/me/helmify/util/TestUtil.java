@@ -66,7 +66,7 @@ public class TestUtil {
 		String deps = String.join(",", dependencies);
 
 		final String url = String.format(
-				"/spring/starter.zip?bootVersion=%s&javaVersion=%s&groupId=%s&name=%s&description=%s&artifactId=%s&language=java&packaging=jar&packageName=%s&type=gradle-project&version=%s&dependencies=%s",
+				"/spring/starter.zip?chartFlavor=helm&bootVersion=%s&javaVersion=%s&groupId=%s&name=%s&description=%s&artifactId=%s&language=java&packaging=jar&packageName=%s&type=gradle-project&version=%s&dependencies=%s",
 				bootVersion, javaVersion, groupId, name, name, name, groupId, version, deps);
 
 		MvcResult result = mvc.perform(get(url)).andExpect(status().isOk()).andReturn();

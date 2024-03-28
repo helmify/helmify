@@ -78,7 +78,7 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 			String chartFlavor = context.getChartFlavor();
 			String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.http"
-					: ".Vales.service.port";
+					: ".Values.service.port";
 
 			if (vendor.equals(FrameworkVendor.Spring)) {
 

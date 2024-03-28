@@ -24,10 +24,11 @@ public class InitializrSupport {
 	};
 
 	protected void streamStarter(byte[] originalStarter, HttpServletResponse response, String artifactId,
-			String version, String filename) {
+			String version, String filename, String chartFlavor) {
 		if (originalStarter != null) {
 			String buildFile = ZipUtil.tryReadBuildFile(new ByteArrayInputStream(originalStarter)).orElseThrow();
 			HelmContext helmContext = fileUploadService.processBuildfile(buildFile, artifactId, version);
+			helmContext.setChartFlavor(chartFlavor);
 			zipFileService.streamZip(helmContext, originalStarter, response, filename);
 		}
 	}
