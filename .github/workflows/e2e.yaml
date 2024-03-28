@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '30 5 * * *'
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "feature/bitnami-charts" ]
 
 jobs:
 

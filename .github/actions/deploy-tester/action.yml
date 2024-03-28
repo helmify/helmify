@@ -1,0 +1,23 @@
+name: Deploy a new Helmify Tester
+description: Deploy a new Helmify Tester
+
+inputs:
+  name:
+    required: true
+    description: 'Tester name'
+  chartFlavor:
+    required: true
+    description: 'The chart flavor to use (helm|bitnami)'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Deploy ${{ inputs.name }} Tester
+      shell: bash
+      run: |
+        curl -X POST --data @testing/${{ inputs.name }}/pom.xml  -o ${{ inputs.name }}.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=${{ inputs.name }}&version=0.1.0&chartFlavor=${{ inputs.chartFlavor }}" \
+        && unzip ${{ inputs.name }}.zip -d ${{ inputs.name }}-chart \
+        && cd ${{ inputs.name }}-chart/helm && helm dependency update \
+        && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing \
+        && helm install ${{ inputs.name }} . \
+        && kubectl wait pod --all --for=condition=Ready --timeout=300s
