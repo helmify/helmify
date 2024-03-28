@@ -14,6 +14,9 @@ inputs:
   type:
     description: 'The type of the application (spring|quarkus)'
     required: true
+  chartFlavor:
+    description: 'The chart flavor to use (helm|bitnami)'
+    required: true
 
 runs:
   using: "composite"
@@ -43,25 +46,11 @@ runs:
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
       run: helm uninstall ${{ inputs.name }}
-    - name: Deploy ${{ inputs.name }} Tester
+    - name: Deploy ${{ inputs.name }} ${{ inputs.chartFlavor }} Tester
       uses: ./.github/actions/deploy-tester
       with:
         name: ${{ inputs.name }}
-        chartFlavor: "helm"
-    - name: Port Forward ${{ inputs.name }} Tester
-      shell: bash
-      run: kubectl port-forward svc/${{inputs.name}} ${{inputs.port}}:8080 &
-    - name: Ping ${{ inputs.name }} Tester
-      shell: bash
-      run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
-    - name: Uninstall ${{ inputs.name }} Tester
-      shell: bash
-      run: helm uninstall ${{ inputs.name }}
-    - name: Deploy ${{ inputs.name }} Tester with Bitnami Chart
-      uses: ./.github/actions/deploy-tester
-      with:
-        name: ${{ inputs.name }}
-        chartFlavor: "bitnami"
+        chartFlavor: ${{ inputs.chartFlavor }}
     - name: Port Forward ${{ inputs.name }} Tester
       shell: bash
       run: kubectl port-forward svc/${{inputs.name}} ${{inputs.port}}:8080 &

@@ -19,13 +19,13 @@ public class QsRxPostgresResolver implements PostgresResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "postgres-username", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "postgres-password", context.getAppName()));
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "QUARKUS_DATASOURCE_USERNAME", context.getAppName()),
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "QUARKUS_DATASOURCE_PASSWORD", context.getAppName()));
 	}
 
 	public Map<String, Object> getSecretEntries() {
-		return Map.of("postgres-username", "{{ .Values.postgresql.auth.username | b64enc | quote }}",
-				"postgres-password", "{{ .Values.postgresql.auth.password | b64enc | quote }}");
+		return Map.of("QUARKUS_DATASOURCE_USERNAME", "{{ .Values.postgresql.auth.username | b64enc | quote }}",
+				"QUARKUS_DATASOURCE_PASSWORD", "{{ .Values.postgresql.auth.password | b64enc | quote }}");
 	}
 
 	public Map<String, String> getDefaultConfig() {
