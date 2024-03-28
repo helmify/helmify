@@ -1,4 +1,4 @@
-name: Helmify E2E Testing
+name: Helmify E2E Testing - Postgres
 
 on:
   schedule:
@@ -37,7 +37,7 @@ jobs:
           expect: postgres
           chartFlavor: bitnami
 
-  e2e-quarkus-postgres:
+  e2e-quarkus-postgres-helm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,3 +50,16 @@ jobs:
           port: 18002
           expect: postgres
           chartFlavor: helm
+  e2e-quarkus-postgres-bitnami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Quarkus Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-postgres-tester
+          type: quarkus
+          port: 18003
+          expect: postgres
+          chartFlavor: bitnami
