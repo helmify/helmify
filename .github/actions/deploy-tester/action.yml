@@ -12,6 +12,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Clean up
+      shell: bash
+      run: |
+        rm -rf ${{ inputs.name }}.zip
+        rm -rf ${{ inputs.name }}-chart
     - name: Deploy ${{ inputs.name }} Tester
       shell: bash
       run: |

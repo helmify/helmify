@@ -33,7 +33,7 @@ jobs:
         with:
           name: spring-postgres-tester
           type: spring
-          port: 18000
+          port: 18001
           expect: postgres
           chartFlavor: bitnami
 
@@ -47,6 +47,6 @@ jobs:
         with:
           name: quarkus-postgres-tester
           type: quarkus
-          port: 18001
+          port: 18002
           expect: postgres
           chartFlavor: helm
