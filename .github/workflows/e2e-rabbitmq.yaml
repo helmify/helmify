@@ -1,4 +1,4 @@
-name: Helmify E2E Testing - Postgres
+name: Helmify E2E Testing - RabbitMQ
 
 on:
   schedule:
