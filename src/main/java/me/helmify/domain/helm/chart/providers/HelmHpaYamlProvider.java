@@ -42,7 +42,7 @@ public class HelmHpaYamlProvider implements HelmFileProvider {
 
 	@Override
 	public String getFileContent(HelmContext context) {
-		return String.format(template, context.getAppName(), context.getAppName(), context.getAppName());
+		return readTemplate("helm/templates/hpa.yaml").replaceAll("REPLACE_ME", context.getAppName());
 	}
 
 	@Override

@@ -22,16 +22,16 @@ public class QsCouchbaseResolver implements CouchbaseResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                makeSecretKeyRef("QUARKUS_COUCHBASE_USERNAME", "couchbase-username", context.getAppName()),
-                makeSecretKeyRef("QUARKUS_COUCHBASE_PASSWORD", "couchbase-password", context.getAppName())
+                makeSecretKeyRef("QUARKUS_COUCHBASE_USERNAME", "QUARKUS_COUCHBASE_USERNAME", context.getAppName()),
+                makeSecretKeyRef("QUARKUS_COUCHBASE_PASSWORD", "QUARKUS_COUCHBASE_PASSWORD", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "couchbase-username", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
-                "couchbase-password", "{{ .Values.couchbase.dbUser.password | b64enc | quote }}"
+                "QUARKUS_COUCHBASE_USERNAME", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
+                "QUARKUS_COUCHBASE_PASSWORD", "{{ .Values.couchbase.dbUser.password | b64enc | quote }}"
         );
     }
 

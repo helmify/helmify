@@ -11,26 +11,10 @@ import java.util.stream.Collectors;
 @Component
 public class HelmConfigMapProvider implements HelmFileProvider {
 
-	private static final String template = """
-			apiVersion: v1
-			kind: ConfigMap
-			metadata:
-			  name: {{ include "REPLACEME.fullname" . }}-config
-			  namespace: {{ .Release.Namespace | quote }}
-			  labels:
-			    {{- include "REPLACEME.labels" . | nindent 4 }}
-			  {{- if .Values.commonAnnotations }}
-			  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-			  {{- end }}
-			data:
-			  application.properties: |-
-			###@helmify:configmap
-			""";
-
 	@Override
 	public String getFileContent(HelmContext context) {
-		String filledTemplate = template.replace("REPLACEME", context.getAppName());
-		return HelmUtil.removeMarkers(customize(filledTemplate, context));
+		String template = readTemplate("helm/templates/configmap.yaml").replaceAll("REPLACE_ME", context.getAppName());
+		return HelmUtil.removeMarkers(customize(template, context));
 	}
 
 	@Override

@@ -19,13 +19,16 @@ public class QsMongodbResolver implements MongodbResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_USERNAME", "mongodb-username", context.getAppName()),
-				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_PASSWORD", "mongodb-password", context.getAppName()));
+				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_USERNAME", "QUARKUS_MONGODB_CREDENTIALS_USERNAME",
+						context.getAppName()),
+				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_PASSWORD", "QUARKUS_MONGODB_CREDENTIALS_PASSWORD",
+						context.getAppName()));
 	}
 
 	public Map<String, Object> getSecretEntries() {
-		return Map.of("mongodb-username", "{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}",
-				"mongodb-password", "{{ (first .Values.mongodb.auth.passwords) | b64enc | quote }}");
+		return Map.of("QUARKUS_MONGODB_CREDENTIALS_USERNAME",
+				"{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}", "QUARKUS_MONGODB_CREDENTIALS_PASSWORD",
+				"{{ (first .Values.mongodb.auth.passwords) | b64enc | quote }}");
 	}
 
 	public Map<String, String> getDefaultConfig() {

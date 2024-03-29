@@ -21,16 +21,16 @@ public class SgElasticSearchResolver implements ElasticSearchResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                makeSecretKeyRef("SPRING_ELASTICSEARCH_USERNAME", "elasticsearch-username", context.getAppName()),
-                makeSecretKeyRef("SPRING_ELASTICSEARCH_PASSWORD", "elasticsearch-password", context.getAppName())
+                makeSecretKeyRef("SPRING_ELASTICSEARCH_USERNAME", "SPRING_ELASTICSEARCH_USERNAME", context.getAppName()),
+                makeSecretKeyRef("SPRING_ELASTICSEARCH_PASSWORD", "SPRING_ELASTICSEARCH_PASSWORD", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "elasticsearch-username", "{{ .Values.elasticsearch.security.username | b64enc | quote }}"
-                , "elasticsearch-password", "{{ .Values.elasticsearch.security.elasticPassword | b64enc | quote }}"
+                "SPRING_ELASTICSEARCH_USERNAME", "{{ .Values.elasticsearch.security.username | b64enc | quote }}"
+                , "SPRING_ELASTICSEARCH_PASSWORD", "{{ .Values.elasticsearch.security.elasticPassword | b64enc | quote }}"
         );
     }
 

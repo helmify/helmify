@@ -20,14 +20,14 @@ public class SgMongodbResolver implements MongodbResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_USERNAME", "mongodb-username", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_PASSWORD", "mongodb-password", context.getAppName()));
+                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_USERNAME", "SPRING_DATA_MONGODB_USERNAME", context.getAppName()),
+                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_PASSWORD", "SPRING_DATA_MONGODB_PASSWORD", context.getAppName()));
     }
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "mongodb-username", "{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}",
-                "mongodb-password", "{{ (first .Values.mongodb.auth.passwords) | b64enc | quote }}");
+                "SPRING_DATA_MONGODB_USERNAME", "{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}",
+                "SPRING_DATA_MONGODB_PASSWORD", "{{ (first .Values.mongodb.auth.passwords) | b64enc | quote }}");
     }
 
     public Map<String, String> getDefaultConfig() {

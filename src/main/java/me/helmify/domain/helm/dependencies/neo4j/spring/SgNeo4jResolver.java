@@ -25,15 +25,15 @@ public class SgNeo4jResolver implements Neo4jResolver {
 
     @Override public List<Map<String,Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_USERNAME", "neo4j-username", context.getAppName()),
-                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_PASSWORD", "neo4j-password", context.getAppName()));
+                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_USERNAME", "SPRING_NEO4J_AUTHENTICATION_USERNAME", context.getAppName()),
+                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_PASSWORD", "SPRING_NEO4J_AUTHENTICATION_PASSWORD", context.getAppName()));
     }
 
     @Override
     public Map<String,Object> getSecretEntries() {
             return Map.of(
-                    "neo4j-username", "{{ .Values.neo4j.neo4j.user | b64enc | quote }}",
-                    "neo4j-password", "{{ .Values.neo4j.neo4j.password | b64enc | quote }}");
+                    "SPRING_NEO4J_AUTHENTICATION_USERNAME", "{{ .Values.neo4j.neo4j.user | b64enc | quote }}",
+                    "SPRING_NEO4J_AUTHENTICATION_PASSWORD", "{{ .Values.neo4j.neo4j.password | b64enc | quote }}");
 
     }
     @Override public Map<String,String> getDefaultConfig() {

@@ -17,13 +17,16 @@ public class QsRxMySqlResolver implements MySqlResolver {
 	}
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "mysql-username", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "mysql-password", context.getAppName()));
+		return List.of(
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "QUARKUS_DATASOURCE_USERNAME",
+						context.getAppName()),
+				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "QUARKUS_DATASOURCE_PASSWORD",
+						context.getAppName()));
 	}
 
 	public Map<String, Object> getSecretEntries() {
-		return Map.of("mysql-username", "{{ .Values.mysql.auth.username | b64enc | quote }}", "mysql-password",
-				"{{ .Values.mysql.auth.password | b64enc | quote }}");
+		return Map.of("QUARKUS_DATASOURCE_USERNAME", "{{ .Values.mysql.auth.username | b64enc | quote }}",
+				"QUARKUS_DATASOURCE_PASSWORD", "{{ .Values.mysql.auth.password | b64enc | quote }}");
 	}
 
 	public Map<String, String> getDefaultConfig() {

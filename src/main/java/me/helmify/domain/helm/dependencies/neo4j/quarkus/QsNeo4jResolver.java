@@ -20,14 +20,16 @@ public class QsNeo4jResolver implements Neo4jResolver {
 	@Override
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				makeSecretKeyRef("QUARKUS_NEO4J_AUTHENTICATION_USERNAME", "neo4j-username", context.getAppName()),
-				makeSecretKeyRef("QUARKUS_NEO4J_AUTHENTICATION_PASSWORD", "neo4j-password", context.getAppName()));
+				makeSecretKeyRef("QUARKUS_NEO4J_AUTHENTICATION_USERNAME", "QUARKUS_NEO4J_AUTHENTICATION_USERNAME",
+						context.getAppName()),
+				makeSecretKeyRef("QUARKUS_NEO4J_AUTHENTICATION_PASSWORD", "QUARKUS_NEO4J_AUTHENTICATION_PASSWORD",
+						context.getAppName()));
 	}
 
 	@Override
 	public Map<String, Object> getSecretEntries() {
-		return Map.of("neo4j-username", "{{ .Values.neo4j.neo4j.user | b64enc | quote }}", "neo4j-password",
-				"{{ .Values.neo4j.neo4j.password | b64enc | quote }}");
+		return Map.of("QUARKUS_NEO4J_AUTHENTICATION_USERNAME", "{{ .Values.neo4j.neo4j.user | b64enc | quote }}",
+				"QUARKUS_NEO4J_AUTHENTICATION_PASSWORD", "{{ .Values.neo4j.neo4j.password | b64enc | quote }}");
 
 	}
 

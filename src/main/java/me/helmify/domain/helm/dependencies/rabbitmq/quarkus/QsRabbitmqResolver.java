@@ -27,8 +27,8 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	public Map<String, Object> getSecretEntries() {
 		return Map.of(
-				"rabbitmq-username", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
-				, "rabbitmq-password", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
+				"RABBITMQ_USERNAME", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
+				, "RABBITMQ_PASSWORD", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
 		);
 	}
 
@@ -42,8 +42,8 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				makeSecretKeyRef("RABBITMQ_USERNAME", "rabbitmq-username", context.getAppName()),
-				makeSecretKeyRef("RABBITMQ_PASSWORD", "rabbitmq-password", context.getAppName())
+				makeSecretKeyRef("RABBITMQ_USERNAME", "RABBITMQ_USERNAME", context.getAppName()),
+				makeSecretKeyRef("RABBITMQ_PASSWORD", "RABBITMQ_PASSWORD", context.getAppName())
 		);
 	}
 	@Override

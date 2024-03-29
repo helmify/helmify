@@ -24,16 +24,16 @@ public class SgMariadbResolver implements MariaDbResolver {
 
 	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
 		return List.of(
-				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_USERNAME", "mariadb-username", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_PASSWORD", "mariadb-password", context.getAppName())
+				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_USERNAME", "SPRING_DATASOURCE_USERNAME", context.getAppName()),
+				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_PASSWORD", "SPRING_DATASOURCE_PASSWORD", context.getAppName())
 		);
 	}
 
 
 	public Map<String, Object> getSecretEntries() {
 		return Map.of(
-				"mariadb-username", "{{ .Values.mariadb.auth.username | b64enc | quote }}"
-				, "mariadb-password", "{{ .Values.mariadb.auth.password | b64enc | quote }}"
+				"SPRING_DATASOURCE_USERNAME", "{{ .Values.mariadb.auth.username | b64enc | quote }}"
+				, "SPRING_DATASOURCE_PASSWORD", "{{ .Values.mariadb.auth.password | b64enc | quote }}"
 		);
 	}
 

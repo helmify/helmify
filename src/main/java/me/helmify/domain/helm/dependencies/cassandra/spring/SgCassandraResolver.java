@@ -21,16 +21,16 @@ public class SgCassandraResolver implements CassandraResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                makeSecretKeyRef("SPRING_CASSANDRA_USERNAME", "cassandra-username", context.getAppName()),
-                makeSecretKeyRef("SPRING_CASSANDRA_PASSWORD", "cassandra-password", context.getAppName())
+                makeSecretKeyRef("SPRING_CASSANDRA_USERNAME", "SPRING_CASSANDRA_USERNAME", context.getAppName()),
+                makeSecretKeyRef("SPRING_CASSANDRA_PASSWORD", "SPRING_CASSANDRA_PASSWORD", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "cassandra-username", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
-                "cassandra-password", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
+                "SPRING_CASSANDRA_USERNAME", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
+                "SPRING_CASSANDRA_PASSWORD", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
         );
     }
 

@@ -8,19 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelmSecretsYamlProvider implements HelmFileProvider {
 
-	private static final String template = """
-			apiVersion: v1
-			kind: Secret
-			metadata:
-			  name: {{ include "REPLACEME.fullname" . }}
-			  namespace: {{ .Release.Namespace }}
-			  labels:
-			    {{- include "REPLACEME.labels" . | nindent 4 }}
-			type: Opaque
-			data:
-			###@helmify:secrets
-			""";
-
 	@Override
 	public String patchContent(String content, HelmContext context) {
 		StringBuffer patch = new StringBuffer();
@@ -37,7 +24,7 @@ public class HelmSecretsYamlProvider implements HelmFileProvider {
 
 	@Override
 	public String getFileContent(HelmContext context) {
-		String template = HelmSecretsYamlProvider.template.replace("REPLACEME", context.getAppName());
+		String template = readTemplate("helm/templates/secrets.yaml").replaceAll("REPLACE_ME", context.getAppName());
 		return patchContent(template, context);
 	}
 

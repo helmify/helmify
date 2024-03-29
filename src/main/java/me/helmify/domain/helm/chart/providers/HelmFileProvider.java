@@ -1,6 +1,8 @@
 package me.helmify.domain.helm.chart.providers;
 
+import lombok.SneakyThrows;
 import me.helmify.domain.helm.HelmContext;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * HelmFileProviders are responsible for providing the plaintext file contents of an
@@ -26,5 +28,12 @@ public interface HelmFileProvider {
 	 * stored
 	 */
 	String getFileName();
+
+	@SneakyThrows
+	default String readTemplate(String path) {
+		ClassPathResource classPathResource = new ClassPathResource(path);
+		byte[] bytes = classPathResource.getInputStream().readAllBytes();
+		return new String(bytes);
+	}
 
 }

@@ -20,16 +20,16 @@ public class SgCouchbaseResolver implements CouchbaseResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_USERNAME", "couchbase-username", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_PASSWORD", "couchbase-password", context.getAppName())
+                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_USERNAME", "SPRING_COUCHBASE_USERNAME", context.getAppName()),
+                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_PASSWORD", "SPRING_COUCHBASE_PASSWORD", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "couchbase-username", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
-                "couchbase-password", "{{ .Values.couchbase.dbUser.password | b64enc | quote }}"
+                "SPRING_COUCHBASE_USERNAME", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
+                "SPRING_COUCHBASE_PASSWORD", "{{ .Values.couchbase.dbUser.password | b64enc | quote }}"
         );
     }
 

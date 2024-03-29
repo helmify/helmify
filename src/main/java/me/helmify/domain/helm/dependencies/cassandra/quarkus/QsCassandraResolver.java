@@ -26,16 +26,16 @@ public class QsCassandraResolver implements CassandraResolver {
 
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         return List.of(
-                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_USERNAME", "cassandra-username", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_PASSWORD", "cassandra-password", context.getAppName())
+                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_USERNAME", "QUARKUS_CASSANDRA_AUTH_USERNAME", context.getAppName()),
+                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_PASSWORD", "QUARKUS_CASSANDRA_AUTH_PASSWORD", context.getAppName())
         );
     }
 
 
     public Map<String, Object> getSecretEntries() {
         return Map.of(
-                "cassandra-username", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
-                "cassandra-password", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
+                "QUARKUS_CASSANDRA_AUTH_USERNAME", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
+                "QUARKUS_CASSANDRA_AUTH_PASSWORD", "{{ .Values.cassandra.dbUser.password | b64enc | quote }}"
         );
     }
 
