@@ -31,14 +31,21 @@ public class SgRedisResolver implements RedisResolver {
     }
 
     @Override
+    public Map<String,Object> getSecretEntries() {
+        return Map.of(
+                "SPRING_DATA_REDIS_PASSWORD", "{{ \"redis\" | b64enc | quote }}"
+        );
+    }
+
+    @Override
     public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
         String appName = context.getAppName();
         return List.of(Map.of(
                 "name", "SPRING_DATA_REDIS_PASSWORD",
                 "valueFrom", Map.of(
                         "secretKeyRef", Map.of(
-                                "name", "REPLACEME-redis".replace("REPLACEME", appName),
-                                "key", "redis-password",
+                                "name", "%s-secret".formatted( appName),
+                                "key", "SPRING_DATA_REDIS_PASSWORD",
                                 "optional", false))));
     }
 

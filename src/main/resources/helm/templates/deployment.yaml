@@ -36,10 +36,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 ###@helmify:envblock
           envFrom:
-            {{- if .Values.envVarsConfigMap }}
             - configMapRef:
-                name: {{ .Values.envVarsConfigMap }}
-            {{- end }}
+                name: {{ include "REPLACE_ME.fullname" . }}-config
+            - secretRef:
+                name: {{ include "REPLACE_ME.fullname" . }}-secret
           ports:
             - name: http
               containerPort: 80

@@ -206,29 +206,27 @@ class HelmChartServiceTest {
 
 		// look for env vars
 		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: neo4j-username"));
+		assertTrue(deploymentYaml.contains("key: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
 		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: neo4j-password"));
+		assertTrue(deploymentYaml.contains("key: SPRING_NEO4J_AUTHENTICATION_PASSWORD"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: rabbitmq-username"));
+		assertTrue(deploymentYaml.contains("key: SPRING_RABBITMQ_USERNAME"));
 		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: rabbitmq-password"));
+		assertTrue(deploymentYaml.contains("key: SPRING_RABBITMQ_PASSWORD"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATA_REDIS_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: redis-password"));
+		assertTrue(deploymentYaml.contains("key: SPRING_DATA_REDIS_PASSWORD"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: postgres-username") || deploymentYaml.contains("key: mysql-username")
-				|| deploymentYaml.contains("key: mariadb-username"));
+		assertTrue(deploymentYaml.contains("key: SPRING_DATASOURCE_USERNAME"));
 		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: postgres-password") || deploymentYaml.contains("key: mysql-password")
-				|| deploymentYaml.contains("key: mariadb-password"));
+		assertTrue(deploymentYaml.contains("key: SPRING_DATASOURCE_PASSWORD"));
 
 		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: mongodb-username"));
+		assertTrue(deploymentYaml.contains("key: SPRING_DATA_MONGODB_USERNAME"));
 		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: mongodb-password"));
+		assertTrue(deploymentYaml.contains("key: SPRING_DATA_MONGODB_PASSWORD"));
 
 		// look for probes
 		assertTrue(deploymentYaml.contains("readinessProbe"));
@@ -247,17 +245,16 @@ class HelmChartServiceTest {
 
 	private static void checkConfigMapYaml(Map<String, String> contents) {
 		String configmapYaml = contents.get("helm/templates/configmap.yaml");
-		assertTrue(configmapYaml.contains("  application.properties: |-"));
-		assertTrue(configmapYaml.contains("    spring.application.name="));
-		assertTrue(configmapYaml.contains("    spring.rabbitmq.virtual-host="));
-		assertTrue(configmapYaml.contains("    spring.rabbitmq.host="));
-		assertTrue(configmapYaml.contains("    spring.rabbitmq.port="));
-		assertTrue(configmapYaml.contains("    spring.datasource.url="));
-		assertTrue(configmapYaml.contains("    spring.data.redis.host="));
-		assertTrue(configmapYaml.contains("    spring.data.redis.port="));
-		assertTrue(configmapYaml.contains("    spring.data.mongodb.uri="));
-		assertTrue(configmapYaml.contains("    spring.neo4j.uri="));
-		assertTrue(configmapYaml.contains("    spring.kafka.bootstrap-servers="));
+		assertTrue(configmapYaml.contains("  SPRING_APPLICATION_NAME:"));
+		assertTrue(configmapYaml.contains("  SPRING_RABBITMQ_VIRTUAL-HOST:"));
+		assertTrue(configmapYaml.contains("  SPRING_RABBITMQ_HOST:"));
+		assertTrue(configmapYaml.contains("  SPRING_RABBITMQ_PORT:"));
+		assertTrue(configmapYaml.contains("  SPRING_DATASOURCE_URL:"));
+		assertTrue(configmapYaml.contains("  SPRING_DATA_REDIS_HOST:"));
+		assertTrue(configmapYaml.contains("  SPRING_DATA_REDIS_PORT:"));
+		assertTrue(configmapYaml.contains("  SPRING_DATA_MONGODB_URI:"));
+		assertTrue(configmapYaml.contains("  SPRING_NEO4J_URI:"));
+		assertTrue(configmapYaml.contains("  SPRING_KAFKA_BOOTSTRAP-SERVERS:"));
 
 	}
 

@@ -24,6 +24,7 @@ public final class HelmUtil {
 	public static String removeMarkers(String content) {
 		return Arrays.stream(content.split("\n"))
 			.filter(s -> !s.contains("###@helmify"))
+			.filter(s -> !s.contains("REMOVE: "))
 			.collect(Collectors.joining("\n"));
 	}
 

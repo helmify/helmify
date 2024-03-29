@@ -46,6 +46,8 @@ public abstract class HelmChartTests {
 		File chartDirectory = TestUtil.downloadStarter(this.mvc, context.chartName, context.chartVersion,
 				context.dependencies);
 
+		System.out.println("chartDirectory = " + chartDirectory);
+
 		// lint chart
 		GenericContainer<?> lintContainer = new GenericContainer<>("alpine/helm:3.11.1")
 			.withCopyToContainer(MountableFile.forHostPath(chartDirectory.toPath(), 0777), "/apps")

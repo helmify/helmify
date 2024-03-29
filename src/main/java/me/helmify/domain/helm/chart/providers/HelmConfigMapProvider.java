@@ -1,8 +1,8 @@
 package me.helmify.domain.helm.chart.providers;
 
-import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.chart.TemplateStringPatcher;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
 
@@ -85,22 +85,20 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 		String string = patch.toString();
 		String filled = HelmUtil
-			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helmify:configmap", string, 4));
+			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helmify:configmap", string, 2));
+		filled = filled.lines().map(line -> {
 
-		if ("bitnami".equals(context.getChartFlavor())) {
-			filled = filled.lines().map(line -> {
-				if (line.contains("  application-prod.properties: |"))
-					return "";
-				// convert property notation to env var notation
-				if (line.contains(".") && line.contains("=")) {
-					String[] split = line.split("=");
-					return "  " + (split[0].toUpperCase().replaceAll("\\.", "_") + ": \"" + split[1] + "\"")
-						.replaceAll("\"\"", "\"")
-						.trim();
-				}
-				return line;
-			}).filter(line -> !line.trim().isEmpty()).collect(Collectors.joining("\r\n"));
-		}
+			if (line.contains("REMOVE:"))
+				return "";
+			// convert property notation to env var notation
+			if (line.contains(".") && line.contains("=")) {
+				String[] split = line.split("=");
+				return "  " + (split[0].toUpperCase().replaceAll("\\.", "_") + ": \"" + split[1] + "\"")
+					.replaceAll("\"\"", "\"")
+					.trim();
+			}
+			return line;
+		}).filter(line -> !line.trim().isEmpty()).collect(Collectors.joining("\r\n"));
 
 		return filled;
 	}
