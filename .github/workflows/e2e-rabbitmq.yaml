@@ -1,0 +1,39 @@
+name: Helmify E2E Testing - Postgres
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  pull_request:
+    branches: [ "main"]
+  push:
+    branches: [ "feature/bitnami-charts" ]
+
+jobs:
+
+  e2e-spring-rabbitmq-helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-rabbitmq-tester
+          type: spring
+          port: 18000
+          expect: rabbitmq
+          chartFlavor: helm
+  e2e-spring-rabbitmq-bitnami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-rabbitmq-tester
+          type: spring
+          port: 18001
+          expect: rabbitmq
+          chartFlavor: bitnami
+
