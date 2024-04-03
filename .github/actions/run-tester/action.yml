@@ -42,10 +42,15 @@ runs:
       run: kubectl port-forward svc/${{inputs.name}} ${{inputs.port}}:8080 &
     - name: Ping ${{ inputs.name }} Tester
       shell: bash
-      run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
-    - name: Print ${{ inputs.name }} Tester Log
-      shell: bash
-      run: kubectl logs svc/${{inputs.name}}
+      run: |
+        if [ $(mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}) -eq 0 ]; then
+          echo "Test Passed"
+        else
+          echo "Test Failed"
+          kubectl logs svc/${{inputs.name}} || true
+          exit 1
+        fi
+
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
       run: helm uninstall ${{ inputs.name }}
