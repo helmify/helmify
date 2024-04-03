@@ -25,4 +25,10 @@ runs:
         && cd ${{ inputs.name }}-chart/helm && helm dependency update \
         && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing \
         && helm install ${{ inputs.name }} . \
-        && kubectl wait pod --all --for=condition=Ready --timeout=300s
+    - name: Wait for Tester
+      shell: bash
+      run: |
+        until kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -q '^[0-9]*\/[0-9]*\sReady$'; do
+          kubectl get pods --all-namespaces --no-headers
+          sleep 10
+        done
