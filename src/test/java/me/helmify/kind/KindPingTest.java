@@ -23,7 +23,22 @@ public class KindPingTest {
 		String url = System.getProperty("url");
 		String expected = System.getProperty("expected");
 
-		Assertions.assertTrue(checkResponse(url, expected), "Expected response not found from: " + expected);
+		int tries = 0;
+		int max = 3;
+
+		boolean checkResponse = false;
+
+		while (tries < max) {
+			checkResponse = checkResponse(url, expected);
+			if (checkResponse) {
+				break;
+			}
+			Thread.sleep(3000);
+			tries++;
+		}
+
+		Assertions.assertTrue(checkResponse, "Expected response not found from: " + expected);
+
 
 	}
 
