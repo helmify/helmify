@@ -47,7 +47,8 @@ class HelmChartServiceTest {
 		HelmContext context = mavenModelProcessor.process(m);
 
 		context.setChartFlavor("helm");
-		context.setAppName("test");
+		String appName = "test";
+		context.setAppName(appName);
 		context.setAppVersion("1.0.0");
 
 		assertNotNull(context);
@@ -103,7 +104,7 @@ class HelmChartServiceTest {
 					() -> assertNotNull(s.getSecretEntries()), () -> assertNotNull(s.getDefaultConfig()),
 					() -> assertNotNull(s.getEnvironmentEntries()), () -> assertNotNull(s.getInitContainer())));
 
-		context.setCustomizations(new HelmContext.HelmContextCustomization("test", "latest", null, Map.of()));
+		context.setCustomizations(new HelmContext.HelmContextCustomization(appName, "latest", null, Map.of()));
 		context.setCustomized(true);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -187,11 +188,11 @@ class HelmChartServiceTest {
 		assertTrue(contents.keySet().containsAll(names));
 
 		checkConfigMapYaml(contents);
-		checkDeploymentYaml(contents);
+		checkDeploymentYaml(contents, appName);
 		checkChartYaml(context, contents);
 	}
 
-	private static void checkDeploymentYaml(Map<String, String> contents) {
+	private static void checkDeploymentYaml(Map<String, String> contents, String appName) {
 		String deploymentYaml = contents.get("helm/templates/deployment.yaml");
 
 		// look for init containers
@@ -205,28 +206,11 @@ class HelmChartServiceTest {
 		assertTrue(deploymentYaml.contains("-kafkachecker"));
 
 		// look for env vars
-		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: SPRING_NEO4J_AUTHENTICATION_USERNAME"));
-		assertTrue(deploymentYaml.contains("name: SPRING_NEO4J_AUTHENTICATION_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: SPRING_NEO4J_AUTHENTICATION_PASSWORD"));
-
-		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: SPRING_RABBITMQ_USERNAME"));
-		assertTrue(deploymentYaml.contains("name: SPRING_RABBITMQ_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: SPRING_RABBITMQ_PASSWORD"));
-
-		assertTrue(deploymentYaml.contains("name: SPRING_DATA_REDIS_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: SPRING_DATA_REDIS_PASSWORD"));
-
-		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: SPRING_DATASOURCE_USERNAME"));
-		assertTrue(deploymentYaml.contains("name: SPRING_DATASOURCE_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: SPRING_DATASOURCE_PASSWORD"));
-
-		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_USERNAME"));
-		assertTrue(deploymentYaml.contains("key: SPRING_DATA_MONGODB_USERNAME"));
-		assertTrue(deploymentYaml.contains("name: SPRING_DATA_MONGODB_PASSWORD"));
-		assertTrue(deploymentYaml.contains("key: SPRING_DATA_MONGODB_PASSWORD"));
+		assertTrue(deploymentYaml.contains("envFrom"));
+		assertTrue(deploymentYaml.contains("configMapRef"));
+		assertTrue(deploymentYaml.contains("{{ include \"test.fullname\" . }}-config"));
+		assertTrue(deploymentYaml.contains("secretRef"));
+		assertTrue(deploymentYaml.contains("{{ include \"test.fullname\" . }}-secret"));
 
 		// look for probes
 		assertTrue(deploymentYaml.contains("readinessProbe"));
@@ -237,9 +221,6 @@ class HelmChartServiceTest {
 		// look for lifecycle hook
 		assertTrue(deploymentYaml.contains("preStop:"));
 		assertTrue(deploymentYaml.contains("command: [\"sh\", \"-c\", \"sleep 10\"]"));
-
-		// look for config volume mount
-		assertTrue(deploymentYaml.contains("mountPath: /workspace/BOOT-INF/classes/application.properties"));
 
 	}
 
