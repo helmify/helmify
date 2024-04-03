@@ -29,6 +29,8 @@ runs:
       shell: bash
       run: |
         echo "Monitoring pods ..."
+        
+        sleep 10
         for i in {1..12}; do
           echo "Iteration $i: Listing pods in the default namespace..."
           kubectl get pods -n default
