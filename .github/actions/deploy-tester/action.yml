@@ -36,7 +36,7 @@ runs:
           kubectl get pods -n default
           
           echo "Checking for pod errors and printing events..."
-          kubectl get events --namespace default | grep Error
+          (kubectl get events --namespace default | grep Error) || true
         
           sleep 10
         done
