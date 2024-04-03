@@ -30,6 +30,7 @@ runs:
       run: |
         max_attempts=12 # 2 minutes / 10 seconds per attempt
         attempt=0
+        
         until kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -q '^[0-9]*\/[0-9]*\sReady$'; do
           
           if [ $attempt -ge $max_attempts ]; then
@@ -38,13 +39,15 @@ runs:
           fi
         
           echo "Waiting for all pods to be ready..."
+          # Fetch pods that are not in the 'Ready' state
+          pods_not_ready=$(kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -v '^[0-9]*\/[0-9]*\sReady$')
           
-          # Check for pods that are not in the "Ready" state and print their events
-          kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -v '^[0-9]*\/[0-9]*\sReady$' | while read -r line; do
-              pod_namespace=$(echo $line | awk '{print $1}')
-              pod_name=$(echo $line | awk '{print $2}')
-              echo "Checking events for pod $pod_name in namespace $pod_namespace"
-              kubectl describe pod $pod_name -n $pod_namespace | grep -A 5 "Events:"
-            done
+          # For each pod not in the 'Ready' state, describe the pod to get more information, including events
+          for pod in $pods_not_ready; do
+            echo "Pod $pod is not ready. Fetching events..."
+            kubectl describe pod $pod
+          done
+          
           sleep 10
+          attempt=$((attempt+1))
         done
