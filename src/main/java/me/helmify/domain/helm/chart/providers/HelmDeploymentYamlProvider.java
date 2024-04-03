@@ -18,99 +18,12 @@ import static me.helmify.domain.helm.chart.TemplateStringPatcher.removeBetween;
 @RequiredArgsConstructor
 public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
-	private static final String template = """
-			apiVersion: apps/v1
-			kind: Deployment
-			metadata:
-			  name: {{ include "REPLACEME.fullname" . }}
-			  labels:
-			    {{- include "REPLACEME.labels" . | nindent 4 }}
-			spec:
-			  {{- if not .Values.autoscaling.enabled }}
-			  replicas: {{ .Values.replicaCount }}
-			  {{- end }}
-			  selector:
-			    matchLabels:
-			      {{- include "REPLACEME.selectorLabels" . | nindent 6 }}
-			  template:
-			    metadata:
-			      {{- with .Values.podAnnotations }}
-			      annotations:
-			        {{- toYaml . | nindent 8 }}
-			      {{- end }}
-			      labels:
-			        {{- include "REPLACEME.selectorLabels" . | nindent 8 }}
-			    spec:
-			      {{- with .Values.imagePullSecrets }}
-			      imagePullSecrets:
-			        {{- toYaml . | nindent 8 }}
-			      {{- end }}
-			      serviceAccountName: {{ include "REPLACEME.serviceAccountName" . }}
-			      securityContext:
-			        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-			###@helmify:initcontainers
-			      containers:
-			        - name: {{ .Chart.Name }}
-			          securityContext:
-			            {{- toYaml .Values.securityContext | nindent 12 }}
-			          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-			          imagePullPolicy: {{ .Values.image.pullPolicy }}
-			###@helmify:envblock
-			          ports:
-			            - name: http
-			              containerPort: {{ .Values.service.port }}
-			              protocol: TCP
-			###@helmify:probes
-			          livenessProbe:
-			            httpGet:
-			              path: /
-			              port: http
-			          readinessProbe:
-			            httpGet:
-			              path: /
-			              port: http
-			###@helmify:lifecycle
-			          # allow for graceful shutdown
-			          lifecycle:
-			            preStop:
-			              exec:
-			                command: ["sh", "-c", "sleep 10"]
-			          volumeMounts:
-			            - name: {{ include "REPLACEME.fullname" . }}-config-vol
-			              mountPath: ###@helmify:configpath/application.properties
-			              subPath: application.properties
-			          resources:
-			            {{- toYaml .Values.resources | nindent 12 }}
-			      volumes:
-			        - name: {{ include "REPLACEME.fullname" . }}-config-vol
-			          projected:
-			            sources:
-			              - configMap:
-			                  name: {{ include "REPLACEME.fullname" . }}-config
-			      {{- with .Values.nodeSelector }}
-			      nodeSelector:
-			        {{- toYaml . | nindent 8 }}
-			      {{- end }}
-			      {{- with .Values.affinity }}
-			      affinity:
-			        {{- toYaml . | nindent 8 }}
-			      {{- end }}
-			      {{- with .Values.tolerations }}
-			      tolerations:
-			        {{- toYaml . | nindent 8 }}
-			      {{- end }}
-			  """;
-
 	@Override
 	public String getFileContent(HelmContext context) {
-		boolean isSpring = context.getFrameworkVendor().equals(FrameworkVendor.Spring);
-		boolean isQuarkus = context.getFrameworkVendor().equals(FrameworkVendor.Quarkus);
 
-		String configPath = isSpring ? "/workspace/BOOT-INF/classes" : isQuarkus ? "/deployments/config" : "";
+		String template = readTemplate("helm/templates/deployment.yaml").replaceAll("REPLACE_ME", context.getAppName());
 
-		String filledTemplate = template.replace("REPLACEME", context.getAppName())
-			.replace("###@helmify:configpath", configPath);
-		return HelmUtil.removeMarkers(customize(filledTemplate, context));
+		return customize(template, context);
 	}
 
 	@Override
@@ -162,7 +75,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 					""", liveness, readiness), 10);
 		}
 
-		return injectEnvVars(withInitContainers, context);
+		return HelmUtil.removeMarkers(injectEnvVars(withInitContainers, context));
 	}
 
 	private static String injectInitContainers(String content, HelmContext context) {

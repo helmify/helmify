@@ -39,11 +39,4 @@ public class SgRabbitmqResolver implements RabbitmqResolver {
 		);
 	}
 
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(
-				makeSecretKeyRef("SPRING_RABBITMQ_USERNAME", "SPRING_RABBITMQ_USERNAME", context.getAppName()),
-				makeSecretKeyRef("SPRING_RABBITMQ_PASSWORD", "SPRING_RABBITMQ_PASSWORD", context.getAppName())
-		);
-	}
-
 }
