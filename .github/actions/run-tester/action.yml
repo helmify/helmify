@@ -43,11 +43,11 @@ runs:
     - name: Ping ${{ inputs.name }} Tester
       shell: bash
       run: |
-        if [ $(mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}) -eq 0 ]; then
-          echo "Test Passed"
-        else
+        mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
+        
+        if [ $? -ne 0 ]; then
           echo "Test Failed"
-          kubectl logs svc/${{inputs.name}} || true
+          kubectl logs svc/${{inputs.name}} 
           exit 1
         fi
 
