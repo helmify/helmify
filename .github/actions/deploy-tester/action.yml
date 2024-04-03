@@ -32,6 +32,15 @@ runs:
         
         sleep 10
         for i in {1..12}; do
+          # Check if all pods are in the "Running" state
+          pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}')
+          all_pods_running=$(echo "$pods_status" | tr ' ' '\n' | sort | uniq | grep -q 'Running')
+          
+          if [ "$all_pods_running" ]; then
+            echo "All pods are ready. Terminating the loop."
+            break
+          fi
+        
           echo "Iteration $i: Listing pods in the default namespace..."
           kubectl get pods -n default
           
