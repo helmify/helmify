@@ -43,6 +43,9 @@ runs:
     - name: Ping ${{ inputs.name }} Tester
       shell: bash
       run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
+    - name: Print ${{ inputs.name }} Tester Log
+      shell: bash
+      run: kubectl logs svc/${{inputs.name}}
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
       run: helm uninstall ${{ inputs.name }}
