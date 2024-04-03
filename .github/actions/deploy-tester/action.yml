@@ -28,26 +28,19 @@ runs:
     - name: Wait for Tester
       shell: bash
       run: |
-        max_attempts=12 # 2 minutes / 10 seconds per attempt
-        attempt=0
-        
-        until kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -q '^[0-9]*\/[0-9]*\sReady$'; do
+        echo "Monitoring pods ..."
+        for i in {1..12}; do
+          echo "Iteration $i: Listing pods in the default namespace..."
+          kubectl get pods -n default
           
-          if [ $attempt -ge $max_attempts ]; then
-            echo "Timeout: Maximum attempts reached. Exiting..."
-            exit 1
-          fi
-        
-          echo "Waiting for all pods to be ready..."
-          # Fetch pods that are not in the 'Ready' state
-          pods_not_ready=$(kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -v '^[0-9]*\/[0-9]*\sReady$')
-          
-          # For each pod not in the 'Ready' state, describe the pod to get more information, including events
-          for pod in $pods_not_ready; do
-            echo "Pod $pod is not ready. Fetching events..."
-            kubectl describe pod $pod
+          echo "Checking for pod errors and printing events..."
+          for pod in $(kubectl get pods -n default -o jsonpath='{.items[*].metadata.name}'); do
+            podStatus=$(kubectl get pod $pod -n default -o jsonpath='{.status.phase}')
+            if [ "$podStatus" == "Error" ]; then
+              echo "Pod $pod is in an error state. Printing events..."
+              kubectl describe pod $pod -n default || true
+            fi
           done
-          
+        
           sleep 10
-          attempt=$((attempt+1))
         done
