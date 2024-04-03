@@ -38,7 +38,7 @@ runs:
           echo "Checking for pod errors and printing events..."
           for pod in $(kubectl get pods -n default -o jsonpath='{.items[*].metadata.name}'); do
             podStatus=$(kubectl get pod $pod -n default -o jsonpath='{.status.phase}')
-            if [ "$podStatus" == "Error" ]; then
+            if [ "$podStatus" == *Error* ]; then
               echo "Pod $pod is in an error state. Printing events..."
               kubectl describe pod $pod -n default || true
             fi
