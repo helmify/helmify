@@ -131,8 +131,8 @@ public class BitnamiChart {
 
 		String string = buf.toString()
 			.replace("fullnameOverride: \"\"", "fullnameOverride: \"%s\"".formatted(appName))
-			.replace("extraEnvVarsSecret: \"\"", "extraEnvVarsSecret: \"%s\"".formatted(appName))
-			.replace("extraEnvVarsCM: \"\"", "extraEnvVarsCM: \"%s\"".formatted(appName));
+			.replace("extraEnvVarsSecret: \"\"", "extraEnvVarsSecret: \"%s\"".formatted(appName + "-secret"))
+			.replace("extraEnvVarsCM: \"\"", "extraEnvVarsCM: \"%s\"".formatted(appName + "-config"));
 
 		files.put("values.yaml", string);
 	}
