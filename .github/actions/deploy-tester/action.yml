@@ -36,7 +36,7 @@ runs:
           pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}')
           all_pods_running=$(echo "$pods_status" | tr ' ' '\n' | sort | uniq | grep -q 'Running')
           
-          if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; 
+          if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; then
             echo "All pods are ready. Terminating the loop."
             break 
           fi
