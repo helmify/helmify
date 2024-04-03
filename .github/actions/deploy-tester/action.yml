@@ -29,6 +29,13 @@ runs:
       shell: bash
       run: |
         until kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -q '^[0-9]*\/[0-9]*\sReady$'; do
-          kubectl get pods --all-namespaces --no-headers
+          echo "Waiting for all pods to be ready..."
+          # Check for pods that are not in the "Ready" state and print their events
+          kubectl get pods --all-namespaces --no-headers | awk '{print $2}' | grep -v '^[0-9]*\/[0-9]*\sReady$' | while read -r line; do
+              pod_namespace=$(echo $line | awk '{print $1}')
+              pod_name=$(echo $line | awk '{print $2}')
+              echo "Checking events for pod $pod_name in namespace $pod_namespace"
+              kubectl describe pod $pod_name -n $pod_namespace | grep -A 5 "Events:"
+            done
           sleep 10
         done
