@@ -45,7 +45,7 @@ runs:
       shell: bash
       run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
     - name: Dump log
-      if: steps.ping.outcomes.failure == 'true'
+      if: always()
       shell: bash
       run: kubectl logs svc/${{inputs.name}}
     - name: Uninstall ${{ inputs.name }} Tester
