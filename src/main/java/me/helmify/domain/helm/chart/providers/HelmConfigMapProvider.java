@@ -13,7 +13,8 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 	@Override
 	public String getFileContent(HelmContext context) {
-		String template = readTemplate("helm/templates/configmap.yaml").replaceAll("REPLACE_ME", context.getAppName());
+		String template = readTemplate("helm/templates/configmap.yaml").replaceAll("REPLACE_ME", context.getAppName())
+			.replaceAll("%%COMPONENT_NAME%%", context.getAppName());
 		return HelmUtil.removeMarkers(customize(template, context));
 	}
 
@@ -23,7 +24,6 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 	}
 
 	private String customize(String content, HelmContext context) {
-		content = content.replaceAll("%%COMPONENT_NAME%%", context.getAppName());
 		StringBuffer patch = new StringBuffer();
 		context.getHelmChartSlices()
 			.stream()
@@ -42,7 +42,6 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 		switch (vendor) {
 			case Spring -> {
-				patch.append("SPRING_PROFILES_ACTIVE={{ .Values.spring.profiles.active }}\n");
 				patch.append("SPRING_APPLICATION_NAME={{ .Values.fullnameOverride }}\n");
 				if (hasActuator) {
 					patch.append("MANAGEMENT_SERVER_PORT={{ %s }}\n".formatted(healthCheckPortExpression));
