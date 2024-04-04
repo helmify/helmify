@@ -39,7 +39,6 @@ public class KindPingTest {
 
 		Assertions.assertTrue(checkResponse, "Expected response not found from: " + expected);
 
-
 	}
 
 	private boolean checkResponse(String url, String expected) throws Exception {
