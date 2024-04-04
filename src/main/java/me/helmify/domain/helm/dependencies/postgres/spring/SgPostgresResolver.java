@@ -21,15 +21,6 @@ public class SgPostgresResolver implements PostgresResolver {
 		return List.of("postgres");
 	}
 
-
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(
-				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_USERNAME", "SPRING_DATASOURCE_USERNAME", context.getAppName()),
-				HelmUtil.makeSecretKeyRef("SPRING_DATASOURCE_PASSWORD", "SPRING_DATASOURCE_PASSWORD", context.getAppName())
-		);
-	}
-
-
 	public Map<String, Object> getSecretEntries() {
 		return Map.of(
 				"SPRING_DATASOURCE_USERNAME", "{{ .Values.postgresql.auth.username | b64enc | quote }}"
