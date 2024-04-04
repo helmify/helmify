@@ -26,8 +26,8 @@ public class SgRedisResolver implements RedisResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.data.redis.host", "{{ .Values.global.hosts.redis }}",
-                "spring.data.redis.port", "{{ .Values.global.ports.redis }}");
+                "SPRING_DATA_REDIS_HOST", "{{ .Values.global.hosts.redis }}",
+                "SPRING_DATA_REDIS_PORT", "{{ .Values.global.ports.redis }}");
     }
 
     @Override
@@ -35,18 +35,6 @@ public class SgRedisResolver implements RedisResolver {
         return Map.of(
                 "SPRING_DATA_REDIS_PASSWORD", "{{ \"redis\" | b64enc | quote }}"
         );
-    }
-
-    @Override
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        String appName = context.getAppName();
-        return List.of(Map.of(
-                "name", "SPRING_DATA_REDIS_PASSWORD",
-                "valueFrom", Map.of(
-                        "secretKeyRef", Map.of(
-                                "name", "%s-secret".formatted( appName),
-                                "key", "SPRING_DATA_REDIS_PASSWORD",
-                                "optional", false))));
     }
 
 }

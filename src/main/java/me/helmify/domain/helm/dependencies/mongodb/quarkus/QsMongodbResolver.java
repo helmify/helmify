@@ -17,14 +17,6 @@ public class QsMongodbResolver implements MongodbResolver {
 		return List.of("quarkus-mongodb-panache", "quarkus-mongodb-client");
 	}
 
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(
-				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_USERNAME", "QUARKUS_MONGODB_CREDENTIALS_USERNAME",
-						context.getAppName()),
-				makeSecretKeyRef("QUARKUS_MONGODB_CREDENTIALS_PASSWORD", "QUARKUS_MONGODB_CREDENTIALS_PASSWORD",
-						context.getAppName()));
-	}
-
 	public Map<String, Object> getSecretEntries() {
 		return Map.of("QUARKUS_MONGODB_CREDENTIALS_USERNAME",
 				"{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}", "QUARKUS_MONGODB_CREDENTIALS_PASSWORD",
@@ -32,9 +24,9 @@ public class QsMongodbResolver implements MongodbResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("%prod.quarkus.mongodb.connection-string",
+		return Map.of("QUARKUS_MONGODB_CONNECTION-STRING",
 				"mongodb://{{ .Values.global.hosts.mongodb }}:{{ .Values.global.ports.mongodb }}",
-				"%prod.quarkus.mongodb.database", "{{ .Values.mongodb.database }}");
+				"QUARKUS_MONGODB_DATABASE", "{{ .Values.mongodb.database }}");
 	}
 
 }

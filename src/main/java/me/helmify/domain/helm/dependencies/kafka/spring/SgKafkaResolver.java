@@ -22,7 +22,7 @@ public class SgKafkaResolver implements KafkaResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("spring.kafka.bootstrap-servers",
+		return Map.of("SPRING_KAFKA_BOOTSTRAP-SERVERS",
 				"{{ .Values.global.hosts.kafka }}:{{ .Values.global.ports.kafka }}");
 	}
 

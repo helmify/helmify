@@ -18,15 +18,6 @@ public class SgElasticSearchResolver implements ElasticSearchResolver {
         return List.of("spring-data-elasticsearch", "spring-boot-starter-data-elasticsearch");
     }
 
-
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                makeSecretKeyRef("SPRING_ELASTICSEARCH_USERNAME", "SPRING_ELASTICSEARCH_USERNAME", context.getAppName()),
-                makeSecretKeyRef("SPRING_ELASTICSEARCH_PASSWORD", "SPRING_ELASTICSEARCH_PASSWORD", context.getAppName())
-        );
-    }
-
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "SPRING_ELASTICSEARCH_USERNAME", "{{ .Values.elasticsearch.security.username | b64enc | quote }}"
@@ -37,7 +28,7 @@ public class SgElasticSearchResolver implements ElasticSearchResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.elasticsearch.uris",
+                "SPRING_ELASTICSEARCH_URIS",
                 "http://{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
         );
     }

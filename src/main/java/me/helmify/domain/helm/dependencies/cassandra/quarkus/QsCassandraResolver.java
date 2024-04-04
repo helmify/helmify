@@ -24,14 +24,6 @@ public class QsCassandraResolver implements CassandraResolver {
     }
 
 
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_USERNAME", "QUARKUS_CASSANDRA_AUTH_USERNAME", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("QUARKUS_CASSANDRA_AUTH_PASSWORD", "QUARKUS_CASSANDRA_AUTH_PASSWORD", context.getAppName())
-        );
-    }
-
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "QUARKUS_CASSANDRA_AUTH_USERNAME", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
@@ -39,12 +31,11 @@ public class QsCassandraResolver implements CassandraResolver {
         );
     }
 
-
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "%prod.quarkus.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.cassandra }}",
-                "%prod.quarkus.cassandra.keyspace", "{{ .Values.cassandra.keyspaceName }}",
-                "%prod.quarkus.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
+                "QUARKUS_CASSANDRA_CONTACT-POINTS","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ports.cassandra }}",
+                "QUARKUS_CASSANDRA_KEYSPACE", "{{ .Values.cassandra.keyspaceName }}",
+                "QUARKUS_CASSANDRA_LOCAL-DATACENTER", "{{ .Values.cassandra.dataCenter }}"
         );
     }
 

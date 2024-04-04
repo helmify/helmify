@@ -17,23 +17,15 @@ public class QsMariadbResolver implements MariaDbResolver {
 		return List.of("quarkus-jdbc-mariadb");
 	}
 
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_USERNAME", "QUARKUS_DATASOURCE_USERNAME",
-						context.getAppName()),
-				HelmUtil.makeSecretKeyRef("QUARKUS_DATASOURCE_PASSWORD", "QUARKUS_DATASOURCE_PASSWORD",
-						context.getAppName()));
-	}
-
 	public Map<String, Object> getSecretEntries() {
 		return Map.of("QUARKUS_DATASOURCE_USERNAME", "{{ .Values.mariadb.auth.username | b64enc | quote }}",
 				"QUARKUS_DATASOURCE_PASSWORD", "{{ .Values.mariadb.auth.password | b64enc | quote }}");
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("%prod.quarkus.datasource.jdbc.url",
+		return Map.of("QUARKUS_DATASOURCE_JDBC_URL",
 				"jdbc:mariadb://{{ .Values.global.hosts.mariadb }}:{{ .Values.global.ports.mariadb }}/{{ .Values.mariadb.database }}",
-				"%prod.quarkus.datasource.db-kind", "mariadb");
+				"QUARKUS_DATASOURCE_DB-KIND", "mariadb");
 	}
 
 	@Override

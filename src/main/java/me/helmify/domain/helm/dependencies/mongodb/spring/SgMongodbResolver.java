@@ -18,12 +18,6 @@ public class SgMongodbResolver implements MongodbResolver {
         return List.of("spring-boot-starter-data-mongodb", "spring-boot-starter-data-mongodb-reactive");
     }
 
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_USERNAME", "SPRING_DATA_MONGODB_USERNAME", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("SPRING_DATA_MONGODB_PASSWORD", "SPRING_DATA_MONGODB_PASSWORD", context.getAppName()));
-    }
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "SPRING_DATA_MONGODB_USERNAME", "{{ (first .Values.mongodb.auth.usernames) | b64enc | quote }}",
@@ -32,7 +26,7 @@ public class SgMongodbResolver implements MongodbResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.data.mongodb.uri",
+                "SPRING_DATA_MONGODB_URI",
                 "mongodb://{{ .Values.global.hosts.mongodb }}:{{ .Values.global.ports.mongodb }}/{{ .Values.mongodb.database }}");
     }
 

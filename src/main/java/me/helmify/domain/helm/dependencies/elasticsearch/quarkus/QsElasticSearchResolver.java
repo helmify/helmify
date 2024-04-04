@@ -18,15 +18,6 @@ public class QsElasticSearchResolver implements ElasticSearchResolver {
         return List.of("quarkus-elasticsearch");
     }
 
-
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                makeSecretKeyRef("QUARKUS_ELASTICSEARCH_USERNAME", "QUARKUS_ELASTICSEARCH_USERNAME", context.getAppName()),
-                makeSecretKeyRef("QUARKUS_ELASTICSEARCH_PASSWORD", "QUARKUS_ELASTICSEARCH_PASSWORD", context.getAppName())
-        );
-    }
-
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "QUARKUS_ELASTICSEARCH_USERNAME", "{{ .Values.elasticsearch.security.username | b64enc | quote }}"
@@ -37,7 +28,7 @@ public class QsElasticSearchResolver implements ElasticSearchResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "%prod.quarkus.elasticsearch.hosts",
+                "QUARKUS_ELASTICSEARCH_HOSTS",
                 "{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
         );
     }

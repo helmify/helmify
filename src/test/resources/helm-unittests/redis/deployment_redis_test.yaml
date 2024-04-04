@@ -29,9 +29,3 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].envFrom[1].secretRef.name
           value: test-redis-chart-secret
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: SPRING_DATA_REDIS_PASSWORD
-          count: 1
-          any: true

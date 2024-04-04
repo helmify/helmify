@@ -18,15 +18,6 @@ public class SgCassandraResolver implements CassandraResolver {
         return List.of("spring-boot-starter-data-cassandra", "spring-boot-starter-data-cassandra-reactive");
     }
 
-
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                makeSecretKeyRef("SPRING_CASSANDRA_USERNAME", "SPRING_CASSANDRA_USERNAME", context.getAppName()),
-                makeSecretKeyRef("SPRING_CASSANDRA_PASSWORD", "SPRING_CASSANDRA_PASSWORD", context.getAppName())
-        );
-    }
-
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "SPRING_CASSANDRA_USERNAME", "{{ .Values.cassandra.dbUser.user | b64enc | quote }}",
@@ -37,9 +28,9 @@ public class SgCassandraResolver implements CassandraResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.cassandra.contact-points","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local",
-                "spring.cassandra.keyspace-name", "{{ .Values.cassandra.keyspaceName }}",
-                "spring.cassandra.local-datacenter", "{{ .Values.cassandra.dataCenter }}"
+                "SPRING_CASSANDRA_CONTACT-POINTS","{{ .Values.global.hosts.cassandra }}.{{ .Release.Namespace }}.svc.cluster.local",
+                "SPRING_CASSANDRA_KEYSPACE-NAME", "{{ .Values.cassandra.keyspaceName }}",
+                "SPRING_CASSANDRA_LOCAL-DATACENTER", "{{ .Values.cassandra.dataCenter }}"
         );
     }
 

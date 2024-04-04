@@ -16,15 +16,8 @@ public class QsRedisResolver implements RedisResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("%prod.quarkus.redis.hosts",
+		return Map.of("QUARKUS_REDIS_HOSTS",
 				"redis://{{ .Values.global.hosts.redis }}:{{ .Values.global.ports.redis }}");
-	}
-
-	@Override
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		String appName = context.getAppName();
-		return List.of(Map.of("name", "QUARKUS_REDIS_PASSWORD", "valueFrom", Map.of("secretKeyRef", Map.of("name",
-				"REPLACEME-redis".replace("REPLACEME", appName), "key", "redis-password", "optional", false))));
 	}
 
 }

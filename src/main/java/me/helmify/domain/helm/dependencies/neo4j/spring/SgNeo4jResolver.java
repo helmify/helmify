@@ -23,11 +23,6 @@ public class SgNeo4jResolver implements Neo4jResolver {
     }
 
 
-    @Override public List<Map<String,Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_USERNAME", "SPRING_NEO4J_AUTHENTICATION_USERNAME", context.getAppName()),
-                makeSecretKeyRef("SPRING_NEO4J_AUTHENTICATION_PASSWORD", "SPRING_NEO4J_AUTHENTICATION_PASSWORD", context.getAppName()));
-    }
 
     @Override
     public Map<String,Object> getSecretEntries() {
@@ -38,7 +33,7 @@ public class SgNeo4jResolver implements Neo4jResolver {
     }
     @Override public Map<String,String> getDefaultConfig() {
         return Map.of(
-                "spring.neo4j.uri",
+                "SPRING_NEO4J_URI",
                 "bolt://{{ .Values.global.hosts.neo4j }}:{{ .Values.global.ports.neo4j }}"
         );
     }

@@ -28,7 +28,8 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 		context.getHelmChartSlices()
 			.stream()
 			.filter(f -> f.getDefaultConfig() != null)
-			.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
+			.forEach(f -> f.getDefaultConfig()
+				.forEach((k, v) -> patch.append(k).append(": ").append("\"").append(v).append("\"").append("\n")));
 
 		FrameworkVendor vendor = context.getFrameworkVendor();
 		String chartFlavor = context.getChartFlavor();
@@ -37,31 +38,31 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 
 		String healthCheckPortExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.healthcheck"
 				: ".Values.healthcheck.port";
-		String exposureInclude = "bitnami".equals(chartFlavor) ? "\"*\"" : "*";
+		String exposureInclude = "\"*\"";
 		String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.http" : ".Values.service.port";
 
 		switch (vendor) {
 			case Spring -> {
-				patch.append("SPRING_APPLICATION_NAME={{ .Values.fullnameOverride }}\n");
+				patch.append("SPRING_APPLICATION_NAME: \"{{ .Values.fullnameOverride }}\"\n");
 				if (hasActuator) {
-					patch.append("MANAGEMENT_SERVER_PORT={{ %s }}\n".formatted(healthCheckPortExpression));
-					patch.append("MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=%s\n".formatted(exposureInclude));
+					patch.append("MANAGEMENT_SERVER_PORT: \"{{ %s }}\"\n".formatted(healthCheckPortExpression));
+					patch.append("MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: %s\n".formatted(exposureInclude));
 				}
 				if (createIngress)
-					patch.append("SERVER_PORT={{ %s }}\n".formatted(portExpression));
+					patch.append("SERVER_PORT: \"{{ %s }}\"\n".formatted(portExpression));
 			}
 			case Quarkus -> {
-				patch.append("QUARKUS_APPLICATION_NAME={{ .Values.fullnameOverride }}\n");
-				patch.append("QUARKUS_LOG_LEVEL=DEBUG\n");
-				patch.append("QUARKUS_LOG_MIN-LEVEL=DEBUG\n");
-				patch.append("QUARKUS_LOG_CONSOLE_ENABLE=true\n");
-				patch.append("QUARKUS_LOG_CONSOLE_FORMAT=%d{HH:mm:ss} %-5p [%c] %s%e%n\n");
+				patch.append("QUARKUS_APPLICATION_NAME: \"{{ .Values.fullnameOverride }}\"\n");
+				patch.append("QUARKUS_LOG_LEVEL: \"DEBUG\"\n");
+				patch.append("QUARKUS_LOG_MIN-LEVEL: \"DEBUG\"\n");
+				patch.append("QUARKUS_LOG_CONSOLE_ENABLE: \"true\"\n");
+				patch.append("QUARKUS_LOG_CONSOLE_FORMAT: \"%d{HH:mm:ss} %-5p [%c] %s%e%n\"\n");
 				if (hasActuator) {
-					patch.append("QUARKUS_MANAGEMENT_ENABLED=true\n");
-					patch.append("QUARKUS_MANAGEMENT_PORT={{ %s }}\n".formatted(healthCheckPortExpression));
+					patch.append("QUARKUS_MANAGEMENT_ENABLED: \"true\"\n");
+					patch.append("QUARKUS_MANAGEMENT_PORT: \"{{ %s }}\"\n".formatted(healthCheckPortExpression));
 				}
 				if (createIngress)
-					patch.append("QUARKUS_HTTP_PORT={{ %s }}\n".formatted(portExpression));
+					patch.append("QUARKUS_HTTP_PORT: \"{{ %s }}\"\n".formatted(portExpression));
 			}
 		}
 

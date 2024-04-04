@@ -33,9 +33,9 @@ public class SgRabbitmqResolver implements RabbitmqResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"spring.rabbitmq.host", "{{ .Values.global.hosts.rabbitmq }}",
-				"spring.rabbitmq.port", "{{ .Values.global.ports.rabbitmq }}",
-				"spring.rabbitmq.virtual-host", "{{ .Values.rabbitmq.vhost }}"
+				"SPRING_RABBITMQ_HOST", "{{ .Values.global.hosts.rabbitmq }}",
+				"SPRING_RABBITMQ_PORT", "{{ .Values.global.ports.rabbitmq }}",
+				"SPRING_RABBITMQ_VIRTUAL-HOST", "{{ .Values.rabbitmq.vhost }}"
 		);
 	}
 

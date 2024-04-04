@@ -17,15 +17,6 @@ public class SgCouchbaseResolver implements CouchbaseResolver {
         return List.of("spring-boot-starter-data-couchbase", "spring-data-couchbase");
     }
 
-
-    public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-        return List.of(
-                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_USERNAME", "SPRING_COUCHBASE_USERNAME", context.getAppName()),
-                HelmUtil.makeSecretKeyRef("SPRING_COUCHBASE_PASSWORD", "SPRING_COUCHBASE_PASSWORD", context.getAppName())
-        );
-    }
-
-
     public Map<String, Object> getSecretEntries() {
         return Map.of(
                 "SPRING_COUCHBASE_USERNAME", "{{ .Values.couchbase.dbUser.user | b64enc | quote }}",
@@ -36,11 +27,11 @@ public class SgCouchbaseResolver implements CouchbaseResolver {
 
     public Map<String, String> getDefaultConfig() {
         return Map.of(
-                "spring.couchbase.env.timeouts.view", "15000",
-                "spring.couchbase.env.timeouts.query", "15000",
-                "spring.data.couchbase.bucket-name", "{{ .Values.couchbase.bucketName }}",
-                "spring.data.couchbase.auto-index", "true",
-                "spring.couchbase.connection-string","couchbase://{{ .Values.global.hosts.couchbase }}.{{ .Release.Namespace }}.svc.cluster.local"
+                "SPRING_COUCHBASE_ENV_TIMEOUTS_VIEW", "15000",
+                "SPRING_COUCHBASE_ENV_TIMEOUTS_QUERY", "15000",
+                "SPRING_DATA_COUCHBASE_BUCKET-NAME", "{{ .Values.couchbase.bucketName }}",
+                "SPRING_DATA_COUCHBASE_AUTO-INDEX", "true",
+                "SPRING_COUCHBASE_CONNECTION-STRING","couchbase://{{ .Values.global.hosts.couchbase }}.{{ .Release.Namespace }}.svc.cluster.local"
         );
     }
 

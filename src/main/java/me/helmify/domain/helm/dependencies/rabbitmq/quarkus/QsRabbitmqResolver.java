@@ -34,18 +34,12 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"%prod.rabbitmq-host", "{{ .Values.global.hosts.rabbitmq }}",
-				"%prod.rabbitmq-port", "{{ .Values.global.ports.rabbitmq }}",
-				"%prod.rabbitmq-virtual-host", "{{ .Values.rabbitmq.vhost }}"
+				"RABBITMQ-HOST", "{{ .Values.global.hosts.rabbitmq }}",
+				"RABBITMQ-PORT", "{{ .Values.global.ports.rabbitmq }}",
+				"RABBITMQ-VIRTUAL-HOST", "{{ .Values.rabbitmq.vhost }}"
 		);
 	}
 
-	public List<Map<String, Object>> getEnvironmentEntries(HelmContext context) {
-		return List.of(
-				makeSecretKeyRef("RABBITMQ_USERNAME", "RABBITMQ_USERNAME", context.getAppName()),
-				makeSecretKeyRef("RABBITMQ_PASSWORD", "RABBITMQ_PASSWORD", context.getAppName())
-		);
-	}
 	@Override
 	public FrameworkVendor getVendor() {
 		return FrameworkVendor.Quarkus;
