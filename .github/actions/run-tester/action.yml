@@ -23,7 +23,7 @@ runs:
   steps:
     - name: Pull  ${{ inputs.name }} Tester
       shell: bash
-      run: docker pull helmify/${{ inputs.name }}:latest && docker tag helmify/${{ inputs.name }}:latest docker.io/library/${{ inputs.name }}:latest
+      run: docker pull helmify/${{ inputs.name }}:latest && docker tag helmify/${{ inputs.name }}:latest docker.io/library/${{ inputs.name }}:0.1.0
     - name: Deploy ${{ inputs.name }} ${{ inputs.chartFlavor }} Tester
       uses: ./.github/actions/deploy-tester
       with:
