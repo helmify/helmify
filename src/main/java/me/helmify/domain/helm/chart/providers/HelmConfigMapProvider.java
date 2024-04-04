@@ -23,6 +23,7 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 	}
 
 	private String customize(String content, HelmContext context) {
+		content = content.replaceAll("%%COMPONENT_NAME%%", context.getAppName());
 		StringBuffer patch = new StringBuffer();
 		context.getHelmChartSlices()
 			.stream()
