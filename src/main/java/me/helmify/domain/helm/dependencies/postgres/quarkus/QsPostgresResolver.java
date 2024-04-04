@@ -23,9 +23,9 @@ public class QsPostgresResolver implements PostgresResolver {
 	}
 
 	public Map<String, String> getDefaultConfig() {
-		return Map.of("%prod.quarkus.datasource.jdbc.url",
+		return Map.of("QUARKUS_DATASOURCE_JDBC_URL",
 				"jdbc:postgresql://{{ .Values.global.hosts.postgresql }}:{{ .Values.global.ports.postgresql }}/{{ .Values.postgresql.database }}",
-				"%prod.quarkus.datasource.db-kind", "postgresql");
+				"QUARKUS_DATASOURCE_DB-KIND", "postgresql");
 	}
 
 	@Override

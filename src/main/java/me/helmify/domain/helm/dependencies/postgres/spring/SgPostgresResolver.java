@@ -31,7 +31,7 @@ public class SgPostgresResolver implements PostgresResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"spring.datasource.url",
+				"SPRING_DATASOURCE_URL",
 				"jdbc:postgresql://{{ .Values.global.hosts.postgresql }}:{{ .Values.global.ports.postgresql }}/{{ .Values.postgresql.database }}"
 		);
 	}
