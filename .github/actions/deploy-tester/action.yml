@@ -38,7 +38,7 @@ runs:
           
           if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; then
             echo "All pods are ready. Terminating the loop."
-            sleep 10
+            sleep 20
             break 
           fi
         
