@@ -33,7 +33,7 @@ runs:
         sleep 10
         for i in {1..12}; do
           # Check if all pods are in the "Running" state
-          pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}')
+          pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}' || true)
           all_pods_running=$(echo "$pods_status" | tr ' ' '\n' | sort | uniq | grep -q 'Running')
           
           if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; then
@@ -43,7 +43,7 @@ runs:
           fi
         
           echo "Iteration $i: Listing pods in the default namespace..."
-          kubectl get pods -n default
+          kubectl get pods -n default || true
           
           echo "Checking for pod errors and printing events..."
           (kubectl get events --namespace default | grep Error) || true
