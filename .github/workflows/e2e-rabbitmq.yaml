@@ -36,4 +36,29 @@ jobs:
           port: 18001
           expect: rabbitmq
           chartFlavor: bitnami
-
+  e2e-quarkus-rabbitmq-helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-rabbitmq-tester
+          type: quarkus
+          port: 18003
+          expect: rabbitmq
+          chartFlavor: helm
+  e2e-quarkus-rabbitmq-bitnami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-rabbitmq-tester
+          type: quarkus
+          port: 18004
+          expect: rabbitmq
+          chartFlavor: bitnami
