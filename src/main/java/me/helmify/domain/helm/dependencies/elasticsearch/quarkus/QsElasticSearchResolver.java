@@ -1,6 +1,7 @@
 package me.helmify.domain.helm.dependencies.elasticsearch.quarkus;
 
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.dependencies.elasticsearch.ElasticSearchResolver;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,11 @@ public class QsElasticSearchResolver implements ElasticSearchResolver {
                 "QUARKUS_ELASTICSEARCH_HOSTS",
                 "{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
         );
+    }
+
+    @Override
+    public FrameworkVendor getVendor() {
+        return FrameworkVendor.Quarkus;
     }
 
 }

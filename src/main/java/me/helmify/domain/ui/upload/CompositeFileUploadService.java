@@ -33,26 +33,6 @@ public class CompositeFileUploadService {
 	}
 
 	@SneakyThrows
-	public HelmContext processBuildfile(String buildFile) {
-		boolean isXml = buildFile.contains("<?xml");
-		String originalFilename = isXml ? "pom.xml" : "build.gradle";
-		FileUploadService service = chooseService(originalFilename);
-
-		String appName, appVersion;
-		if (isXml) {
-			Model model = MavenModelParser.parsePom(buildFile).orElseThrow();
-			appName = model.getArtifactId();
-			appVersion = model.getVersion();
-		}
-		else {
-			appName = GradleUtil.extractName(buildFile);
-			appVersion = GradleUtil.extractVersion(buildFile);
-		}
-
-		return service.processBuildFile(buildFile, appName, appVersion);
-	}
-
-	@SneakyThrows
 	public HelmContext processBuildfile(String buildFile, String name, String version) {
 		String originalFilename = buildFile.contains("<?xml") ? "pom.xml" : "build.gradle";
 		FileUploadService service = chooseService(originalFilename);

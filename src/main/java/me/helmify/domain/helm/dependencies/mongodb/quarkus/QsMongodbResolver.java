@@ -1,6 +1,7 @@
 package me.helmify.domain.helm.dependencies.mongodb.quarkus;
 
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.dependencies.mongodb.MongodbResolver;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,11 @@ public class QsMongodbResolver implements MongodbResolver {
 		return Map.of("QUARKUS_MONGODB_CONNECTION-STRING",
 				"mongodb://{{ .Values.global.hosts.mongodb }}:{{ .Values.global.ports.mongodb }}",
 				"QUARKUS_MONGODB_DATABASE", "{{ .Values.mongodb.database }}");
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

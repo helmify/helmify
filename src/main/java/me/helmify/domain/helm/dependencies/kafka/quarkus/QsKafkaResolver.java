@@ -1,5 +1,6 @@
 package me.helmify.domain.helm.dependencies.kafka.quarkus;
 
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.dependencies.kafka.KafkaResolver;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,11 @@ public class QsKafkaResolver implements KafkaResolver {
 	public Map<String, String> getDefaultConfig() {
 		return Map.of("MP_MESSAGING_INCOMING_KAFKA_BOOTSTRAP_SERVERS",
 				"{{ .Values.global.hosts.kafka }}:{{ .Values.global.ports.kafka }}");
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

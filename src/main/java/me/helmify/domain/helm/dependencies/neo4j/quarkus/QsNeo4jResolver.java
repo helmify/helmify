@@ -1,6 +1,7 @@
 package me.helmify.domain.helm.dependencies.neo4j.quarkus;
 
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.dependencies.neo4j.Neo4jResolver;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,11 @@ public class QsNeo4jResolver implements Neo4jResolver {
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of("QUARKUS_NEO4J_URI", "bolt://{{ .Values.global.hosts.neo4j }}:{{ .Values.global.ports.neo4j }}");
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }

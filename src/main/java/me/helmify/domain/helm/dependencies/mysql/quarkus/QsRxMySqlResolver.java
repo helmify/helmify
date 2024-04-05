@@ -1,6 +1,7 @@
 package me.helmify.domain.helm.dependencies.mysql.quarkus;
 
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.dependencies.mysql.MySqlResolver;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,11 @@ public class QsRxMySqlResolver implements MySqlResolver {
 	public Map<String, String> getDefaultConfig() {
 		return Map.of("QUARKUS_DATASOURCE_REACTIVE_URL",
 				"vertx-reactive:mysql://{{ .Values.global.hosts.mysql }}:{{ .Values.global.ports.mysql }}/{{ .Values.mysql.database }}");
+	}
+
+	@Override
+	public FrameworkVendor getVendor() {
+		return FrameworkVendor.Quarkus;
 	}
 
 }
