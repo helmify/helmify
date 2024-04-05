@@ -2,14 +2,15 @@ package me.helmify.domain.helm.chart.providers;
 
 import lombok.RequiredArgsConstructor;
 import me.helmify.app.config.YamlConfig;
-import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.List;
+import java.util.Map;
 
 import static me.helmify.domain.helm.chart.TemplateStringPatcher.insertAfter;
 import static me.helmify.domain.helm.chart.TemplateStringPatcher.removeBetween;
@@ -18,12 +19,36 @@ import static me.helmify.domain.helm.chart.TemplateStringPatcher.removeBetween;
 @RequiredArgsConstructor
 public class HelmDeploymentYamlProvider implements HelmFileProvider {
 
+	private final Map<FrameworkVendor, String> liveness = Map.of(FrameworkVendor.Spring, "/actuator/health/liveness",
+			FrameworkVendor.Quarkus, "/q/health/live");
+
+	private final Map<FrameworkVendor, String> readiness = Map.of(FrameworkVendor.Spring, "/actuator/health/readiness",
+			FrameworkVendor.Quarkus, "/q/health/ready");
+
 	@Override
 	public String getFileContent(HelmContext context) {
 
 		String template = readTemplate("helm/templates/deployment.yaml").replaceAll("REPLACE_ME", context.getAppName());
 
 		return customize(template, context);
+	}
+
+	@Override
+	public String patchContent(String content, HelmContext context) {
+		return "helm".equals(context.getChartFlavor()) ? customize(content, context)
+				: customizeBitnamiDeployment(content, context);
+	}
+
+	private String customizeBitnamiDeployment(String content, HelmContext context) {
+		boolean hasActuator = context.isHasActuator();
+		boolean createIngress = context.isCreateIngress();
+
+		if (createIngress && hasActuator && FrameworkVendor.Quarkus.equals(context.getFrameworkVendor())) {
+			content = content.replace("/actuator/health/liveness", liveness.get(context.getFrameworkVendor()))
+				.replace("/actuator/health/readiness", readiness.get(context.getFrameworkVendor()));
+		}
+
+		return content;
 	}
 
 	@Override
@@ -45,10 +70,6 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 			withInitContainers = removeBetween("###@helmify:probes", "###@helmify:lifecycle", withInitContainers);
 
 			FrameworkVendor vendor = context.getFrameworkVendor();
-			String liveness = vendor.equals(FrameworkVendor.Spring) ? "/actuator/health/liveness"
-					: vendor.equals(FrameworkVendor.Quarkus) ? "/q/health/live" : "";
-			String readiness = vendor.equals(FrameworkVendor.Spring) ? "/actuator/health/readiness"
-					: vendor.equals(FrameworkVendor.Quarkus) ? "/q/health/ready" : "";
 
 			withInitContainers = insertAfter(withInitContainers, "###@helmify:probes", String.format("""
 					  - name: healthcheck
@@ -72,7 +93,7 @@ public class HelmDeploymentYamlProvider implements HelmFileProvider {
 					  httpGet:
 					    path: %s
 					    port: healthcheck
-					""", liveness, readiness), 10);
+					""", liveness.get(vendor), readiness.get(vendor)), 10);
 		}
 
 		return HelmUtil.removeMarkers(injectEnvVars(withInitContainers, context));

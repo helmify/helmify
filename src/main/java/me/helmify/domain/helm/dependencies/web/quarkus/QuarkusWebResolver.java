@@ -22,7 +22,8 @@ public class QuarkusWebResolver implements DependencyResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("quarkus-vertx-graphql", "quarkus-smallrye-graphql", "quarkus-resteasy-reactive-jackson");
+		return List.of("quarkus-vertx-graphql", "quarkus-smallrye-graphql", "quarkus-resteasy-reactive-jackson",
+				"quarkus-rest-jackson");
 	}
 
 	@Override

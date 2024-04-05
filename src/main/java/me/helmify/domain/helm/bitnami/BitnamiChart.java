@@ -1,8 +1,11 @@
 package me.helmify.domain.helm.bitnami;
 
+import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.chart.providers.HelmConfigMapProvider;
+import me.helmify.domain.helm.chart.providers.HelmDeploymentYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmSecretsYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmValuesYamlProvider;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.yaml.snakeyaml.Yaml;
@@ -79,7 +82,16 @@ public class BitnamiChart {
 		postProcessValuesYaml(files, context);
 		postProcessConfigMap(files, context);
 		postProcessSecrets(files, context);
+		postProcessDeployment(files, context);
 
+	}
+
+	private static void postProcessDeployment(Map<String, String> files, BitnamiChartContext context) {
+		String deploymentFile = "templates/deployment.yaml";
+		String deployment = files.get(deploymentFile);
+		String patchedDeployment = new HelmDeploymentYamlProvider().patchContent(deployment,
+				context.getOriginalContext());
+		files.put(deploymentFile, patchedDeployment);
 	}
 
 	private static void postProcessSecrets(Map<String, String> files, BitnamiChartContext context) {

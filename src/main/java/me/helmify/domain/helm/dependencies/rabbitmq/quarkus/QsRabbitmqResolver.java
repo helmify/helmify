@@ -22,7 +22,7 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("quarkus-smallrye-reactive-messaging-rabbitmq");
+		return List.of("quarkus-smallrye-reactive-messaging-rabbitmq", "quarkus-messaging-rabbitmq");
 	}
 
 	public Map<String, Object> getSecretEntries() {
