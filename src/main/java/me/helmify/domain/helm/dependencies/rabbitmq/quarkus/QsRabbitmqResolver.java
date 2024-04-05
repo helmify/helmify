@@ -27,16 +27,16 @@ public class QsRabbitmqResolver implements RabbitmqResolver {
 
 	public Map<String, Object> getSecretEntries() {
 		return Map.of(
-				"RABBITMQ_USERNAME", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
-				, "RABBITMQ_PASSWORD", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
+				"MP_MESSAGING_CONNECTOR_SMALLRYE-RABBITMQ_USERNAME", "{{ .Values.rabbitmq.auth.username | b64enc | quote }}"
+				, "MP_MESSAGING_CONNECTOR_SMALLRYE-RABBITMQ_PASSWORD", "{{ .Values.rabbitmq.auth.password | b64enc | quote }}"
 		);
 	}
 
 	public Map<String, String> getDefaultConfig() {
 		return Map.of(
-				"RABBITMQ-HOST", "{{ .Values.global.hosts.rabbitmq }}",
-				"RABBITMQ-PORT", "{{ .Values.global.ports.rabbitmq }}",
-				"RABBITMQ-VIRTUAL-HOST", "{{ .Values.rabbitmq.vhost }}"
+				"MP_MESSAGING_CONNECTOR_SMALLRYE-RABBITMQ_HOST", "{{ .Values.global.hosts.rabbitmq }}",
+				"MP_MESSAGING_CONNECTOR_SMALLRYE-RABBITMQ_PORT", "{{ .Values.global.ports.rabbitmq }}",
+				"MP_MESSAGING_CONNECTOR_SMALLRYE-RABBITMQ_VIRTUAL-HOST", "{{ .Values.rabbitmq.vhost }}"
 		);
 	}
 
