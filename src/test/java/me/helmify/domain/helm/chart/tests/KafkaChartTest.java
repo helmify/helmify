@@ -1,5 +1,6 @@
 package me.helmify.domain.helm.chart.tests;
 
+import me.helmify.domain.helm.HelmChartTests;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
