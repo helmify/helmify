@@ -10,4 +10,23 @@ import java.util.List;
 
 public class CassandraBitnamiChartTest extends HelmChartTests {
 
+	String bitnami = "bitnami";
+
+	String testSource = "cassandra";
+
+	String chartName = "test-cassandra-chart";
+
+	@Test
+	public void lintBitnamiChartSpringCassandra() {
+		List<String> starterDependencies = List.of("data-cassandra");
+		lintAndTestChart(new HelmUnittestContext(chartName, "1.0.0", starterDependencies, testSource, List.of(),
+				bitnami, FrameworkVendor.Spring));
+	}
+
+	public void lintBitnamiChartQuarkusCassandra() {
+		List<String> starterDependencies = List.of("cassandra-quarkus-client");
+		lintAndTestChart(new HelmUnittestContext(chartName, "1.0.0", starterDependencies, testSource, List.of(),
+				bitnami, FrameworkVendor.Quarkus));
+	}
+
 }

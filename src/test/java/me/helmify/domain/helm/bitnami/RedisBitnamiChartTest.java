@@ -10,4 +10,22 @@ import java.util.List;
 
 public class RedisBitnamiChartTest extends HelmChartTests {
 
+	String bitnami = "bitnami";
+
+	String testSource = "redis";
+
+	@Test
+	public void lintBitnamiChartSpringRedis() {
+		List<String> starterDependencies = List.of(testSource);
+		lintAndTestChart(new HelmUnittestContext("test-redis-chart", "1.0.0", starterDependencies, testSource,
+				List.of(), bitnami, FrameworkVendor.Spring));
+	}
+
+	@Test
+	public void lintBitnamiChartQuarkusRedis() {
+		List<String> starterDependencies = List.of("redis-client");
+		lintAndTestChart(new HelmUnittestContext("test-redis-chart", "1.0.0", starterDependencies, "redis", List.of(),
+				bitnami, FrameworkVendor.Quarkus));
+	}
+
 }

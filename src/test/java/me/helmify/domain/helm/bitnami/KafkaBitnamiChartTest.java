@@ -10,4 +10,24 @@ import java.util.List;
 
 public class KafkaBitnamiChartTest extends HelmChartTests {
 
+	String bitnami = "bitnami";
+
+	String testSource = "kafka";
+
+	String chartName = "test-kafka-chart";
+
+	@Test
+	public void lintBitnamiChartSpringKafka() {
+		List<String> starterDependencies = List.of("kafka");
+		lintAndTestChart(new HelmUnittestContext(chartName, "1.0.0", starterDependencies, testSource, List.of(),
+				bitnami, FrameworkVendor.Spring));
+	}
+
+	@Test
+	public void lintBitnamiChartQuarkusKafka() {
+		List<String> starterDependencies = List.of("messaging-kafka");
+		lintAndTestChart(new HelmUnittestContext(chartName, "1.0.0", starterDependencies, testSource, List.of(),
+				bitnami, FrameworkVendor.Quarkus));
+	}
+
 }

@@ -10,4 +10,22 @@ import java.util.List;
 
 public class MariaDbBitnamiChartTest extends HelmChartTests {
 
+	String bitnami = "bitnami";
+
+	String testSource = "mariadb";
+
+	@Test
+	public void lintBitnamiChartSpringMariadb() {
+		List<String> starterDependencies = List.of("mariadb");
+		lintAndTestChart(new HelmUnittestContext("test-mariadb-chart", "1.0.0", starterDependencies, testSource,
+				List.of(), bitnami, FrameworkVendor.Spring));
+	}
+
+	@Test
+	public void lintBitnamiChartQuarkusMariadb() {
+		List<String> starterDependencies = List.of("jdbc-mariadb");
+		lintAndTestChart(new HelmUnittestContext("test-mariadb-chart", "1.0.0", starterDependencies, testSource,
+				List.of(), bitnami, FrameworkVendor.Quarkus));
+	}
+
 }
