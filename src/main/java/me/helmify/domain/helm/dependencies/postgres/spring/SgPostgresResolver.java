@@ -18,7 +18,7 @@ public class SgPostgresResolver implements PostgresResolver {
 
 	@Override
 	public List<String> matchOn() {
-		return List.of("postgres");
+		return List.of("postgresql");
 	}
 
 	public Map<String, Object> getSecretEntries() {

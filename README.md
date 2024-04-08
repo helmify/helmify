@@ -1,49 +1,152 @@
 # helmify
 
-Generate a Helm Chart for an existing application. 
+Generate a Helm Chart for an existing application.
 
 ## Currently supporting
 
-- [x] Spring Boot
-- [x] Quarkus
-- [x] Maven
-- [x] Gradle
+### Chart Flavors
+- "Helm Create" - a basic Helm Chart like you would get from `helm create`
+- "Bitnami" - a Helm Chart with Bitnami's common chart structure
+
+### Application Types
+- Web Applications
+
+### Languages
+
+#### Java
+
+<table>
+  <tr>
+    <td colspan="4">Supported JVM Frameworks</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maven</td>
+    <td>Gradle (groovy)</td>
+    <td>Gradle (kts)</td>
+  </tr>
+  <tr>
+    <td>Spring Boot</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Quarkus</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td colspan="4">Supported Services</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Spring Boot</td>
+    <td>Quarkus</td>
+  </tr>
+  <tr>
+    <td>Postgresql</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>MySQL</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>MariaDB</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Elasticsearch</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Cassandra</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Couchbase</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Neo4j</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>RabbitMQ</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Kafka</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>Yes</td>
+    <td>WIP</td>
+  </tr>
+  <tr>
+    <td>Probes</td>
+    <td>Spring Actuator</td>
+    <td>Smallrye Health</td>
+  </tr>
+</table>
+
+#### Go
+TODO
+
+#### Python
+TODO
+
+#### Node.js
+TODO
+
 
 ## What does it do
 
-First step to using helmify is to provide a buildfile. For supported frameworks see above.
-This can be a Maven pom.xml or a Gradle build.gradle / build.gradle.kts file. You can either upload the file
-or have helmify pull it from a Spring Initializr URL (of Initializr's "Share" feature).
+Helmify aims to support developers in getting their applications running on Kubernetes as easily as possible.
 
-Next, helmify will query you for additional information:
+Since Helm is the de-facto way for packaging applications [citation needed] to run on Kubernetes, Helmify is looking to
+support developers in running their applications - possibly with dependencies like databases etc - on K8s as early
+as possible. 
 
-- The URL of your docker image repository
-- The tag to use for your docker image
-- optionally a Docker Image Pull Secret can be specified
+To achieve this goal, Helmify will provide a developer with:
+- A Config Map to set up the application with all required information for successful connectivity to external resources
+- A Secret to store credentials for external resources
+- A Deployment with initContainers to wait for external resources to be ready
+- A Service exposing ports for http and healthcheck access
 
-helmify will pre-populate the generated helm chart with this information.
+Additionally, the Helmify Web UI will offer some options for customization:
+- Choose the Helm Chart flavor (Helm Create, Bitnami)
+- Specify Docker Image Name / Pull Secret
 
-Finally, helmify will set up a helm chart tailored to your application's needs. It will:
+## How to use
 
-- create a configmap.yaml and write a spring application.properties file which contains coordinates to external
-  resources:
-  - spring.datasource.url
-  - spring.rabbitmq.host/port
-- if spring actuator is found, helmify will configure it to run on a separate port which will be used for readiness
-  and liveness probes
-- create / update secrets.yaml to store credentials for external resources
-- update deployment.yaml to mount resource credential secretKeyRefs as environment variables into your pods
-  - spring datasource username / password
-  - spring rabbitmq username / password
-- update deployment.yaml to run an initContainer for each external resource which blocks until the resource is ready
-- update deployment.yaml to mount a runtime configuration file (spring application.properties)
-- update deployment.yaml to configure readiness/liveness probes
-- update values.yaml with a config block for each external resource
-- update values.yaml with global values like hostnames
-- update values.yaml to align naming to artifactId
-- update values.yaml to use user-supplied docker image repository url
+Helmify can be used in several ways: 
 
-... and offer the generated helm chart as a zip file for download.
+- Use the Web UI at https://helmify.me
+- Use the CLI, available from the [releases page](https://github.com/helmify/helmify/releases)
+- Set up https://helmify.me/spring as Spring Initializr URL in your IDE
+- Set up https://helmify.me/quarkus as Quarkus Initializr URL in your IDE
+
 
 ## Stack
 
