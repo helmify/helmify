@@ -38,7 +38,7 @@ runs:
           
           if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; then
             echo "All pods are ready. Terminating the loop."
-            sleep 20
+            sleep 30
             break 
           fi
         
@@ -48,5 +48,5 @@ runs:
           echo "Checking for pod errors and printing events..."
           (kubectl get events --namespace default | grep Error) || true
         
-          sleep 10
+          sleep 30
         done
