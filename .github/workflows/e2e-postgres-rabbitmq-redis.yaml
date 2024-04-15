@@ -1,4 +1,4 @@
-name: Helmify E2E Testing - Postgres
+name: Helmify E2E Testing - Postgres / RabbitMQ / Redis
 
 on:
   schedule:
@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  e2e-spring-postgres-helm:
+  e2e-spring-postgres-rabbit-redis-helm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,12 +18,12 @@ jobs:
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
-          name: spring-postgres-tester
+          name: spring-postgres-rabbit-redis
           type: spring
           port: 18000
-          expect: postgres
+          expect: postgres,rabbitmq,redis
           chartFlavor: helm
-  e2e-spring-postgres-bitnami:
+  e2e-spring-postgres-rabbit-redis-bitnami:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,35 +31,34 @@ jobs:
       - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
-          name: spring-postgres-tester
+          name: spring-postgres-rabbit-redis
           type: spring
           port: 18001
-          expect: postgres
+          expect: postgres,rabbitmq,redis
           chartFlavor: bitnami
-
-  e2e-quarkus-postgres-helm:
+  e2e-quarkus-postgres-rabbit-redis-helm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-tester
-      - name: Run Quarkus Postgres Tester
+      - name: Run Spring Postgres Tester
         uses: ./.github/actions/run-tester
         with:
-          name: quarkus-postgres-tester
-          type: quarkus
-          port: 18002
-          expect: postgres
-          chartFlavor: helm
-  e2e-quarkus-postgres-bitnami:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-tester
-      - name: Run Quarkus Postgres Tester
-        uses: ./.github/actions/run-tester
-        with:
-          name: quarkus-postgres-tester
+          name: quarkus-postgres-rabbit-redis
           type: quarkus
           port: 18003
-          expect: postgres
+          expect: postgres,rabbitmq,redis
+          chartFlavor: helm
+  e2e-quarkus-postgres-rabbit-redis-bitnami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Postgres Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-postgres-rabbit-redis
+          type: quarkus
+          port: 18004
+          expect: postgres,rabbitmq,redis
           chartFlavor: bitnami

@@ -1,18 +1,22 @@
 package me.helmify.kind;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class KindPingTest {
 
 	@Test
-	public void testCluster() throws Exception {
+	public void testCluster() {
 
 		// only execute when explicitly called
 		String property = System.getProperty("test");
@@ -23,25 +27,36 @@ public class KindPingTest {
 		String url = System.getProperty("url");
 		String expected = System.getProperty("expected");
 
-		int tries = 0;
-		int max = 3;
+		List<String> expectations = expected.contains(",") ? Arrays.asList(expected.split(",")) : List.of(expected);
+		Map<String, Boolean> fulfilledExpectations = expectations.stream()
+			.collect(Collectors.toMap(e -> e, e -> false));
 
-		boolean checkResponse = false;
-
-		while (tries < max) {
-			checkResponse = checkResponse(url, expected);
-			if (checkResponse) {
-				break;
+		fulfilledExpectations.keySet().forEach(exp -> {
+			int tries = 0;
+			int max = 3;
+			while (tries < max) {
+				boolean response = checkResponse(url + "/" + exp, expected);
+				if (response) {
+					fulfilledExpectations.put(exp, true);
+					break;
+				}
+				sleep();
+				tries++;
 			}
-			Thread.sleep(3000);
-			tries++;
-		}
+		});
 
-		Assertions.assertTrue(checkResponse, "Expected response not found from: " + expected);
+		fulfilledExpectations.keySet().forEach(k -> {
+			Assertions.assertTrue(fulfilledExpectations.get(k), "Expected response not found from: " + k);
+		});
 
 	}
 
-	private boolean checkResponse(String url, String expected) throws Exception {
+	@SneakyThrows
+	private static void sleep() {
+		Thread.sleep(3000);
+	}
+
+	private boolean checkResponse(String url, String expected) {
 		// response from url should contain expected string. response from url is a
 		// hashmap
 		RestClient client = RestClient.builder().build();
