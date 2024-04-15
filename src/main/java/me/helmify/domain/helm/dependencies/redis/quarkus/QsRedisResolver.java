@@ -22,6 +22,11 @@ public class QsRedisResolver implements RedisResolver {
 	}
 
 	@Override
+	public Map<String, Object> getSecretEntries() {
+		return Map.of("QUARKUS_REDIS_PASSWORD", "{{ .Values.redis.auth.password | b64enc | quote }}");
+	}
+
+	@Override
 	public FrameworkVendor getVendor() {
 		return FrameworkVendor.Quarkus;
 	}

@@ -33,7 +33,7 @@ public class SgRedisResolver implements RedisResolver {
     @Override
     public Map<String,Object> getSecretEntries() {
         return Map.of(
-                "SPRING_DATA_REDIS_PASSWORD", "{{ \"redis\" | b64enc | quote }}"
+                "SPRING_DATA_REDIS_PASSWORD", "{{ .Values.redis.auth.password | b64enc | quote }}"
         );
     }
 
