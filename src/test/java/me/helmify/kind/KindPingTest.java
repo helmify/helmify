@@ -65,6 +65,7 @@ public class KindPingTest {
 		// hashmap
 		RestClient client = RestClient.builder().build();
 		Map<String, Boolean> body = client.get().uri(url).retrieve().body(mapType);
+		log.info("Received response from {} for key {} : {}", url, expected, body);
 		return body != null && body.containsKey(expected) && body.get(expected);
 	}
 
