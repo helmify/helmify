@@ -35,7 +35,9 @@ public class KindPingTest {
 			int tries = 0;
 			int max = 3;
 			while (tries < max) {
-				boolean response = checkResponse(url + "/" + exp, expected);
+				String endpoint = url + "/" + exp;
+				boolean response = checkResponse(endpoint, expected);
+				log.info("Got Response from endpoint {} : {}", endpoint, response);
 				if (response) {
 					fulfilledExpectations.put(exp, true);
 					break;
@@ -44,6 +46,8 @@ public class KindPingTest {
 				tries++;
 			}
 		});
+
+		log.info("Current Expectations: {}", fulfilledExpectations);
 
 		fulfilledExpectations.keySet().forEach(k -> {
 			Assertions.assertTrue(fulfilledExpectations.get(k), "Expected response not found from: " + k);
