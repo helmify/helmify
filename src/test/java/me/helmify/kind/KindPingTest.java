@@ -36,7 +36,7 @@ public class KindPingTest {
 			int max = 10;
 			while (tries < max) {
 				String endpoint = url + "/" + exp;
-				boolean response = checkResponse(endpoint, expected);
+				boolean response = checkResponse(endpoint, exp);
 				log.info("Got Response from endpoint {} : {}", endpoint, response);
 				if (response) {
 					fulfilledExpectations.put(exp, true);
