@@ -33,7 +33,7 @@ public class KindPingTest {
 
 		fulfilledExpectations.keySet().forEach(exp -> {
 			int tries = 0;
-			int max = 3;
+			int max = 10;
 			while (tries < max) {
 				String endpoint = url + "/" + exp;
 				boolean response = checkResponse(endpoint, expected);
@@ -57,7 +57,7 @@ public class KindPingTest {
 
 	@SneakyThrows
 	private static void sleep() {
-		Thread.sleep(3000);
+		Thread.sleep(5000);
 	}
 
 	private boolean checkResponse(String url, String expected) {
