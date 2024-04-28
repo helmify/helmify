@@ -10,19 +10,15 @@ import me.helmify.util.HelmUtil;
 @NoArgsConstructor
 public class HelmSecret extends HelmFile {
 
-	public HelmSecret(String filename, String secretName, String stringData) {
+	public HelmSecret(String filename, String secretName, String content) {
 		this.fileName = filename;
 		this.secretName = secretName;
-		this.stringData = stringData;
+		this.content = content;
 	}
 
 	@Getter
 	@Setter
 	private String secretName;
-
-	@Getter
-	@Setter
-	private String stringData;
 
 	private static final String yaml = """
 			apiVersion: v1
@@ -36,9 +32,14 @@ public class HelmSecret extends HelmFile {
 
 	@JsonIgnore
 	public String getYaml() {
-		String patched = TemplateStringPatcher.insertAfter(yaml, "###@helmify:data", stringData, 2)
+		String patched = TemplateStringPatcher.insertAfter(yaml, "###@helmify:data", content, 2)
 			.replace("SECRET_NAME", secretName);
 		return HelmUtil.removeMarkers(patched);
+	}
+
+	@Override
+	public String getContent() {
+		return getYaml();
 	}
 
 }

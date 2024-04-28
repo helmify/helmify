@@ -1,8 +1,8 @@
 package me.helmify.domain.helm.dependencies.cassandra;
 
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.model.HelmSecret;
 import me.helmify.domain.helm.dependencies.DependencyResolver;
+import me.helmify.domain.helm.model.HelmSecret;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public interface CassandraResolver extends DependencyResolver {
 				),
 				"global", Map.of(
 						"hosts", Map.of(
-								"cassandra", context.getAppName() + "-cassandra"),
+								"cassandra", context.getAppName() + "-cassandra-headless"),
 						"ports", Map.of(
 								"cassandra", getPort())));
 	}
@@ -72,4 +72,12 @@ init-keyspace.cql: >-
         """.replace("@@keyspace", getKeySpaceName(context))
 				)
 		);
-	}}
+	}
+
+	@Override
+	default String getReadmeParts() {
+		return """
+		## Cassandra
+		""";
+    }
+}

@@ -8,17 +8,31 @@ import java.util.Map;
 
 public interface MariaDbResolver extends DependencyResolver {
 
+	//@formatter:off
 	default Map<String, Object> getValuesEntries(HelmContext context) {
-		return Map.of("mariadb",
-				Map.of("enabled", true, "database", "my_database", "fullnameOverride",
-						context.getAppName() + "-mariadb", "nameOverride", context.getAppName() + "-mariadb",
-						"architecture", "standalone", "primary",
-						Map.of("persistence",
-								Map.of("enabled", true, "storageClass", "", "accessModes", List.of("ReadWriteOnce"),
-										"size", "1Gi")),
-						"auth", Map.of("username", "mariadb", "password", "mariadb", "rootPassword", "mariadb")),
-				"global", Map.of("hosts", Map.of("mariadb", context.getAppName() + "-mariadb"), "ports",
-						Map.of("mariadb", 3306)));
+		String mariadbName = context.getAppName() + "-mariadb";
+		return Map.of("mariadb", Map.of(
+				"enabled", true,
+						"database", "my_database",
+						"fullnameOverride", mariadbName,
+						"nameOverride", mariadbName,
+						"architecture", "standalone",
+						"primary", Map.of(
+							"persistence", Map.of(
+									"enabled", true,
+									"storageClass", "",
+									"accessModes", List.of("ReadWriteOnce"),
+									"size", "1Gi")
+						),
+					"auth", Map.of(
+							"username", "mariadb",
+							"password", "mariadb",
+							"rootPassword", "mariadb")
+				),
+				"global", Map.of(
+					"hosts", Map.of(
+						"mariadb", mariadbName + "-0." + mariadbName),
+					"ports",Map.of("mariadb", 3306)));
 	}
 
 	default Map<String, Object> getPreferredChart() {

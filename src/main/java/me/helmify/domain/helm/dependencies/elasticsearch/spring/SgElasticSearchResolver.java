@@ -29,7 +29,7 @@ public class SgElasticSearchResolver implements ElasticSearchResolver {
     public Map<String, String> getDefaultConfig() {
         return Map.of(
                 "SPRING_ELASTICSEARCH_URIS",
-                "http://{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
+                "{{ .Values.global.hosts.elasticsearch }}:{{ .Values.global.ports.elasticsearch }}"
         );
     }
 

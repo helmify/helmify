@@ -106,5 +106,13 @@ spec:
         return "couchbase";
     }
 
+    @Override default String getReadmeParts() {
+        return """
+		## Couchbase
+		
+		### Couchbase Operator
+		To install the official Couchbase Operator via Helm, see https://docs.couchbase.com/operator/current/helm-setup-guide.html
+		""";
+    }
 
 }

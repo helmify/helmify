@@ -80,4 +80,8 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		return new ArrayList<>();
 	}
 
+	default String getReadmeParts() {
+		return "";
+	}
+
 }
