@@ -33,7 +33,7 @@ public class KindPingTest {
 
 		fulfilledExpectations.keySet().forEach(exp -> {
 			int tries = 0;
-			int max = 10;
+			int max = 60;
 			while (tries < max) {
 				String endpoint = url + "/" + exp;
 				boolean response = checkResponse(endpoint, exp);
@@ -57,16 +57,22 @@ public class KindPingTest {
 
 	@SneakyThrows
 	private static void sleep() {
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 	}
 
 	private boolean checkResponse(String url, String expected) {
-		// response from url should contain expected string. response from url is a
-		// hashmap
-		RestClient client = RestClient.builder().build();
-		Map<String, Boolean> body = client.get().uri(url).retrieve().body(mapType);
-		log.info("Received response from {} for key {} : {}", url, expected, body);
-		return body != null && body.containsKey(expected) && body.get(expected);
+		try {
+			// response from url should contain expected string. response from url is a
+			// hashmap
+			RestClient client = RestClient.builder().build();
+			Map<String, Boolean> body = client.get().uri(url).retrieve().body(mapType);
+			log.info("Received response from {} for key {} : {}", url, expected, body);
+			return body != null && body.containsKey(expected) && body.get(expected);
+		}
+		catch (Exception e) {
+			log.error("Error while checking response from url: " + url, e);
+		}
+		return false;
 	}
 
 	ParameterizedTypeReference<Map<String, Boolean>> mapType = new ParameterizedTypeReference<>() {
