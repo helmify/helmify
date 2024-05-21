@@ -10,7 +10,11 @@ import java.util.Map;
 
 import static me.helmify.util.HelmUtil.makeSecretKeyRef;
 
-@Component
+/**
+ * Since there is no working Couchbase support for Quarkus at the time of writing, we will
+ * for now deprecate this resolver. May revisit at a later date.
+ */
+@Deprecated(forRemoval = false)
 public class QsCouchbaseResolver implements CouchbaseResolver {
 
 	//@formatter:off
