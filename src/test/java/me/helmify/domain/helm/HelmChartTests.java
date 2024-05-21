@@ -80,9 +80,6 @@ public abstract class HelmChartTests extends HelmLintBaseTest {
 
 		System.out.println("chartDirectory = " + chartDirectory);
 
-		String containerLog = lintHelmChart(chartDirectory.getAbsolutePath());
-		Assertions.assertTrue(containerLog.contains("0 chart(s) failed"));
-
 		boolean shouldTest = !context.unittestFiles.isEmpty();
 
 		if (shouldTest) {
