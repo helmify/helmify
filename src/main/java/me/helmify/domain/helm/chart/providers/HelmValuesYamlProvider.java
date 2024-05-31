@@ -47,7 +47,7 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 			}
 		}));
 
-		return buffer.toString();
+		return buffer.toString().replace("'''", "'");
 	}
 
 	@Override
