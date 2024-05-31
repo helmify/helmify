@@ -45,7 +45,9 @@ public class QuarkusInitializrProxy extends InitializrSupport {
 	}
 
 	@PostMapping(value = "/quarkus/api/download")
-	public void getStarter(@RequestBody Map<String, Object> body, HttpServletResponse response) throws IOException {
+	public void getStarter(@RequestBody Map<String, Object> body,
+			@RequestParam(name = "chartFlavor", defaultValue = "helm") String chartFlavor,
+			HttpServletResponse response) {
 		byte[] originalStarter = r.post()
 			.uri(quarkusDownloadUrl)
 			.body(body)
@@ -60,7 +62,7 @@ public class QuarkusInitializrProxy extends InitializrSupport {
 		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
 		response.setContentType("application/octet-stream");
 		streamStarter(originalStarter, response, body.get("artifactId").toString(), body.get("version").toString(),
-				"starter.zip");
+				"starter.zip", chartFlavor);
 	}
 
 }

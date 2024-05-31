@@ -1,11 +1,11 @@
 package me.helmify.domain.build.maven;
 
 import lombok.RequiredArgsConstructor;
-import me.helmify.domain.helm.resolvers.FrameworkVendor;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
 import me.helmify.domain.helm.HelmDependency;
-import me.helmify.domain.helm.resolvers.DependencyResolver;
+import me.helmify.domain.helm.dependencies.DependencyResolver;
 import me.helmify.util.HelmUtil;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;

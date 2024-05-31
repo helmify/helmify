@@ -14,36 +14,32 @@ inputs:
   type:
     description: 'The type of the application (spring|quarkus)'
     required: true
+  chartFlavor:
+    description: 'The chart flavor to use (helm|bitnami)'
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Build  ${{ inputs.name }} Tester
-      if: ${{ inputs.type  == 'spring' }}
+    - name: Pull  ${{ inputs.name }} Tester
       shell: bash
-      run: |
-        mvn -B clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=${{ inputs.name }}:0.1.0  --file testing/${{ inputs.name }}/pom.xml
-    - name: Build  ${{ inputs.name }} Tester
-      if: ${{ inputs.type  == 'quarkus' }}
-      shell: bash
-      run: |
-        mvn clean compile quarkus:image-build -Dquarkus.container-image.name=${{ inputs.name }} -Dquarkus.container-image.tag=0.1.0 --file testing/${{ inputs.name }}/pom.xml \
-        && docker tag runner/${{ inputs.name }}:0.1.0 ${{ inputs.name }}:0.1.0
-    - name: Deploy ${{ inputs.name }} Tester
-      shell: bash
-      run: |
-        curl -X POST --data @testing/${{ inputs.name }}/pom.xml  -o ${{ inputs.name }}.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=${{ inputs.name }}&version=0.1.0" \
-        && unzip ${{ inputs.name }}.zip -d ${{ inputs.name }}-chart \
-        && cd ${{ inputs.name }}-chart/helm && helm dependency update \
-        && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing \
-        && helm install ${{ inputs.name }} . \
-        && kubectl wait pod --all --for=condition=Ready --timeout=300s
+      run: docker pull helmify/${{ inputs.name }}:latest && docker tag helmify/${{ inputs.name }}:latest docker.io/library/${{ inputs.name }}:0.1.0
+    - name: Deploy ${{ inputs.name }} ${{ inputs.chartFlavor }} Tester
+      uses: ./.github/actions/deploy-tester
+      with:
+        name: ${{ inputs.name }}
+        chartFlavor: ${{ inputs.chartFlavor }}
     - name: Port Forward ${{ inputs.name }} Tester
       shell: bash
       run: kubectl port-forward svc/${{inputs.name}} ${{inputs.port}}:8080 &
     - name: Ping ${{ inputs.name }} Tester
+      id: ping
       shell: bash
       run: mvn test -Dtest=KindPingTest -Durl=http://localhost:${{inputs.port}}/ping -Dexpected=${{inputs.expect}}
+    - name: Dump log
+      if: always()
+      shell: bash
+      run: kubectl logs svc/${{inputs.name}}
     - name: Uninstall ${{ inputs.name }} Tester
       shell: bash
       run: helm uninstall ${{ inputs.name }}

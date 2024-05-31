@@ -43,6 +43,7 @@ public class CustomizationMvcController {
 				Optional.ofNullable(info.getDockerImagePullSecret()).orElse(""), Map.of()));
 		context.setZipLink("helm.zip");
 		context.setCustomized(true);
+		context.setChartFlavor(info.getChartFlavor());
 		info.setZipLink(context.getZipLink());
 		info.setContext(context);
 		sessionService.addSession(info);

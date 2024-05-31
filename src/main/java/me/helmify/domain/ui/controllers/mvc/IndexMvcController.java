@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Set;
+
 /**
  * Controller for index page.
  * <p>
@@ -19,10 +21,10 @@ public class IndexMvcController {
 
 	private final BuildInfoProvider buildInfoProvider;
 
-	private final String supportedDependencies;
+	private final Set<String> supportedDependencies;
 
 	public IndexMvcController(ChartCounter chartCounter, BuildInfoProvider buildInfoProvider,
-			@Qualifier("supportedDependencies") String supportedDependencies) {
+			@Qualifier("supportedDependencies") Set<String> supportedDependencies) {
 		this.chartCounter = chartCounter;
 		this.buildInfoProvider = buildInfoProvider;
 		this.supportedDependencies = supportedDependencies;

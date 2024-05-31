@@ -23,27 +23,9 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].lifecycle.preStop.exec.command
           value: [ "sh", "-c", "sleep 10" ]
-      - contains:
-          path: spec.template.spec.containers[0].volumeMounts
-          content:
-            name: test-postgres-chart-config-vol
-            mountPath: /workspace/BOOT-INF/classes/application.properties
-            subPath: application.properties
       - equal:
-          path: spec.template.spec.volumes[0].name
-          value: test-postgres-chart-config-vol
-      - equal:
-          path: spec.template.spec.volumes[0].projected.sources[0].configMap.name
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
           value: test-postgres-chart-config
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: SPRING_DATASOURCE_USERNAME
-          count: 1
-          any: true
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: SPRING_DATASOURCE_PASSWORD
-          count: 1
-          any: true
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1].secretRef.name
+          value: test-postgres-chart-secret

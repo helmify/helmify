@@ -1,8 +1,11 @@
 package me.helmify.util;
 
-import lombok.SneakyThrows;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.zeroturnaround.zip.ZipUtil;
@@ -12,12 +15,14 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -54,22 +59,73 @@ public class TestUtil {
 		Files.copy(helmValuesFile.toPath(), Paths.get(chartDirectory.getAbsolutePath(), "tests", "values.yaml"));
 	}
 
-	/**
-	 * Downloads a Spring Boot Project and unpacks it into a temporary directory. Returns
-	 * a file reference to the unpacked starter zip's helm directory
-	 */
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class QuarkusRequest {
+
+		String buildTool;
+
+		String groupId;
+
+		String artifactId;
+
+		String version;
+
+		String className;
+
+		String path;
+
+		boolean noCode;
+
+		boolean noExamples;
+
+		int javaVersion;
+
+		String streamKey;
+
+		List<String> extensions;
+
+	}
+
 	@SneakyThrows
-	public static File downloadStarter(MockMvc mvc, String name, String version, List<String> dependencies) {
-		String bootVersion = "3.2.2";
-		String javaVersion = "21";
-		String groupId = "com.example";
-		String deps = String.join(",", dependencies);
+	public static File downloadStarter(MockMvc mvc, String name, String version, List<String> dependencies,
+			String chartFlavor, FrameworkVendor vendor) {
 
-		final String url = String.format(
-				"/spring/starter.zip?bootVersion=%s&javaVersion=%s&groupId=%s&name=%s&description=%s&artifactId=%s&language=java&packaging=jar&packageName=%s&type=gradle-project&version=%s&dependencies=%s",
-				bootVersion, javaVersion, groupId, name, name, name, groupId, version, deps);
+		MvcResult result = null;
 
-		MvcResult result = mvc.perform(get(url)).andExpect(status().isOk()).andReturn();
+		switch (vendor) {
+			case Spring -> {
+
+				String bootVersion = "3.2.2";
+				String javaVersion = "21";
+				String groupId = "com.example";
+				String deps = String.join(",", dependencies);
+				String url = String.format(
+						"/spring/starter.zip?chartFlavor=%s&bootVersion=%s&javaVersion=%s&groupId=%s&name=%s&description=%s&artifactId=%s&language=java&packaging=jar&packageName=%s&type=gradle-project&version=%s&dependencies=%s",
+						chartFlavor, bootVersion, javaVersion, groupId, name, name, name, groupId, version, deps);
+
+				result = mvc.perform(get(url)).andExpect(status().isOk()).andReturn();
+
+			}
+			case Quarkus -> {
+				String url = "/quarkus/api/download";
+				QuarkusRequest request = new QuarkusRequest();
+				request.setExtensions(new ArrayList<>());
+				request.setVersion("1.0.0");
+				request.setBuildTool("MAVEN");
+				request.setArtifactId(name);
+				request.setGroupId("com.example");
+				request.setJavaVersion(17);
+				dependencies.stream().map(d -> "io.quarkus:" + d).forEach(request.getExtensions()::add);
+
+				String s = new ObjectMapper().writeValueAsString(request);
+
+				result = mvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content(s)).andReturn();
+
+			}
+		}
 
 		byte[] content = result.getResponse().getContentAsByteArray();
 		assertNotNull(content);
@@ -86,7 +142,8 @@ public class TestUtil {
 
 		log.info("Unpacked starter zip to {}", parent.getAbsolutePath());
 
-		return Paths.get(parent.getAbsolutePath(), "helm").toFile();
+		return FrameworkVendor.Spring.equals(vendor) ? Paths.get(parent.getAbsolutePath(), "helm").toFile()
+				: Paths.get(parent.getAbsolutePath(), name, "helm").toFile();
 	}
 
 	@SneakyThrows

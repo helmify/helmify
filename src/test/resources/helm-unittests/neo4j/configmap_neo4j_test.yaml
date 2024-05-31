@@ -11,9 +11,9 @@ tests:
       - equal:
           path: metadata.name
           value: test-neo4j-chart-config
-      - matchRegex:
-          path: data["application.properties"]
-          pattern: spring.application.name=test-neo4j-chart
-      - matchRegex:
-          path: data["application.properties"]
-          pattern: spring.neo4j.uri=bolt://test-neo4j-chart-neo4j:7687
+      - equal:
+          path: data.SPRING_APPLICATION_NAME
+          value: test-neo4j-chart
+      - equal:
+          path: data.SPRING_NEO4J_URI
+          value: bolt://test-neo4j-chart-neo4j:7687

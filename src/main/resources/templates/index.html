@@ -12,124 +12,79 @@
     <link rel="stylesheet" href="/main.css"/>
 
 </head>
-<style>
-    .helm-dl-btn {
-        cursor: pointer;
-        font-size: 1.6em;
-        font-weight: bold;
-        text-align: center;
-        padding: 1.4em;
-        margin-top: 3em;
-        box-shadow: 0 3px 3px 2px white;
-    }
-
-    .helm-dl-btn:active {
-        box-shadow: unset;
-    }
-
-    .step-header {
-        font-size: 1.3em;
-    }
-
-    .step-header.text-primary {
-        text-decoration: underline;
-    }
-
-    .step-header.default {
-        opacity: 0.5;
-    }
-
-    #footer {
-        position: absolute;
-        bottom: 0;
-        text-align: center;
-        width: 99%;
-    }
-
-    #header {
-        text-align: center;
-        border-bottom: 0.1rem solid #d1d1d1;
-    }
-
-    body {
-        --bg-color: #333;
-        --bg-secondary-color: #131316;
-        --font-color: #f5f5f5;
-        --color-grey: #ccc;
-        --color-darkGrey: #777;
-        padding: 1em;
-    }
-
-    .brand {
-        padding-left: 0 !important;
-    }
-</style>
 <body>
-<div class="row">
-    <navbar-component  class="col-12"></navbar-component>
-</div>
-<div class="row" hx-boost="true">
-    <div class="col-12 text-center">
-        <div>
-            Helping you get to production faster =) <a href="/about">Tell me more ..</a>
-        </div>
+<header>
+    <div class="row">
+        <navbar-component  class="col-12"></navbar-component>
     </div>
-    <div class="col-12">
-        <div id="outlet" style="margin-top: 2em" class="col-12" th:insert="~{fragments :: first-form}"></div>
-        <form id="form"
-              hx-encoding="multipart/form-data"
-              hx-post="/upload-file"
-              hx-target="#main"
-              method="post">
-            <input id="upload-input"
-                   type="file"
-                   name="file"
-                   class="form-control-file"
-                   style="display: none;"
-                   onchange="this.form.requestSubmit()"
-            >
-        </form>
-        <form id="springInitializrForm">
-            <label>
-                <input id="springInitializrLink"
-                       hx-trigger="keyup changed"
-                       hx-post="/spring-initializr-link"
-                       hx-ext="json-enc"
-                       hx-target="#main"
-                       name="springInitializrLink"
+</header>
+<main>
+    <div class="row" hx-boost="true">
+        <div class="col-12 text-center">
+            <div>
+                Helping you get to production faster =) <a href="/about">Tell me more ..</a>
+            </div>
+        </div>
+        <div class="col-12">
+            <div id="outlet" style="margin-top: 2em" class="col-12" th:insert="~{fragments :: first-form}"></div>
+            <form id="form"
+                  hx-encoding="multipart/form-data"
+                  hx-post="/upload-file"
+                  hx-target="#main"
+                  method="post">
+                <input id="upload-input"
+                       type="file"
+                       name="file"
+                       class="form-control-file"
                        style="display: none;"
-                       type="text"
-                />
-            </label>
-        </form>
+                       onchange="this.form.requestSubmit()"
+                >
+            </form>
+            <form id="springInitializrForm">
+                <label>
+                    <input id="springInitializrLink"
+                           hx-trigger="keyup changed"
+                           hx-post="/spring-initializr-link"
+                           hx-ext="json-enc"
+                           hx-target="#main"
+                           name="springInitializrLink"
+                           style="display: none;"
+                           type="text"
+                    />
+                </label>
+            </form>
+        </div>
     </div>
+</main>
+<footer>
+    <div class="row" id="footer" style="padding-top: 0.5em; background-color: #333">
+        <div class="col-2 text-left" style="padding-top: 0.5em; padding-bottom: 0.5em">
+            <span id="notification-text"></span>
+        </div>
+        <div class="col-8 text-center" style="padding: 0.5em;">
+            Supported Technologies: Spring, Quarkus, Maven, Gradle,
+            <span th:each="name,iter : ${supportedDependencies}">
+                            <span th:text="${name}"></span>
+                            <span th:if="${name != '' && iter.last == false}">, </span>
+                        </span>
+        </div>
+        <div class="col-2"></div>
+        <div class="col-12" style="border-bottom: 0.1rem solid #d1d1d1;"></div>
+        <div class="col-4 text-left" style="padding-top: 0.5em;">
+            Charts generated: <span th:text="${chartsGenerated}"></span>
+        </div>
+        <div class="col-4" style="padding-top: 0.5em;">
+            <i>Did you know:</i> You can use <a href="https://helmify.me/spring">helmify.me/spring</a> as a
+            Spring Initializr URL in your IDE.
+        </div>
+        <div class="col-4 text-right" style="padding-top: 0.5em;">
+            <div>
+                Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
+            </div>
+        </div>
+    </div>
+</footer>
 
-</div>
-<div class="row" id="footer" style="padding-top: 0.5em; ">
-    <div class="col-2 text-left" style="padding-top: 0.5em; padding-bottom: 0.5em">
-        <span id="notification-text"></span>
-    </div>
-    <div class="col-8 text-center" style="padding: 0.5em;">
-        Supported Technologies: Maven, Gradle, <span th:text="${supportedDependencies}"></span>
-    </div>
-    <div class="col-2"></div>
-    <div class="col-12" style="border-bottom: 0.1rem solid #d1d1d1;"></div>
-    <div class="col-4 text-left" style="padding-top: 0.9em;">
-        Charts generated: <span th:text="${chartsGenerated}"></span>
-    </div>
-    <div class="col-4" style="padding-top: 0.9em;">
-        <i>Did you know:</i> You can use <a href="https://helmify.me/spring">helmify.me/spring</a> as a
-        Spring Initializr URL in your IDE.
-    </div>
-    <div class="col-4 text-right">
-        <div>
-            Version: <span th:text="${buildInfo.version}"></span> / Id: <span th:text="${buildInfo.id}"></span>
-        </div>
-        <div>
-            Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
-        </div>
-    </div>
-</div>
 <script lang="text/javascript">
     document.onpaste = function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -154,5 +109,8 @@
         }
     }
 </script>
+<div style="display: none;position:absolute;bottom: 10px;right: 310px;">
+    Built at: <span th:text="${#dates.format(buildInfo.date, 'dd.MM.yyyy HH:mm:ss')}"></span>
+</div>
 </body>
 </html>

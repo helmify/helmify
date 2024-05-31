@@ -11,9 +11,9 @@ tests:
       - equal:
           path: metadata.name
           value: test-postgres-chart-config
-      - matchRegex:
-          path: data["application.properties"]
-          pattern: spring.application.name=test-postgres-chart
-      - matchRegex:
-          path: data["application.properties"]
-          pattern: spring.datasource.url=jdbc:postgresql://test-postgres-chart-postgresql:5432/postgres
+      - equal:
+          path: data.SPRING_APPLICATION_NAME
+          value: test-postgres-chart
+      - equal:
+          path: data.SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://test-postgres-chart-postgresql:5432/postgres

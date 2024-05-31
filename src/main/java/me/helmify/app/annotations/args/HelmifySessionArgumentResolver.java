@@ -51,6 +51,8 @@ public class HelmifySessionArgumentResolver implements HandlerMethodArgumentReso
 				sessionInfo.setDockerImageTag(map.get("dockerImageTag").toString());
 			if (map.containsKey("dockerImagePullSecret"))
 				sessionInfo.setDockerImagePullSecret(map.get("dockerImagePullSecret").toString());
+			if (map.containsKey("chartFlavor"))
+				sessionInfo.setChartFlavor(map.get("chartFlavor").toString());
 		}
 
 		sessionService.addSession(sessionInfo);

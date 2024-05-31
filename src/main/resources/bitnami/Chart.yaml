@@ -1,0 +1,14 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+apiVersion: v2
+appVersion: UPSTREAM_PROJECT_VERSION
+dependencies:
+  - name: common
+    repository: oci://registry-1.docker.io/bitnamicharts
+    tags:
+      - bitnami-common
+    version: 2.x.x
+description: DESCRIPTION
+name: CHART_NAME
+version: 0.1.0

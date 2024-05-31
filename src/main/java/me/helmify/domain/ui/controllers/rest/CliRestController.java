@@ -22,9 +22,11 @@ public class CliRestController {
 
 	@PostMapping("/cli")
 	public void cli(@RequestParam("name") String name, @RequestParam("version") String version,
+			@RequestParam(name = "chartFlavor", defaultValue = "helm") String chartFlavor,
 			@RequestBody String buildFileContents, HttpServletResponse response) throws IOException {
 
 		HelmContext helmContext = fileUploadService.processBuildfile(buildFileContents, name, version);
+		helmContext.setChartFlavor(chartFlavor);
 		zipFileService.streamZip(helmContext, response, "helm.zip");
 	}
 
