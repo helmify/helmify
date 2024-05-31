@@ -9,13 +9,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'testing'
       - name: Set up
-        uses: ./.github/actions/setup
+        uses: ./testing/.github/actions/setup
         with:
           dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Neo4j/Mysql/Mongodb/Kafka Testers
-        uses: ./.github/actions/build
+        uses: ./testing/.github/actions/build
         with:
           name: nmmk
 
