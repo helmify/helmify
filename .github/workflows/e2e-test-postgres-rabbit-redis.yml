@@ -39,7 +39,7 @@ jobs:
           name: spring-postgres-rabbit-redis
           type: spring
           port: 18004
-          expect: postgres,radditmq,redis
+          expect: postgres,rabbitmq,redis
   e2e-quarkus-postgres-rabbit-redis:
     needs:
       - build
@@ -53,4 +53,4 @@ jobs:
           name: quarkus-postgres-rabbit-redis
           type: quarkus
           port: 18005
-          expect: postgres,radditmq,redis
+          expect: postgres,rabbitmq,redis
