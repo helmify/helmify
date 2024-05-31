@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: 'testing'
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -20,12 +18,12 @@ jobs:
           repository: 'helmify/testing'
           clean: "false"
       - name: Set up
-        uses: ./testing/.github/actions/setup
+        uses: ./.github/actions/setup
         with:
           dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Mariadb/Elasticsearch/Cassandra/Couchbase Testers
-        uses: ./testing/.github/actions/build
+        uses: ./.github/actions/build
         with:
           name: mecc
 
