@@ -32,11 +32,14 @@ jobs:
         helm install demo . && \
         cd ../.. && \
         mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
-    - name: Deploy Helmify
-      uses: ./.github/actions/deploy-helmify
+    - name: Build Helmify
+      uses: ./.github/actions/build-helmify
       with:
         dockerhubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Deploy Helmify
+      uses: ./.github/actions/deploy-helmify
+      with:
         deployHost: ${{ secrets.DEPLOY_HOST }}
         deployUsername: ${{ secrets.DEPLOY_USERNAME }}
         deployKey: ${{ secrets.DEPLOY_KEY }}
