@@ -4,7 +4,9 @@ on:
   schedule:
     - cron: '30 5 * * *'
   pull_request:
-    branches: [ "main" , "develop"]
+    branches: [ "main"]
+  push:
+    branches: [ "develop" ]
 
 jobs:
   e2e-test-mariadb-elastic-cassandra-couchbase:
