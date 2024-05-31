@@ -27,6 +27,8 @@ jobs:
         with:
           name: postgres-rabbit-redis
   e2e-spring-postgres-rabbit-redis:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +41,8 @@ jobs:
           port: 18004
           expect: postgres,radditmq,redis
   e2e-quarkus-postgres-rabbit-redis:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

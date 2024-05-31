@@ -27,6 +27,8 @@ jobs:
         with:
           name: mecc
   e2e-spring-mariadb-elasticsearch-cassandra-couchbase:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +41,8 @@ jobs:
           port: 18000
           expect: mariadb,elasticsearch,cassandra,couchbase
   e2e-quarkus-mariadb-elasticsearch-cassandra-couchbase:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

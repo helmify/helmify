@@ -27,6 +27,8 @@ jobs:
         with:
           name: nmmk
   e2e-spring-neo4j-mysql-mongodb-kafka:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +41,8 @@ jobs:
           port: 18002
           expect: neo4j,mysql,mongodb,kafka
   e2e-quarkus-neo4j-mysql-mongodb-kafka:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
