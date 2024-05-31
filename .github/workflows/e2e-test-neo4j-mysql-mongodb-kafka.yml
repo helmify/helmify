@@ -18,6 +18,7 @@ jobs:
         with:
           path: 'testing'
           repository: 'helmify/testing'
+          clean: "false"
       - name: List
         run: ls -lah testing
       - name: Set up

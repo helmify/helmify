@@ -18,6 +18,7 @@ jobs:
         with:
           path: 'testing'
           repository: 'helmify/testing'
+          clean: "false"
       - name: Set up
         uses: ./testing/.github/actions/setup
         with:
