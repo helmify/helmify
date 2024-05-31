@@ -10,9 +10,13 @@ on:
 
 
 jobs:
-  e2e-test-mariadb-elastic-cassandra-couchbase:
-    uses: helmify/testing/.github/workflows/e2e-test-mariadb-elastic-cassandra-couchbase.yml@main
-  e2e-test-neo4j-mysql-mongodb-kafka:
-    uses: helmify/testing/.github/workflows/e2e-test-neo4j-mysql-mongodb-kafka.yml@main
-  e2e-test-postgres-rabbit-redis:
-    uses: helmify/testing/.github/workflows/e2e-test-postgres-rabbit-redis.yml@main
+  e2e-test-helmify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'helmify/testing'
+      - uses: helmify/testing/.github/workflows/e2e-test-mariadb-elastic-cassandra-couchbase.yml@main
+      - uses: helmify/testing/.github/workflows/e2e-test-neo4j-mysql-mongodb-kafka.yml@main
+      - uses: helmify/testing/.github/workflows/e2e-test-postgres-rabbit-redis.yml@main
