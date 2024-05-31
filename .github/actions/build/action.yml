@@ -9,6 +9,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: List
+      shell: bash
+      run: |
+          ls -lah &&
+          ls -lah testing
     - name: Build ${{ inputs.name }} Testers
       shell: bash
       run: | 
