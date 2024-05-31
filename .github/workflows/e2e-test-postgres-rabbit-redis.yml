@@ -9,18 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: 'helmify/testing'
-          path: 'testing'
       - name: Set up
-        uses: ./testing/.github/actions/setup
+        uses: ./.github/actions/setup
         with:
           dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Postgres/RabbitMQ/Redis Testers
-        uses: ./testing/.github/actions/build
+        uses: ./.github/actions/build
         with:
           name: postgres-rabbit-redis
 
