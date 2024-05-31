@@ -18,6 +18,8 @@ jobs:
         with:
           path: 'testing'
           repository: 'helmify/testing'
+      - name: List
+        run: ls -lah testing
       - name: Set up
         uses: ./testing/.github/actions/setup
         with:
