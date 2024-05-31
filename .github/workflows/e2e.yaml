@@ -8,15 +8,14 @@ on:
   push:
     branches: [ "develop" ]
 
-
 jobs:
-  e2e-test-helmify:
+  e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: 'helmify/testing'
-      - uses: helmify/testing/.github/workflows/e2e-test-mariadb-elastic-cassandra-couchbase.yml@main
-      - uses: helmify/testing/.github/workflows/e2e-test-neo4j-mysql-mongodb-kafka.yml@main
-      - uses: helmify/testing/.github/workflows/e2e-test-postgres-rabbit-redis.yml@main
+          directory: 'testing'
+      - name: test
+        uses: ./testing/.github/workflows/e2e-test-postgres-rabbit-redis
