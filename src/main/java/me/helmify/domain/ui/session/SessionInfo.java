@@ -7,6 +7,9 @@ import lombok.Setter;
 import me.helmify.domain.helm.HelmContext;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -27,7 +30,7 @@ public class SessionInfo {
 
 	boolean customized;
 
-	List<String> dependencyNames;
+	Set<String> dependencyNames;
 
 	@JsonIgnore
 	HelmContext context;
@@ -38,6 +41,8 @@ public class SessionInfo {
 
 	String dockerImagePullSecret;
 
+	String chartFlavor;
+
 	public static SessionInfo from(HelmContext c) {
 		SessionInfo info = new SessionInfo();
 		info.setId(String.valueOf(System.nanoTime()));
@@ -47,7 +52,11 @@ public class SessionInfo {
 		info.setZipLink(c.getZipLink());
 		info.setCreateIngress(c.isCreateIngress());
 		info.setCustomized(c.getCustomized());
-		info.setDependencyNames(c.getDependencyNames().stream().map(HelmContext.HelmDependencyName::getName).toList());
+		info.setDependencyNames(c.getDependencyNames()
+			.stream()
+			.map(HelmContext.HelmDependencyName::getName)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet()));
 		info.setContext(c);
 		return info;
 	}

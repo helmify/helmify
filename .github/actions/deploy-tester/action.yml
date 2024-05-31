@@ -1,0 +1,52 @@
+name: Deploy a new Helmify Tester
+description: Deploy a new Helmify Tester
+
+inputs:
+  name:
+    required: true
+    description: 'Tester name'
+  chartFlavor:
+    required: true
+    description: 'The chart flavor to use (helm|bitnami)'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clean up
+      shell: bash
+      run: |
+        rm -rf ${{ inputs.name }}.zip
+        rm -rf ${{ inputs.name }}-chart
+    - name: Deploy ${{ inputs.name }} Tester
+      shell: bash
+      run: |
+        curl -X POST --data @testing/${{ inputs.name }}/pom.xml  -o ${{ inputs.name }}.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=${{ inputs.name }}&version=0.1.0&chartFlavor=${{ inputs.chartFlavor }}" \
+        && unzip ${{ inputs.name }}.zip -d ${{ inputs.name }}-chart \
+        && cd ${{ inputs.name }}-chart/helm && helm dependency update \
+        && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing \
+        && helm install ${{ inputs.name }} . \
+    - name: Wait for Tester
+      shell: bash
+      run: |
+        echo "Monitoring pods ..."
+        
+        sleep 10
+        for i in {1..12}; do
+          # Check if all pods are in the "Running" state
+          pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}' || true)
+          echo "Pods status: $pods_status"
+          
+          if [[ $(echo "$pods_status" | tr ' ' '\n' | sort | uniq ) == "Running" ]]; then
+            echo "All pods are ready. Terminating the loop."
+            sleep 30
+            break 
+          fi
+        
+          echo "Iteration $i: Listing pods in the default namespace..."
+          kubectl get pods -n default || true
+          
+          echo "Checking for pod errors and printing events..."
+          (kubectl get events --namespace default | grep Error) || true
+        
+          sleep 30
+        done

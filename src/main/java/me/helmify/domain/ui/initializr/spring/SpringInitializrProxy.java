@@ -3,9 +3,9 @@ package me.helmify.domain.ui.initializr.spring;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import me.helmify.domain.ui.upload.CompositeFileUploadService;
-import me.helmify.domain.ui.initializr.InitializrSupport;
 import me.helmify.domain.ui.ZipFileService;
+import me.helmify.domain.ui.initializr.InitializrSupport;
+import me.helmify.domain.ui.upload.CompositeFileUploadService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -55,7 +55,8 @@ public class SpringInitializrProxy extends InitializrSupport {
 
 	@GetMapping(value = "/spring/starter.zip")
 	public void getStarter(@RequestParam("artifactId") String artifactId, @RequestParam("version") String version,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+			@RequestParam(name = "chartFlavor", defaultValue = "helm") String chartFlavor, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 
 		Map<String, List<String>> collected = request.getParameterMap()
 			.keySet()
@@ -74,7 +75,7 @@ public class SpringInitializrProxy extends InitializrSupport {
 
 		response.setHeader("Content-Disposition", "attachment; filename=starter.zip");
 		response.setContentType("application/octet-stream");
-		streamStarter(originalStarter, response, artifactId, version, "starter.zip");
+		streamStarter(originalStarter, response, artifactId, version, "starter.zip", chartFlavor);
 
 	}
 

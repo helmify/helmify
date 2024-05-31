@@ -16,6 +16,8 @@ class HelmServiceYamlProviderTest {
 
 		HelmContext ctx = new HelmContext();
 		ctx.setHasActuator(true);
+		ctx.setChartFlavor("helm");
+		ctx.setAppName("app");
 
 		String fileContent = helmServiceYamlProvider.getFileContent(ctx);
 		Set<Integer> collect = fileContent.lines()

@@ -5,6 +5,13 @@ body {
     --color-grey: #ccc;
     --color-darkGrey: #777;
     padding: 1em;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
 }
 
 #header {
@@ -37,4 +44,28 @@ body {
 
 .pad-left {
     padding-left: 1em;
+}
+
+input[type="text"]:focus {
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    box-shadow: none;
+    border-bottom: 3px solid #14854f !important;
+    font-size: 1.1em;
+}
+
+input[type="text"]{
+    border-radius: 0 !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 1px solid var(--color-lightGrey) !important;
+    background-color: #333;
+    color: #14854f !important;
+}
+
+input[type="text"].disabled-input {
+    opacity: 1 !important;
+    border-bottom: 1px solid var(--color-darkGrey) !important;
 }

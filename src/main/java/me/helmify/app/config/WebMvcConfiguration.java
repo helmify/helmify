@@ -3,7 +3,7 @@ package me.helmify.app.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import me.helmify.domain.helm.resolvers.DependencyResolver;
+import me.helmify.domain.helm.dependencies.DependencyResolver;
 import me.helmify.domain.ui.counter.ChartDownloadedEvent;
 import me.helmify.app.annotations.args.HelmifySessionArgumentResolver;
 import me.helmify.domain.ui.session.SessionService;
@@ -19,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,14 +50,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	@Qualifier("supportedDependencies")
-	public String supportedDependencies(List<DependencyResolver> resolvers) {
-		Set<String> supportedDependenciesList = resolvers.stream()
+	public Set<String> supportedDependencies(List<DependencyResolver> resolvers) {
+		return resolvers.stream()
 			.map(DependencyResolver::dependencyName)
+			.filter(Objects::nonNull)
 			.filter(s -> !s.equals("actuator"))
 			.filter(s -> !s.equals("web"))
 			.map(StringUtils::capitalize)
 			.collect(Collectors.toSet());
-		return String.join(", ", supportedDependenciesList);
 	}
 
 }
