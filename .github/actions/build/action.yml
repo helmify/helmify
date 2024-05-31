@@ -11,12 +11,11 @@ runs:
   steps:
     - name: Build ${{ inputs.name }} Testers
       shell: bash
-      run: |
-        cd testing && 
-        mvn -DskipTests=true clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=spring-${{ inputs.name }}:0.1.0  --file spring-${{ inputs.name }}/pom.xml && 
+      run: | 
+        mvn -DskipTests=true clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=spring-${{ inputs.name }}:0.1.0  --file testing/spring-${{ inputs.name }}/pom.xml && 
         docker tag spring-${{ inputs.name }}:0.1.0 helmify/spring-${{ inputs.name }}:latest &&
         docker push helmify/spring-${{ inputs.name }}:latest &&
         
-        cd quarkus-${{ inputs.name }} && chmod +x mvnw && ./mvnw install -DskipTests -Dquarkus.container-image.build=true -Dquarkus.container-image.tag=latest &&
+        cd testing/quarkus-${{ inputs.name }} && chmod +x mvnw && ./mvnw install -DskipTests -Dquarkus.container-image.build=true -Dquarkus.container-image.tag=latest &&
         docker tag runner/quarkus-${{ inputs.name }}:latest helmify/quarkus-${{ inputs.name }}:latest &&
         docker push helmify/quarkus-${{ inputs.name }}:latest
