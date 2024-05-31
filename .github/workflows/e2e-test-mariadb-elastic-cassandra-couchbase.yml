@@ -1,0 +1,26 @@
+name: Helmify-Testing Mariadb/Elasticsearch/Cassandra/Couchbase
+
+on:
+  workflow_call:
+  push:
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'helmify/testing'
+          directory: 'testing'
+      - name: Set up
+        uses: ./testing/.github/actions/setup
+        with:
+          dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Mariadb/Elasticsearch/Cassandra/Couchbase Testers
+        uses: ./testing/.github/actions/build
+        with:
+          name: mecc
+

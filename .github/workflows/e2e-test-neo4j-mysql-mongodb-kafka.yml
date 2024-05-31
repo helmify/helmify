@@ -1,0 +1,26 @@
+name: Helmify-Testing Neo4j/Mysql/Mongodb/Kafka
+
+on:
+  workflow_call:
+  push:
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'helmify/testing'
+          directory: 'testing'
+      - name: Set up
+        uses: ./testing/.github/actions/setup
+        with:
+          dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Neo4j/Mysql/Mongodb/Kafka Testers
+        uses: ./testing/.github/actions/build
+        with:
+          name: nmmk
+
