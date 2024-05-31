@@ -34,7 +34,9 @@ runs:
         username: ${{ inputs.dockerhubUsername }}
         password: ${{ inputs.dockerhubToken }}
     - name: Push Docker Image
-      run: docker push helmify/helmify:latest
+      run:  |
+        docker tag helmify/helmify:latest helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} && 
+        docker push helmify/helmify:${{ github.run_id }}${{ github.run_attempt }}
       shell: bash
     - name: deploy
       uses: appleboy/ssh-action@v1.0.0
@@ -44,6 +46,7 @@ runs:
         key: ${{ inputs.deployKey }}
         port: ${{ inputs.deployPort }}
         script: |
-          docker pull helmify/helmify:latest && 
+          docker pull helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} &&
+          docker tag helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} helmify/helmify:dev && 
           wget -O docker-compose.yml https://raw.githubusercontent.com/helmify/helmify/develop/docker-compose.yml &&
           docker compose up -d --force-recreate --no-deps ${{ inputs.instance }}
