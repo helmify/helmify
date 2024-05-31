@@ -33,13 +33,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-tester
-      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester
+      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester with Helm Create Chart
         uses: ./.github/actions/run-tester
         with:
           name: spring-postgres-rabbit-redis
           type: spring
-          port: 18004
+          port: 17010
           expect: postgres,rabbitmq,redis
+          chartFlavor: helm
+      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-postgres-rabbit-redis
+          type: spring
+          port: 17020
+          expect: postgres,rabbitmq,redis
+          chartFlavor: bitnami
   e2e-quarkus-postgres-rabbit-redis:
     needs:
       - build
@@ -47,10 +56,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-tester
-      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester
+      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester with Helm Create Chart
         uses: ./.github/actions/run-tester
         with:
           name: quarkus-postgres-rabbit-redis
           type: quarkus
-          port: 18005
+          port: 17030
           expect: postgres,rabbitmq,redis
+          chartFlavor: helm
+      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-postgres-rabbit-redis
+          type: quarkus
+          port: 17040
+          expect: postgres,rabbitmq,redis
+          chartFlavor: bitnami

@@ -33,13 +33,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-tester
-      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase Tester
+      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase with Helm Create Chart
         uses: ./.github/actions/run-tester
         with:
           name: spring-mecc
           type: spring
-          port: 18000
+          port: 18010
           expect: mariadb,elasticsearch,cassandra,couchbase
+          chartFlavor: helm
+      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-mecc
+          type: spring
+          port: 18020
+          expect: mariadb,elasticsearch,cassandra,couchbase
+          chartFlavor: bitnami
   e2e-quarkus-mariadb-elasticsearch-cassandra-couchbase:
     needs:
       - build
@@ -47,10 +56,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-tester
-      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase Tester
+      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase with Helm Create Chart
         uses: ./.github/actions/run-tester
         with:
           name: quarkus-mecc
           type: quarkus
-          port: 18001
+          port: 18030
           expect: mariadb,elasticsearch,cassandra
+          chartFlavor: helm
+      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-mecc
+          type: quarkus
+          port: 18040
+          expect: mariadb,elasticsearch,cassandra
+          chartFlavor: bitnami
