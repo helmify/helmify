@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'helmify/testing'
-          directory: 'testing'
+          path: 'testing'
       - name: Set up
         uses: ./testing/.github/actions/setup
         with:
