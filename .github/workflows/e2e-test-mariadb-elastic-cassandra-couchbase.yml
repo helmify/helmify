@@ -9,15 +9,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Helmify
         uses: actions/checkout@v4
-      - name: Checkout
+      - name: Checkout Helmify-Testing
         uses: actions/checkout@v4
         with:
           path: 'testing'
           repository: 'helmify/testing'
           clean: "false"
-      - name: Set up
+      - name: Tester Build Setup
         uses: ./.github/actions/setup
         with:
           dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -26,4 +26,27 @@ jobs:
         uses: ./.github/actions/build
         with:
           name: mecc
-
+  e2e-spring-mariadb-elasticsearch-cassandra-couchbase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-mecc
+          type: spring
+          port: 18000
+          expect: mariadb,elasticsearch,cassandra,couchbase
+  e2e-quarkus-mariadb-elasticsearch-cassandra-couchbase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-mecc
+          type: quarkus
+          port: 18001
+          expect: mariadb,elasticsearch,cassandra

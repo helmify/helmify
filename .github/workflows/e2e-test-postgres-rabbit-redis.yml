@@ -26,4 +26,27 @@ jobs:
         uses: ./.github/actions/build
         with:
           name: postgres-rabbit-redis
-
+  e2e-spring-postgres-rabbit-redis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-postgres-rabbit-redis
+          type: spring
+          port: 18004
+          expect: postgres,radditmq,redis
+  e2e-quarkus-postgres-rabbit-redis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-postgres-rabbit-redis
+          type: quarkus
+          port: 18005
+          expect: postgres,radditmq,redis
