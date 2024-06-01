@@ -31,7 +31,7 @@ public interface MariaDbResolver extends DependencyResolver {
 				),
 				"global", Map.of(
 					"hosts", Map.of(
-						"mariadb", "'"+mariadbName + "-0'"),
+						"mariadb", mariadbName + "-0"),
 					"ports",Map.of("mariadb", 3306)));
 	}
 
