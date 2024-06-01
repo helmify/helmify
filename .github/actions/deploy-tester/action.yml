@@ -17,6 +17,14 @@ runs:
       run: |
         rm -rf ${{ inputs.name }}.zip
         rm -rf ${{ inputs.name }}-chart
+    - name: Optionally install couchbase operator
+      if: ${{ contains(inputs.name, 'mecc') }}
+      shell: bash
+      run: |
+        helm repo add couchbase https://couchbase-partners.github.io/helm-charts/ \
+        && helm repo update \
+        && helm install couchbase --set cluster.name=couch couchbase/couchbase-operator \
+        && sleep 30
     - name: Deploy ${{ inputs.name }} Tester
       shell: bash
       run: |
