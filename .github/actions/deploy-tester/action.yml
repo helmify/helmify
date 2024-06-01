@@ -15,8 +15,9 @@ runs:
     - name: Clean up
       shell: bash
       run: |
-        rm -rf ${{ inputs.name }}.zip
-        rm -rf ${{ inputs.name }}-chart
+        rm -rf ${{ inputs.name }}.zip \
+        && rm -rf ${{ inputs.name }}-chart \
+        && helm uninstall ${{ inputs.name }} || true
     - name: Optionally install couchbase operator
       if: ${{ contains(inputs.name, 'mecc') }}
       shell: bash
