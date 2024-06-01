@@ -46,7 +46,7 @@ runs:
         echo "Monitoring pods ..."
         
         sleep 10
-        for i in {1..12}; do
+        for i in {1..30}; do
           # Check if all pods are in the "Running" state
           pods_status=$(kubectl get pods -n default -o jsonpath='{.items[*].status.phase}' || true)
           echo "Pods status: $pods_status"
@@ -63,5 +63,5 @@ runs:
           echo "Checking for pod errors and printing events..."
           (kubectl get events --namespace default | grep Error) || true
         
-          sleep 30
+          sleep 20
         done
