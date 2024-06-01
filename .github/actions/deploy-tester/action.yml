@@ -17,7 +17,7 @@ runs:
       run: |
         rm -rf ${{ inputs.name }}.zip \
         && rm -rf ${{ inputs.name }}-chart \
-        && helm uninstall ${{ inputs.name }} || true
+        && helm uninstall ${{ inputs.name }} || true \
         && helm uninstall couchbase || true
     - name: Optionally install couchbase operator
       if: ${{ contains(inputs.name, 'mecc') }}
