@@ -21,5 +21,7 @@ runs:
       shell: bash
       run: |  
         mvn clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} --file pom.xml && 
-        docker push helmify/helmify:${{ github.run_id }}${{ github.run_attempt }}
+        docker push helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} && 
+        docker tag helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} helmify/helmify:dev &&
+        docker push helmify/helmify:dev
         
