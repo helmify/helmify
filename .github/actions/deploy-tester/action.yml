@@ -27,7 +27,9 @@ runs:
     - name: Install Tester
       shell: bash
       run: |
-        kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing && helm install ${{ inputs.name }} .
+        cd ${{ inputs.name }}-chart/helm \
+        && helm install ${{ inputs.name }} . \
+        && kind load docker-image ${{ inputs.name }}:0.1.0 --name chart-testing
     - name: Wait for Tester
       shell: bash
       run: |
