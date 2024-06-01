@@ -16,4 +16,4 @@ tests:
           value: test-mariadb-chart
       - equal:
           path: data.SPRING_DATASOURCE_URL
-          value: jdbc:mariadb://test-mariadb-chart-mariadb-0.test-mariadb-chart-mariadb:3306/my_database
+          value: jdbc:mariadb://test-mariadb-chart-mariadb-0:3306/my_database
