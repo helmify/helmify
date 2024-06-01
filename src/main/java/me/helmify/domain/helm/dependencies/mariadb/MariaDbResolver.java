@@ -31,9 +31,18 @@ public interface MariaDbResolver extends DependencyResolver {
 				),
 				"global", Map.of(
 					"hosts", Map.of(
-						"mariadb", "%s-0.%s".formatted(mariadbName, mariadbName)),
-					"ports",Map.of("mariadb", 3306)));
+						"mariadb", getHost(context)),
+					"ports",Map.of("mariadb", getPort())));
 	}
+
+	@Override default String getHost(HelmContext context) {
+		String mariadbName = context.getAppName() + "-mariadb";
+		return "%s-0.%s".formatted(mariadbName, mariadbName);
+    }
+
+	@Override default Integer getPort() {
+    	return 3306;
+    }
 
 	default Map<String, Object> getPreferredChart() {
 		return Map.of("name", "mariadb", "version", "14.0.3", "repository", "https://charts.bitnami.com/bitnami");

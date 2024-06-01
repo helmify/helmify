@@ -2,12 +2,11 @@ package me.helmify.domain.helm.bitnami;
 
 import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.HelmDependency;
+import me.helmify.domain.helm.chart.TemplateStringPatcher;
 import me.helmify.domain.helm.chart.providers.HelmConfigMapProvider;
 import me.helmify.domain.helm.chart.providers.HelmDeploymentYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmSecretsYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmValuesYamlProvider;
-import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.yaml.snakeyaml.Yaml;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BitnamiChart {
 
@@ -129,6 +127,7 @@ public class BitnamiChart {
 	}
 
 	private static void postProcessValuesYaml(Map<String, String> files, BitnamiChartContext context) {
+		HelmContext originalContext = context.getOriginalContext();
 		String chartYaml = files.get("values.yaml");
 		String clean = chartYaml.lines()
 			.filter(line -> !line.contains("%%"))
@@ -136,12 +135,11 @@ public class BitnamiChart {
 			.filter(line -> !line.trim().isEmpty())
 			.collect(Collectors.joining("\r\n"));
 		clean = clean.replaceAll("## @section", "\r\n## @section");
-		clean = new HelmValuesYamlProvider(new Yaml()).patchContent(clean, context.getOriginalContext());
+		clean = new HelmValuesYamlProvider(new Yaml()).patchContent(clean, originalContext);
 
 		StringBuffer buf = new StringBuffer(clean);
 
-		context.getOriginalContext()
-			.getHelmChartSlices()
+		originalContext.getHelmChartSlices()
 			.stream()
 			.filter(slice -> !slice.getValuesEntries().isEmpty())
 			.forEach(slice -> {
@@ -159,12 +157,36 @@ public class BitnamiChart {
 				}
 			});
 
-		String appName = context.getOriginalContext().getAppName();
+		String appName = originalContext.getAppName();
+
+		String initContainerEntry = """
+				- name: %s-checker
+				  image: docker.io/busybox:stable
+				  imagePullPolicy: Always
+				  command: ["sh", "-c", "until printf '.' && nc -z -w 2 %s; do sleep 2; done;"]
+				""";
+
+		List<String> initContainers = originalContext.getHelmChartSlices()
+			.stream()
+			.filter(slice -> Objects.nonNull(slice.getInitContainer()))
+			.map(slice -> {
+
+				String host = slice.getResolver().getHost(originalContext);
+				Integer port = slice.getResolver().getPort();
+
+				String endpoint = "%s %s".formatted(host, port);
+
+				String dependencyName = slice.getDependencyName();
+				return initContainerEntry.formatted(dependencyName, endpoint);
+			})
+			.collect(Collectors.toList());
 
 		String string = buf.toString()
 			.replace("fullnameOverride: \"\"", "fullnameOverride: \"%s\"".formatted(appName))
 			.replace("extraEnvVarsSecret: \"\"", "extraEnvVarsSecret: \"%s\"".formatted(appName + "-secret"))
 			.replace("extraEnvVarsCM: \"\"", "extraEnvVarsCM: \"%s\"".formatted(appName + "-config"));
+		string = TemplateStringPatcher.insertAfter(string, "initContainers: []", String.join("\r\n", initContainers), 4)
+			.replace("initContainers: []", "initContainers:");
 
 		files.put("values.yaml", string);
 	}

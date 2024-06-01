@@ -1,8 +1,8 @@
 package me.helmify.domain.helm.dependencies.couchbase;
 
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.model.HelmFile;
 import me.helmify.domain.helm.dependencies.DependencyResolver;
+import me.helmify.domain.helm.model.HelmFile;
 
 import java.util.List;
 import java.util.Map;
@@ -97,10 +97,13 @@ spec:
 
     }
 
-	default int getPort() {
+	default Integer getPort() {
         return 8093;
     }
 
+    @Override default String getHost(HelmContext context) {
+        return getClustername(context);
+    }
     @Override
     default String dependencyName() {
         return "couchbase";

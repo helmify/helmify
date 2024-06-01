@@ -8,13 +8,11 @@ import java.util.Map;
 public interface KafkaResolver extends DependencyResolver {
 
 	//@formatter:off
-
-
     default Map<String, Object> getValuesEntries(HelmContext context) {
         return Map.of(
                 "kafka",
                 Map.of("enabled", true,
-                        "port", getKafkaPort() ,
+                        "port", getPort() ,
                         "nameOverride", context.getAppName() + "-kafka",
                         "fullnameOverride", context.getAppName() + "-kafka",
                         "listeners", Map.of(
@@ -24,7 +22,7 @@ public interface KafkaResolver extends DependencyResolver {
                                 )
                         )
                 ),
-                "global", Map.of("hosts", Map.of("kafka", context.getAppName() + "-kafka"), "ports", Map.of("kafka", getKafkaPort() ))
+                "global", Map.of("hosts", Map.of("kafka", getHost(context)), "ports", Map.of("kafka", getPort() ))
         );
     }
 
@@ -35,7 +33,12 @@ public interface KafkaResolver extends DependencyResolver {
                 "repository", "https://charts.bitnami.com/bitnami"
         );
     }
-    default int getKafkaPort() {
+
+    @Override default String getHost(HelmContext context) {
+        return context.getAppName() + "-kafka";
+    }
+
+    @Override default Integer getPort() {
         return 9092;
     }
 

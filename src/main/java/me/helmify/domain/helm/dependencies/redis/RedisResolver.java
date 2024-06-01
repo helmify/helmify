@@ -23,24 +23,26 @@ public interface RedisResolver extends DependencyResolver {
 		return Map.of("redis",
 				Map.of( "enabled", true,
 						"auth", Map.of("enabled", true, "password", "redis"),
-						"port", getRedisPort(),
+						"port", getPort(),
 						"nameOverride", context.getAppName() + "-redis",
 						"fullnameOverride", context.getAppName() + "-redis",
 						"architecture", "standalone"
 				),
 				"global", Map.of(
 					"hosts", Map.of(
-						"redis", getRedisHost(context)),
-						"ports", Map.of("redis", getRedisPort()))
+						"redis", getHost(context)),
+						"ports", Map.of("redis", getPort()))
 		);
 	}
 
-	private int getRedisPort() {
-		return 6379;
-	}
+	@Override
+	default Integer getPort() {
+    	return 6379;
+    }
 
-	private String getRedisHost(HelmContext context) {
+	@Override
+	default String getHost(HelmContext context) {
 		return context.getAppName() + "-redis-master";
-	}
+    }
 
 }

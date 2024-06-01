@@ -3,6 +3,7 @@ package me.helmify.domain.helm;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import me.helmify.domain.helm.dependencies.DependencyResolver;
 import me.helmify.domain.helm.model.HelmFile;
 import me.helmify.domain.helm.model.HelmSecret;
 
@@ -36,6 +37,8 @@ public class HelmChartSlice {
 	private List<HelmFile> extraFiles;
 
 	private String dependencyName;
+
+	private DependencyResolver resolver;
 
 	public boolean hasExtraFiles() {
 		return extraFiles != null && !extraFiles.isEmpty();

@@ -40,8 +40,8 @@ public interface PostgresResolver extends DependencyResolver {
 							"postgresPassword", "postgres"
 						)
 				), "global", Map.of(
-						"hosts", Map.of("postgresql", name),
-						"ports", Map.of("postgresql", 5432)
+						"hosts", Map.of("postgresql", getHost(context)),
+						"ports", Map.of("postgresql", getPort())
 				)
 		);
 	}
@@ -51,4 +51,13 @@ public interface PostgresResolver extends DependencyResolver {
 		return "postgresql";
 	}
 
+	@Override
+	default Integer getPort() {
+    	return 5432;
+    }
+
+	@Override
+	default String getHost(HelmContext context) {
+    	return context.getAppName() + "-postgresql";
+    }
 }

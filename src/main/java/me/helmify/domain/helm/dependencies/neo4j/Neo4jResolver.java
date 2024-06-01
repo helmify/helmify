@@ -17,8 +17,8 @@ public interface Neo4jResolver extends DependencyResolver {
     default Map<String, Object> getValuesEntries(HelmContext context) {
         return Map.of(
                 "global", Map.of(
-                        "hosts", Map.of("neo4j", context.getAppName() + "-neo4j"),
-                        "ports", Map.of("neo4j", 7687)),
+                        "hosts", Map.of("neo4j", getHost(context)),
+                        "ports", Map.of("neo4j", getPort())),
                 "neo4j", Map.of(
                         "enabled", true,
                         "database", "my_database",
@@ -49,5 +49,13 @@ public interface Neo4jResolver extends DependencyResolver {
                 "version", "5.12.0",
                 "repository", "https://helm.neo4j.com/neo4j"
         );
+    }
+
+    @Override default String getHost(HelmContext context) {
+        return context.getAppName() + "-neo4j";
+    }
+
+    @Override default Integer getPort() {
+        return 7687;
     }
 }

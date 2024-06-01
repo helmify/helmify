@@ -8,18 +8,40 @@ import java.util.Map;
 
 public interface MongodbResolver extends DependencyResolver {
 
+	//@formatter:off
 	default Map<String, Object> getValuesEntries(HelmContext context) {
-		return Map.of("mongodb",
-				Map.of("enabled", true, "database", "db", "fullnameOverride", context.getAppName() + "-mongodb",
-						"nameOverride", context.getAppName() + "-mongodb", "architecture", "standalone", "primary",
-						Map.of("persistence",
-								Map.of("enabled", true, "storageClass", "", "accessModes", List.of("ReadWriteOnce"),
-										"size", "1Gi")),
-						"auth",
-						Map.of("usernames", List.of("mongodb"), "passwords", List.of("mongodb"), "rootPassword",
-								"mongodb", "databases", List.of("db"))),
-				"global", Map.of("hosts", Map.of("mongodb", context.getAppName() + "-mongodb"), "ports",
-						Map.of("mongodb", 27017)));
+		return Map.of("mongodb", Map.of(
+						"enabled", true,
+						"database", "db",
+						"fullnameOverride", context.getAppName() + "-mongodb",
+						"nameOverride", context.getAppName() + "-mongodb",
+						"architecture", "standalone",
+						"primary", Map.of(
+							"persistence", Map.of(
+								"enabled", true,
+								"storageClass", "",
+								"accessModes", List.of("ReadWriteOnce"),
+								"size", "1Gi")),
+						"auth", Map.of(
+								"usernames", List.of("mongodb"),
+								"passwords", List.of("mongodb"),
+								"rootPassword", "mongodb",
+								"databases", List.of("db"))),
+					"global", Map.of(
+							"hosts", Map.of(
+									"mongodb", getHost(context)),
+							"ports", Map.of(
+									"mongodb", getPort())));
+	}
+
+	@Override
+	default String getHost(HelmContext context) {
+		return context.getAppName() + "-mongodb";
+	}
+
+	@Override
+	default Integer getPort() {
+		return 27017;
 	}
 
 	default Map<String, Object> getPreferredChart() {

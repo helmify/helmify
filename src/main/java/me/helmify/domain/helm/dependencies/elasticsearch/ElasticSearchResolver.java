@@ -31,7 +31,7 @@ public interface ElasticSearchResolver extends DependencyResolver {
 				),
 				"global", Map.of(
 						"hosts", Map.of(
-								"elasticsearch", context.getAppName() + "-elasticsearch-master-hl"),
+								"elasticsearch", getHost(context)),
 						"ports", Map.of("elasticsearch", getPort())));
 
 
@@ -44,9 +44,13 @@ public interface ElasticSearchResolver extends DependencyResolver {
 				"repository", "https://charts.bitnami.com/bitnami");
 	}
 
-	default int getPort() {
+	default Integer getPort() {
 		return 9200;
 	}
+
+	@Override default String getHost(HelmContext context) {
+		return context.getAppName() + "-elasticsearch-master-hl";
+    }
 
 	@Override
 	default String dependencyName() {

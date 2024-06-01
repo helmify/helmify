@@ -10,7 +10,6 @@ import java.util.Map;
 public interface CassandraResolver extends DependencyResolver {
 
 	//@formatter:off
-
 	default String getKeySpaceName(HelmContext context) {
 		return context.getAppName().replace("-", "");
 	}
@@ -36,7 +35,7 @@ public interface CassandraResolver extends DependencyResolver {
 				),
 				"global", Map.of(
 						"hosts", Map.of(
-								"cassandra", context.getAppName() + "-cassandra-headless"),
+								"cassandra", getHost(context)),
 						"ports", Map.of(
 								"cassandra", getPort())));
 	}
@@ -49,9 +48,13 @@ public interface CassandraResolver extends DependencyResolver {
 		);
 	}
 
-	default int getPort() {
+	default Integer getPort() {
 		return 9042;
 	}
+
+	@Override default String getHost(HelmContext context) {
+    	return context.getAppName() + "-cassandra-headless";
+    }
 
 	@Override
 	default String dependencyName() {

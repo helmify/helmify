@@ -59,6 +59,7 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 		slice.setExtraSecrets(getExtraSecrets(context));
 		slice.setExtraFiles(getExtraFiles(context));
 		slice.setDependencyName(dependencyName());
+		slice.setResolver(this);
 
 		return Optional.of(slice);
 	}
@@ -67,6 +68,14 @@ public interface DependencyResolver extends HelmChartSliceBuilder {
 	 * Name of the dependency.
 	 */
 	String dependencyName();
+
+	default String getHost(HelmContext context) {
+		return null;
+	}
+
+	default Integer getPort() {
+		return null;
+	}
 
 	default FrameworkVendor getVendor() {
 		return FrameworkVendor.Spring;

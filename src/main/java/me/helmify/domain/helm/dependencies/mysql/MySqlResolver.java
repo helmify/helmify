@@ -16,8 +16,7 @@ public interface MySqlResolver extends DependencyResolver {
 								Map.of("enabled", true, "storageClass", "", "accessModes", List.of("ReadWriteOnce"),
 										"size", "1Gi")),
 						"auth", Map.of("username", "mysql", "password", "mysql", "rootPassword", "mysql")),
-				"global",
-				Map.of("hosts", Map.of("mysql", context.getAppName() + "-mysql"), "ports", Map.of("mysql", 3306)));
+				"global", Map.of("hosts", Map.of("mysql", getHost(context)), "ports", Map.of("mysql", getPort())));
 	}
 
 	default Map<String, Object> getPreferredChart() {
@@ -27,6 +26,16 @@ public interface MySqlResolver extends DependencyResolver {
 	@Override
 	default String dependencyName() {
 		return "mysql";
+	}
+
+	@Override
+	default String getHost(HelmContext context) {
+		return context.getAppName() + "-mysql";
+	}
+
+	@Override
+	default Integer getPort() {
+		return 3306;
 	}
 
 }
