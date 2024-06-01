@@ -1,6 +1,8 @@
 package me.helmify.domain.helm.bitnami;
 
+import me.helmify.domain.helm.HelmChartSlice;
 import me.helmify.domain.helm.HelmContext;
+import me.helmify.domain.helm.HelmDependency;
 import me.helmify.domain.helm.chart.providers.HelmConfigMapProvider;
 import me.helmify.domain.helm.chart.providers.HelmDeploymentYamlProvider;
 import me.helmify.domain.helm.chart.providers.HelmSecretsYamlProvider;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BitnamiChart {
 
@@ -83,7 +86,18 @@ public class BitnamiChart {
 		postProcessConfigMap(files, context);
 		postProcessSecrets(files, context);
 		postProcessDeployment(files, context);
+		processAdditionalFilesAndSecrets(files, context);
+	}
 
+	private static void processAdditionalFilesAndSecrets(Map<String, String> files, BitnamiChartContext context) {
+		context.getOriginalContext().getHelmChartSlices().stream().filter(HelmChartSlice::hasExtraFiles)
+				.forEach(slice -> slice.getExtraFiles().forEach(file -> {
+					files.put(file.getFileName(), file.getContent());
+				}));
+		context.getOriginalContext().getHelmChartSlices().stream().filter(HelmChartSlice::hasExtraSecrets)
+				.forEach(slice -> slice.getExtraSecrets().forEach(secret -> {
+					files.put(secret.getFileName(), secret.getContent());
+				}));
 	}
 
 	private static void postProcessDeployment(Map<String, String> files, BitnamiChartContext context) {
