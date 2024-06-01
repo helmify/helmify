@@ -90,14 +90,20 @@ public class BitnamiChart {
 	}
 
 	private static void processAdditionalFilesAndSecrets(Map<String, String> files, BitnamiChartContext context) {
-		context.getOriginalContext().getHelmChartSlices().stream().filter(HelmChartSlice::hasExtraFiles)
-				.forEach(slice -> slice.getExtraFiles().forEach(file -> {
-					files.put(file.getFileName(), file.getContent());
-				}));
-		context.getOriginalContext().getHelmChartSlices().stream().filter(HelmChartSlice::hasExtraSecrets)
-				.forEach(slice -> slice.getExtraSecrets().forEach(secret -> {
-					files.put(secret.getFileName(), secret.getContent());
-				}));
+		context.getOriginalContext()
+			.getHelmChartSlices()
+			.stream()
+			.filter(HelmChartSlice::hasExtraFiles)
+			.forEach(slice -> slice.getExtraFiles().forEach(file -> {
+				files.put(file.getFileName(), file.getContent());
+			}));
+		context.getOriginalContext()
+			.getHelmChartSlices()
+			.stream()
+			.filter(HelmChartSlice::hasExtraSecrets)
+			.forEach(slice -> slice.getExtraSecrets().forEach(secret -> {
+				files.put(secret.getFileName(), secret.getContent());
+			}));
 	}
 
 	private static void postProcessDeployment(Map<String, String> files, BitnamiChartContext context) {
