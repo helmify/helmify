@@ -1,5 +1,7 @@
 package me.helmify.domain.helm.chart.tests;
 
+import me.helmify.domain.helm.HelmChartTests;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class ActuatorPostgresChartTest extends HelmChartTests {
                         "1.0.0",
                         starterDependencies,
                         "actuator",
-                        unittestFiles)
+                        unittestFiles, "helm", FrameworkVendor.Spring)
         );
     }
 

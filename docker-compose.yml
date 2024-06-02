@@ -53,7 +53,7 @@ services:
       - traefik.enable=true
 
   helmify-dev:
-    image: helmify/helmify:latest
+    image: helmify/helmify:dev
     container_name: helmify-dev
     restart: always
     environment:

@@ -2,7 +2,8 @@ package me.helmify.domain.helm.chart.providers;
 
 import lombok.RequiredArgsConstructor;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.chart.model.HelmValues;
+import me.helmify.domain.helm.chart.TemplateStringPatcher;
+import me.helmify.domain.helm.model.HelmValues;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
@@ -46,7 +47,14 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 			}
 		}));
 
-		return buffer.toString();
+		return buffer.toString().replace("'''", "'");
+	}
+
+	@Override
+	public String patchContent(String content, HelmContext context) {
+		StringBuffer stringBuffer = new StringBuffer(content);
+		mergeValuesGlobalsBlocks(context, stringBuffer);
+		return stringBuffer.toString();
 	}
 
 	private void mergeValuesGlobalsBlocks(HelmContext context, StringBuffer buffer) {
@@ -65,15 +73,26 @@ public class HelmValuesYamlProvider implements HelmFileProvider {
 			if (valuesEntries.containsKey("global")) {
 				Map<String, Object> block = (Map<String, Object>) valuesEntries.get("global");
 				block.forEach((k, v) -> ((Map<String, Object>) globalMap.get(k)).putAll((Map<String, Object>) v));
-				System.out.println(globalMap);
 			}
 		});
 
 		Map<String, Map<Object, Object>> globalBlock = Map.of("global", globalMap);
+		String newGlobalBlock = yaml.dumpAsMap(globalBlock);
 
-		buffer.append(yaml.dumpAsMap(globalBlock));
+		if (buffer.indexOf(globalsMarker) != -1) {
+
+			String globalsAsString = yaml.dumpAsMap(globalMap);
+			String patched = TemplateStringPatcher.insertAfter(buffer.toString(), globalsMarker, globalsAsString, 2);
+			buffer.setLength(0);
+			buffer.append(patched);
+			return;
+		}
+
+		buffer.append(newGlobalBlock);
 		buffer.append("\n");
 	}
+
+	String globalsMarker = "## @helmify:globals";
 
 	@Override
 	public String getFileName() {

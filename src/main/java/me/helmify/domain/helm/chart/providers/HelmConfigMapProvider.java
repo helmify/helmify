@@ -1,34 +1,26 @@
 package me.helmify.domain.helm.chart.providers;
 
-import me.helmify.domain.FrameworkVendor;
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.chart.customizers.TemplateStringPatcher;
+import me.helmify.domain.helm.chart.TemplateStringPatcher;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 public class HelmConfigMapProvider implements HelmFileProvider {
 
-	private static final String template = """
-			apiVersion: v1
-			kind: ConfigMap
-			metadata:
-			  name: {{ include "REPLACEME.fullname" . }}-config
-			  namespace: {{ .Release.Namespace | quote }}
-			  labels:
-			    {{- include "REPLACEME.labels" . | nindent 4 }}
-			  {{- if .Values.commonAnnotations }}
-			  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-			  {{- end }}
-			data:
-			  application.properties: |-
-			###@helmify:configmap
-			""";
-
 	@Override
 	public String getFileContent(HelmContext context) {
-		String filledTemplate = template.replace("REPLACEME", context.getAppName());
-		return HelmUtil.removeMarkers(customize(filledTemplate, context));
+		String template = readTemplate("helm/templates/configmap.yaml").replaceAll("REPLACE_ME", context.getAppName())
+			.replaceAll("%%COMPONENT_NAME%%", context.getAppName());
+		return HelmUtil.removeMarkers(customize(template, context));
+	}
+
+	@Override
+	public String patchContent(String content, HelmContext context) {
+		return HelmUtil.removeMarkers(customize(content, context));
 	}
 
 	private String customize(String content, HelmContext context) {
@@ -36,51 +28,51 @@ public class HelmConfigMapProvider implements HelmFileProvider {
 		context.getHelmChartSlices()
 			.stream()
 			.filter(f -> f.getDefaultConfig() != null)
-			.forEach(f -> f.getDefaultConfig().forEach((k, v) -> patch.append(k).append("=").append(v).append("\n")));
+			.forEach(f -> f.getDefaultConfig()
+				.forEach((k, v) -> patch.append(k).append(": ").append("\"").append(v).append("\"").append("\n")));
 
 		FrameworkVendor vendor = context.getFrameworkVendor();
-		if (vendor.equals(FrameworkVendor.Spring)) {
-			patch.append("spring.application.name={{ .Values.fullnameOverride }}\n");
-		}
+		String chartFlavor = context.getChartFlavor();
+		boolean hasActuator = context.isHasActuator();
+		boolean createIngress = context.isCreateIngress();
 
-		if (vendor.equals(FrameworkVendor.Quarkus)) {
-			patch.append("quarkus.application.name={{ .Values.fullnameOverride }}\n");
-		}
+		String healthCheckPortExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.healthcheck"
+				: ".Values.healthcheck.port";
+		String exposureInclude = "\"*\"";
+		String portExpression = "bitnami".equals(chartFlavor) ? ".Values.service.ports.http" : ".Values.service.port";
 
-		// set separate port for actuator, we don't want to expose actuator through an
-		// ingress
-		if (context.isHasActuator()) {
-			if (vendor.equals(FrameworkVendor.Spring)) {
-				patch.append("management.server.port={{ .Values.healthcheck.port }}\n");
+		switch (vendor) {
+			case Spring -> {
+				patch.append("SPRING_APPLICATION_NAME: \"{{ .Values.fullnameOverride }}\"\n");
+				if (hasActuator) {
+					patch.append("MANAGEMENT_SERVER_PORT: \"{{ %s }}\"\n".formatted(healthCheckPortExpression));
+					patch.append("MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: %s\n".formatted(exposureInclude));
+				}
+				if (createIngress)
+					patch.append("SERVER_PORT: \"{{ %s }}\"\n".formatted(portExpression));
 			}
-
-			if (vendor.equals(FrameworkVendor.Quarkus)) {
-				patch.append("quarkus.management.enabled=true\n");
-				patch.append("quarkus.management.port={{ .Values.healthcheck.port }}\n");
-			}
-
-		}
-
-		// set server port
-		if (context.isCreateIngress()) {
-			if (vendor.equals(FrameworkVendor.Spring)) {
-				patch.append("server.port={{ .Values.service.port }}\n");
-			}
-
-			if (vendor.equals(FrameworkVendor.Quarkus)) {
-				patch.append("quarkus.http.port={{ .Values.service.port }}\n");
+			case Quarkus -> {
+				patch.append("QUARKUS_APPLICATION_NAME: \"{{ .Values.fullnameOverride }}\"\n");
+				patch.append("QUARKUS_LOG_LEVEL: \"DEBUG\"\n");
+				patch.append("QUARKUS_LOG_MIN-LEVEL: \"DEBUG\"\n");
+				patch.append("QUARKUS_LOG_CONSOLE_ENABLE: \"true\"\n");
+				patch.append("QUARKUS_LOG_CONSOLE_FORMAT: \"%d{HH:mm:ss} %-5p [%c] %s%e%n\"\n");
+				if (hasActuator) {
+					patch.append("QUARKUS_MANAGEMENT_ENABLED: \"true\"\n");
+					patch.append("QUARKUS_MANAGEMENT_PORT: \"{{ %s }}\"\n".formatted(healthCheckPortExpression));
+				}
+				if (createIngress)
+					patch.append("QUARKUS_HTTP_PORT: \"{{ %s }}\"\n".formatted(portExpression));
 			}
 		}
 
-		if (vendor.equals(FrameworkVendor.Quarkus)) {
-			patch.append("\nquarkus.log.level=DEBUG\n")
-				.append("quarkus.log.min-level=DEBUG\n")
-				.append("quarkus.log.console.enable=true\n")
-				.append("quarkus.log.console.format=%d{HH:mm:ss} %-5p [%c] %s%e%n\n");
-		}
-
-		return HelmUtil
-			.removeMarkers(TemplateStringPatcher.insertAfter(content, "###@helmify:configmap", patch.toString(), 4));
+		String populatedConfigMap = TemplateStringPatcher.insertAfter(content, "###@helmify:configmap",
+				patch.toString(), 2);
+		return HelmUtil.removeMarkers(populatedConfigMap)
+			.lines()
+			.filter(l -> !l.contains("REMOVE:"))
+			.filter(line -> !line.trim().isEmpty())
+			.collect(Collectors.joining("\r\n"));
 	}
 
 	@Override

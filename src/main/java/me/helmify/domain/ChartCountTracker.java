@@ -3,16 +3,12 @@ package me.helmify.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import me.helmify.domain.events.ChartDownloadedEvent;
-import org.springframework.beans.factory.annotation.Value;
+import me.helmify.app.FileStoreService;
+import me.helmify.domain.ui.counter.ChartDownloadedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.nio.file.FileStore;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Slf4j
 @Component

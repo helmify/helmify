@@ -5,17 +5,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>me.helmify</groupId>
 	<artifactId>helmify</artifactId>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.6.3-SNAPSHOT</version>
 	<description>Generate a Helm Chart based on your app's dependency list</description>
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot-dependencies.version>3.2.2</spring-boot-dependencies.version>
+		<spring-boot-dependencies.version>3.2.6</spring-boot-dependencies.version>
 		<htmx.org.version>1.9.10</htmx.org.version>
 		<htmlunit.version>2.70.0</htmlunit.version>
 		<webjars-locator.version>0.50</webjars-locator.version>

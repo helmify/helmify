@@ -29,3 +29,4 @@ replay_pid*
 chart-count.json
 helm-start.iml
 /helm
+/helmify-data/

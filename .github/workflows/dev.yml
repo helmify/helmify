@@ -20,27 +20,16 @@ jobs:
       uses: actions/checkout@v3
     - name: Set Build Environment
       uses: ./.github/actions/setup-build
-    - name: Start Helmify Docker Container
-      uses: ./.github/actions/run-helmify
-    - name: Set up Cluster
-      uses: ./.github/actions/setup-cluster
-    - name: Install Test App with generated Helm Chart and Verify
-      run: |
-        curl -X POST --data @src/test/resources/pom-with-postgres.xml  -o helm.zip -H "Content-Type: application/json" "http://localhost:8080/api/cli?name=demo&version=0.0.1-SNAPSHOT" && \
-        unzip helm.zip -d helm && \
-        cd helm && helm dependency update && \
-        helm install demo . && \
-        cd .. && \
-        mvn test -Dtest=KindClusterTest -Dexpected-deployments=demo -Dexpected-services=demo,demo-postgresql -Dexpected-pods=demo,demo-postgresql -Dexpected-configs=demo-config -Dexpected-secrets=demo,demo-postgresql
-    - name: Deploy Helmify
-      uses: ./.github/actions/deploy-helmify
+    - name: Build Helmify
+      uses: ./.github/actions/build-helmify
       with:
         dockerhubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Deploy Helmify
+      uses: ./.github/actions/deploy-helmify
+      with:
         deployHost: ${{ secrets.DEPLOY_HOST }}
         deployUsername: ${{ secrets.DEPLOY_USERNAME }}
         deployKey: ${{ secrets.DEPLOY_KEY }}
         deployPort: ${{ secrets.DEPLOY_PORT }}
         instance: helmify-dev
-
-

@@ -1,0 +1,74 @@
+name: Helmify-Testing Mariadb/Elasticsearch/Cassandra/Couchbase
+
+on:
+  workflow_call:
+  push:
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Helmify
+        uses: actions/checkout@v4
+      - name: Checkout Helmify-Testing
+        uses: actions/checkout@v4
+        with:
+          path: 'testing'
+          repository: 'helmify/testing'
+          clean: "false"
+      - name: Tester Build Setup
+        uses: ./.github/actions/setup
+        with:
+          dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Mariadb/Elasticsearch/Cassandra/Couchbase Testers
+        uses: ./.github/actions/build
+        with:
+          name: mecc
+  e2e-spring-mariadb-elasticsearch-cassandra-couchbase:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase with Helm Create Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-mecc
+          type: spring
+          port: 18010
+          expect: mariadb,elasticsearch,cassandra,couchbase
+          chartFlavor: helm
+      - name: Run Spring Mariadb/Elasticsearch/Cassandra/Couchbase with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-mecc
+          type: spring
+          port: 18020
+          expect: mariadb,elasticsearch,cassandra,couchbase
+          chartFlavor: bitnami
+  e2e-quarkus-mariadb-elasticsearch-cassandra-couchbase:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase with Helm Create Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-mecc
+          type: quarkus
+          port: 18030
+          expect: mariadb,elasticsearch,cassandra
+          chartFlavor: helm
+      - name: Run Quarkus Mariadb/Elasticsearch/Cassandra/Couchbase with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-mecc
+          type: quarkus
+          port: 18040
+          expect: mariadb,elasticsearch,cassandra
+          chartFlavor: bitnami

@@ -68,7 +68,7 @@ class SpringInitializrProxyTest {
 	@Test
 	@SneakyThrows
 	void getStarter() {
-		String url = "/spring/starter.zip?bootVersion=3.1.4&javaVersion=17&groupId=com.example&name=demo10&description=demo10&artifactId=demo10&language=java&packaging=jar&packageName=com.example.demo&type=gradle-project&version=0.0.1-SNAPSHOT&dependencies=amqp,postgresql,web";
+		String url = "/spring/starter.zip?bootVersion=3.2.0&javaVersion=17&groupId=com.example&name=demo10&description=demo10&artifactId=demo10&language=java&packaging=jar&packageName=com.example.demo&type=gradle-project&version=0.0.1-SNAPSHOT&dependencies=amqp,postgresql,web";
 		this.mvc.perform(get(url))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType("application/octet-stream"))

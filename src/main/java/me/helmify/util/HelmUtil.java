@@ -1,6 +1,6 @@
 package me.helmify.util;
 
-import me.helmify.domain.FrameworkVendor;
+import me.helmify.domain.helm.dependencies.FrameworkVendor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,14 +24,15 @@ public final class HelmUtil {
 	public static String removeMarkers(String content) {
 		return Arrays.stream(content.split("\n"))
 			.filter(s -> !s.contains("###@helmify"))
+			.filter(s -> !s.contains("REMOVE: "))
 			.collect(Collectors.joining("\n"));
 	}
 
 	public static Map<String, Object> makeSecretKeyRef(String name, String key, String appName) {
 		return Map.of("name", name, "valueFrom",
 				Map.of("secretKeyRef",
-						Map.of("name", "{{ include \"REPLACEME.fullname\" . }}".replace("REPLACEME", appName), "key",
-								key, "optional", false)));
+						Map.of("name", "{{ include \"REPLACEME.fullname\" . }}-secret".replace("REPLACEME", appName),
+								"key", key, "optional", false)));
 	}
 
 	public static Map<String, Object> initContainer(String appName, String dependencyName, String endpoint) {

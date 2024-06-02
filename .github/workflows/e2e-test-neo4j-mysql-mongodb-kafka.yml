@@ -1,0 +1,74 @@
+name: Helmify-Testing Neo4j/Mysql/Mongodb/Kafka
+
+on:
+  workflow_call:
+  push:
+    branches: [ "main", "develop", "feature/**", "fix/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'testing'
+          repository: 'helmify/testing'
+          clean: "false"
+      - name: Set up
+        uses: ./.github/actions/setup
+        with:
+          dockerHubUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Neo4j/Mysql/Mongodb/Kafka Testers
+        uses: ./.github/actions/build
+        with:
+          name: nmmk
+  e2e-spring-neo4j-mysql-mongodb-kafka:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester with Helm Create Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-nmmk
+          type: spring
+          port: 19010
+          expect: neo4j,mysql,mongodb,kafka
+          chartFlavor: helm
+      - name: Run Spring Neo4j/Mysql/Mongodb/Kafka Tester with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: spring-nmmk
+          type: spring
+          port: 19020
+          expect: neo4j,mysql,mongodb,kafka
+          chartFlavor: bitnami
+  e2e-quarkus-neo4j-mysql-mongodb-kafka:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-tester
+      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester with Helm Create Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-nmmk
+          type: quarkus
+          port: 19030
+          expect: neo4j,mysql,mongodb,kafka
+          chartFlavor: helm
+      - name: Run Quarkus Neo4j/Mysql/Mongodb/Kafka Tester with Bitnami Chart
+        uses: ./.github/actions/run-tester
+        with:
+          name: quarkus-nmmk
+          type: quarkus
+          port: 19040
+          expect: neo4j,mysql,mongodb,kafka
+          chartFlavor: bitnami

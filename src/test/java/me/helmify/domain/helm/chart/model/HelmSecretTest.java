@@ -1,5 +1,6 @@
 package me.helmify.domain.helm.chart.model;
 
+import me.helmify.domain.helm.model.HelmSecret;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ class HelmSecretTest {
 		HelmSecret helmSecret = new HelmSecret();
 		helmSecret.setFileName("test");
 		helmSecret.setSecretName("test");
-		helmSecret.setStringData("""
+		helmSecret.setContent("""
 				CASSANDRA_KEYSPACE: {{ .Values.cassandra.keyspaceName }}
 				CASSANDRA_REPLICATION_STRATEGY: SimpleStrategy
 				CASSANDRA_REPLICATION_FACTOR: "1"

@@ -3,8 +3,9 @@ package me.helmify.domain.helm;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.helmify.domain.helm.chart.model.HelmFile;
-import me.helmify.domain.helm.chart.model.HelmSecret;
+import me.helmify.domain.helm.dependencies.DependencyResolver;
+import me.helmify.domain.helm.model.HelmFile;
+import me.helmify.domain.helm.model.HelmSecret;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class HelmChartSlice {
 
 	private Map<String, String> defaultConfig;
 
-	private Map<String, String> preferredChart;
+	private Map<String, Object> preferredChart;
 
 	private Map<String, Object> valuesEntries;
 
@@ -36,5 +37,15 @@ public class HelmChartSlice {
 	private List<HelmFile> extraFiles;
 
 	private String dependencyName;
+
+	private DependencyResolver resolver;
+
+	public boolean hasExtraFiles() {
+		return extraFiles != null && !extraFiles.isEmpty();
+	}
+
+	public boolean hasExtraSecrets() {
+		return extraSecrets != null && !extraSecrets.isEmpty();
+	}
 
 }

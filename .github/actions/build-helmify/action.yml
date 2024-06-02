@@ -1,0 +1,27 @@
+name: Build Helmify
+description: Build Helmify
+
+inputs:
+  dockerhubUsername:
+    required: true
+    description: 'The username for Docker Hub'
+  dockerhubToken:
+    required: true
+    description: 'The token for Docker Hub'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ inputs.dockerhubUsername }}
+        password: ${{ inputs.dockerhubToken }}
+    - name: Build Helmify
+      shell: bash
+      run: |  
+        mvn clean compile spring-boot:build-image -Dspring-boot.build-image.imageName=helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} --file pom.xml && 
+        docker push helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} && 
+        docker tag helmify/helmify:${{ github.run_id }}${{ github.run_attempt }} helmify/helmify:dev &&
+        docker push helmify/helmify:dev
+        

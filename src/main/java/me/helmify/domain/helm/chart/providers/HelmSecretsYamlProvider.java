@@ -1,29 +1,17 @@
 package me.helmify.domain.helm.chart.providers;
 
 import me.helmify.domain.helm.HelmContext;
-import me.helmify.domain.helm.chart.customizers.TemplateStringPatcher;
+import me.helmify.domain.helm.chart.TemplateStringPatcher;
 import me.helmify.util.HelmUtil;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 public class HelmSecretsYamlProvider implements HelmFileProvider {
 
-	private static final String template = """
-			apiVersion: v1
-			kind: Secret
-			metadata:
-			  name: {{ include "REPLACEME.fullname" . }}
-			  namespace: {{ .Release.Namespace }}
-			  labels:
-			    {{- include "REPLACEME.labels" . | nindent 4 }}
-			type: Opaque
-			data:
-			###@helmify:secrets
-			""";
-
 	@Override
-	public String getFileContent(HelmContext context) {
-		String template = HelmSecretsYamlProvider.template.replace("REPLACEME", context.getAppName());
+	public String patchContent(String content, HelmContext context) {
 		StringBuffer patch = new StringBuffer();
 
 		context.getHelmChartSlices()
@@ -32,8 +20,14 @@ public class HelmSecretsYamlProvider implements HelmFileProvider {
 			.flatMap(f -> f.getSecretEntries().entrySet().stream())
 			.forEach(e -> patch.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
 
-		String patched = TemplateStringPatcher.insertAfter(template, "###@helmify:secrets", patch.toString(), 2);
+		String patched = TemplateStringPatcher.insertAfter(content, "###@helmify:secrets", patch.toString(), 2);
 		return HelmUtil.removeMarkers(patched);
+	}
+
+	@Override
+	public String getFileContent(HelmContext context) {
+		String template = readTemplate("helm/templates/secrets.yaml").replaceAll("REPLACE_ME", context.getAppName());
+		return patchContent(template, context);
 	}
 
 	@Override
